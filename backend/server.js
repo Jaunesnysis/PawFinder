@@ -7,7 +7,7 @@ require("dotenv").config();
 
 // Importuojame abiejų darbus
 const petRoutes = require('./src/Modules/Animals/API/petRoutes');
-const questionnaireRouter = require('./src/Modules/Questionnaire/API/questionnaireRouter');
+const questionnaireRouter = require('./src/Modules/Questionnaire/API/questionnaire');
 
 const app = express();
 const PORT = process.env.PORT || 5050;

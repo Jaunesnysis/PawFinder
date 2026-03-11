@@ -2,7 +2,9 @@ const mockPets = [
     { pet_id: 1, name: "Rikis", city: "Vilnius", status: "Laisvas", species: "Šuo" },
     { pet_id: 2, name: "Mika", city: "Kaunas", status: "Laisvas", species: "Katė" },
     { pet_id: 3, name: "Bosas", city: "Vilnius", status: "Rezervuotas", species: "Šuo" },
-    { pet_id: 4, name: "Murka", city: "Vilnius", status: "Laisvas", species: "Katė" }
+    { pet_id: 4, name: "Murka", city: "Vilnius", status: "Laisvas", species: "Katė" },
+    { pet_id: 5, name: "Lakis", city: "Vilnius", status: "Laisvas", species: "Šuo" },
+    { pet_id: 5, name: "Perla", city: "Vilnius", status: "Laisvas", species: "Katė" }
 ];
 
 // Funkcija, kurią vėliau pakeisime į SQL užklausą
