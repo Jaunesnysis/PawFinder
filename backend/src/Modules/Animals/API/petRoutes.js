@@ -25,4 +25,19 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Šitas maršrutas imituoja AC1.2 - statuso pasikeitimą realiu laiku
+router.post('/broadcast-status', (req, res) => {
+    // Pasiimame 'io' objektą, kurį užsetinom server.js faile
+    const io = req.app.get('io');
+
+    // Transliuojame įvykį "StatusChanged" (kaip nurodyta Subtask 2)
+    // Šią žinutę gaus visi prisijungę React vartotojai
+    io.emit('StatusChanged', {
+        message: 'Gyvūno statusas pasikeitė!',
+        updateAt: new Date()
+    });
+
+    res.json({ success: true, message: 'Real-time pranešimas išsiųstas' });
+});
+
 module.exports = router;
