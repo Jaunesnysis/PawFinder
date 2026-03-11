@@ -4,7 +4,9 @@ const helmet = require("helmet");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5050;
+
+const animalsController = require("./src/Modules/Animals/API/animals.controller");
 
 app.use(helmet());
 app.use(cors());
@@ -17,3 +19,8 @@ app.get("/health", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Serveris paleistas ant porto ${PORT}`);
 });
+
+app.post(
+  "/api/animals/generate-description",
+  animalsController.generateDescription,
+);
