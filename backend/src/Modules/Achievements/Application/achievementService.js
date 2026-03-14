@@ -36,36 +36,40 @@ const addPoints = async (userId, pointsToAdd) =>{
  */
 const getAchievementProgress = async (userId) => {
     const currentPoints = await userService.getUserPoints(userId);
-
     const allAchievements = await achievementRepository.getAllAchievements();
     const earnedBadgeIds = await achievementRepository.getEarnedBadgeIds(userId);
 
-    // Surandame pasiekimus, kurių vartotojas dar neturi
-    const lockedAchievements = allAchievements
+    // 1. Surandame TIK tuos pasiekimus, kuriuos vartotojas JAU uždirbo
+    const earnedBadges = allAchievements.filter(ach =>
+        earnedBadgeIds.includes(ach.achievement_id)
+    );
+
+    // 2. Surandame artimiausią dar neuždirbtą pasiekimą
+    const locked = allAchievements
         .filter(ach => !earnedBadgeIds.includes(ach.achievement_id))
-        .sort((a, b) => a.points_threshold - b.points_threshold); // Rikiuojame pagal taškų ribą
+        .sort((a, b) => a.points_threshold - b.points_threshold);
 
-    // Jei vartotojas jau turi visus pasiekimus
-    if (lockedAchievements.length === 0) {
-        return {
-            total_points: currentPoints,
-            next_achievement: null,
-            message: "Visi pasiekimai jau pasiekti!"
-        };
-    }
+    const nextBadge = locked.length > 0 ? locked[0] : null;
 
-    const nextBadge = lockedAchievements[0];
-    const pointsMissing = nextBadge.points_threshold - currentPoints;
-
-    return {
+    // Paruošiame atsakymo objektą
+    const response = {
         total_points: currentPoints,
-        next_achievement: {
+        earned_badges: earnedBadges,
+        next_achievement: nextBadge ? {
             title: nextBadge.title,
             points_threshold: nextBadge.points_threshold,
-            points_missing: pointsMissing > 0 ? pointsMissing : 0
-        }
+            points_missing: Math.max(0, nextBadge.points_threshold - currentPoints)
+        } : null
     };
-}
+
+    // AC4: Jei visi gauti, pridedame žinutę (kad testas būtų PASS)
+    if (!nextBadge) {
+        response.message = "Visi pasiekimai jau pasiekti!";
+    }
+
+    return response;
+};
+
 
 module.exports = {
     addPoints,

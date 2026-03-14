@@ -6,7 +6,8 @@ const mockAchievements = [
 ];
 
 const mockUserAchievements = [
-    { achievement_id: 1, user_id: 1, earned_at: new Date() }
+    { achievement_id: 1, user_id: 1, earned_at: new Date() },
+    { achievement_id: 2, user_id: 1, earned_at: new Date() }
 ];
 
 const { UserAchievement } = require('../Domain/UserAchievement');
