@@ -7,6 +7,7 @@ require("dotenv").config();
 
 // Importuojame abiejų darbus
 const petRoutes = require("./src/Modules/Animals/API/petRoutes");
+const achievementRoutes = require('./src/Modules/Achievements/API/achievementRoutes');
 const questionnaireRouter = require("./src/Modules/Questionnaire/API/questionnaire");
 
 const app = express();
@@ -53,3 +54,5 @@ app.post(
   "/api/animals/generate-description",
   animalsController.generateDescription,
 );
+
+app.use('/api/achievements', achievementRoutes);

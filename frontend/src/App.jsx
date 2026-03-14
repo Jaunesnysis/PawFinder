@@ -11,7 +11,7 @@ function App() {
         <nav style={{ padding: '10px', background: '#ffffff', marginBottom: '20px',  borderRadius: '12px' }}>
             <Link to="/" style={{ marginRight: '40px', color: '#333' }}>Pradžia</Link>
             <Link to="/animals" style={{ marginRight: '40px', color: '#333' }}>Savanoriams (Gyvūnai)</Link>
-            <Link to="/questionnaire" style={{marginRight: '40px', color: '#333'}}>Klausimynas</Link>
+            <Link to="/questionnaire" style={{marginRight: '40px', color: '#333'}}>Klausimynas </Link>
         </nav>
         <Routes>
           <Route path="/" element={<HomePage />} />
