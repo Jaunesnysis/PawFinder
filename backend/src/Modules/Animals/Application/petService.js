@@ -9,8 +9,8 @@ const getAvailablePets = async (city) => {
     return await petRepository.findAvailableByCity(city);
 }
 
-const getAllAvailablePets = async () => {
-    return await petRepository.getAllAvailablePets();
+const getAllAvailablePets = async (filters = {}) => {
+    return await petRepository.getAllAvailablePets(filters);
 }
 
 module.exports = { getAvailablePets, getAllAvailablePets };
