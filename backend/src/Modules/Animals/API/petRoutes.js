@@ -3,6 +3,22 @@ const router = express.Router();
 
 const petService = require('../Application/petService');
 
+
+// Front-ende tu kvieti: http://localhost:5050/api/mainAnimals
+router.get('/mainAnimals', async (req, res) => {
+    try {
+        // Čia kviečiame servisą gauti VISUS laisvus gyvūnus (arba top sąrašą)
+        // Jei petService dar neturi tokio metodo, sukurk jį arba naudok getAvailablePets(null)
+        const pets = await petService.getAllAvailablePets();
+
+        res.json(pets);
+    } catch (error) {
+        console.error("Klaida mainAnimals API:", error);
+        res.status(500).json({ error: "Nepavyko užkrauti pagrindinio sąrašo." });
+    }
+});
+
+
 /**
  * Maršrutas: GET /api/animals
  * Naudojimas: /api/animals?city=Vilnius

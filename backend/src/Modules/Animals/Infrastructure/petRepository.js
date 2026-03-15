@@ -1,3 +1,5 @@
+const { get } = require("../API/petRoutes");
+
 const mockPets = [
     { pet_id: 1, name: "Rikis", city: "Vilnius", status: "Laisvas", species: "Šuo" },
     { pet_id: 2, name: "Mika", city: "Kaunas", status: "Laisvas", species: "Katė" },
@@ -14,6 +16,10 @@ const findAvailableByCity = async (city) => {
     pet.city.toLowerCase() === city.toLowerCase()
     );
 }
+
+const getAllAvailablePets = async () => {
+    return mockPets;
+}
 /*
 const findAvailableByCity = async (city) => {
     const result = await db.query(
@@ -24,4 +30,4 @@ const findAvailableByCity = async (city) => {
 };
  */
 
-module.exports = { findAvailableByCity };
+module.exports = { findAvailableByCity, getAllAvailablePets };
