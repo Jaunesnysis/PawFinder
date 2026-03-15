@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 // Šis komponentas gauna "pet" objektą per "props"
 const AnimalCard = ({ pet }) => {
+    const [isFavorite, setIsFavorite] = useState(false);
+
+    const toggleFavorite = (e) => {
+        e.stopPropagation(); // Prevent card click when clicking heart
+        setIsFavorite(!isFavorite);
+    };
+
     return (
         <div style={{
             border: '1px solid #e1e5e9',
@@ -21,14 +28,37 @@ const AnimalCard = ({ pet }) => {
             }
         }}>
             <div style={{ marginBottom: '16px' }}>
-                <h3 style={{
-                    margin: '0 0 8px 0',
-                    color: '#2c3e50',
-                    fontSize: '1.4em',
-                    fontWeight: '600'
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '8px'
                 }}>
-                    {pet.name}
-                </h3>
+                    <h3 style={{
+                        margin: '0',
+                        color: '#2c3e50',
+                        fontSize: '1.4em',
+                        fontWeight: '600'
+                    }}>
+                        {pet.name}
+                    </h3>
+                    <button
+                        onClick={toggleFavorite}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '2em',
+                            padding: '0',
+                            margin: '0',
+                            color: isFavorite ? '#ff4757' : '#666',
+                            transition: 'color 0.2s ease, transform 0.1s ease'
+                        }}
+                        title={isFavorite ? 'Pašalinti iš mėgstamų' : 'Pridėti prie mėgstamų'}
+                    >
+                        {isFavorite ? '❤️' : '🤍'}
+                    </button>
+                </div>
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
