@@ -129,7 +129,7 @@ const findAvailableByCity = async (city) => {
 }
 
 const getAllAvailablePets = async (filters = {}) => {
-    let pets = mockPetsFull.filter(pet => pet.status === "Laisvas");
+    let pets = mockPetsFull;
 
     // Taikome filtrus jei jie yra
     if (filters.species) {
@@ -162,6 +162,11 @@ const getAllAvailablePets = async (filters = {}) => {
 
     return pets;
 }
+
+const findAvailableByShelterId = async (shelterId) => {
+    return mockPetsFull.filter(pet => pet.status === "Laisvas" && Number(pet.shelter_id) === Number(shelterId));
+};
+
 /*
 const findAvailableByCity = async (city) => {
     const result = await db.query(
@@ -172,4 +177,4 @@ const findAvailableByCity = async (city) => {
 };
  */
 
-module.exports = { findAvailableByCity, getAllAvailablePets };
+module.exports = { findAvailableByCity, getAllAvailablePets, findAvailableByShelterId };
