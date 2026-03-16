@@ -1,3 +1,4 @@
+// Service responsible for generating animal descriptions using AI
 const { generateAnimalDescription } = require("../Infrastructure/geminiClient");
 const {
   buildAnimalDescriptionPrompt,
