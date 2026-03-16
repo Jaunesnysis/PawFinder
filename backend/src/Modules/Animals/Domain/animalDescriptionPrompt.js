@@ -1,3 +1,4 @@
+// Prompt template used for generating animal descriptions
 function buildAnimalDescriptionPrompt(animal) {
   return `
 Tu esi gyvūnų prieglaudos turinio redaktorius.
