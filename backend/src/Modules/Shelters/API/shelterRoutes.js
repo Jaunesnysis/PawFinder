@@ -3,6 +3,18 @@ const router = express.Router();
 
 const shelterService = require('../Application/shelterService');
 
+// GET /api/shelters
+// Returns a list of all shelters
+router.get('/', async (req, res) => {
+    try {
+        const shelters = await shelterService.getAllShelters();
+        res.json(shelters);
+    } catch (error) {
+        console.error('Shelters list error:', error);
+        res.status(500).json({ error: 'Unable to load shelters list' });
+    }
+});
+
 // GET /api/shelters/:shelterId
 // Returns shelter profile and active pets for the shelter.
 router.get('/:shelterId', async (req, res) => {

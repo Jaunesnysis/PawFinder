@@ -42,6 +42,10 @@ const findShelterById = async (shelterId) => {
     return mockShelters.find(s => Number(s.shelter_id) === Number(shelterId)) || null;
 };
 
+const getAllShelters = async () => {
+    return mockShelters;
+};
+
 // Placeholder for when we replace mock data with a real DB
 /*
 const findShelterById = async (shelterId) => {
@@ -51,6 +55,11 @@ const findShelterById = async (shelterId) => {
     );
     return result.rows[0] || null;
 };
+
+const getAllShelters = async () => {
+    const result = await db.query("SELECT * FROM shelters");
+    return result.rows;
+};
 */
 
-module.exports = { findShelterById };
+module.exports = { findShelterById, getAllShelters };

@@ -129,7 +129,7 @@ const findAvailableByCity = async (city) => {
 }
 
 const getAllAvailablePets = async (filters = {}) => {
-    let pets = mockPetsFull.filter(pet => pet.status === "Laisvas");
+    let pets = mockPetsFull;
 
     // Taikome filtrus jei jie yra
     if (filters.species) {

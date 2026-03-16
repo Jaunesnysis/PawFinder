@@ -32,4 +32,18 @@ const getShelterProfile = async (shelterId) => {
     };
 };
 
-module.exports = { getShelterProfile };
+/**
+ * Returns a list of all shelters (without detailed pet info for performance)
+ */
+const getAllShelters = async () => {
+    const shelters = await shelterRepository.getAllShelters();
+    return shelters.map(shelter => ({
+        shelter_id: shelter.shelter_id,
+        name: shelter.name,
+        description: shelter.description,
+        city: shelter.city,
+        contact: shelter.contact
+    }));
+};
+
+module.exports = { getShelterProfile, getAllShelters };
