@@ -8,6 +8,7 @@ require("dotenv").config();
 // Importuojame abiejų darbus
 const petRoutes = require("./src/Modules/Animals/API/petRoutes");
 const achievementRoutes = require('./src/Modules/Achievements/API/achievementRoutes');
+const notificationRoutes = require('./src/Modules/Notifications/API/notificationRoutes');
 const questionnaireRouter = require("./src/Modules/Questionnaire/API/questionnaire");
 const shelterRoutes = require("./src/Modules/Shelters/API/shelterRoutes");
 
@@ -40,6 +41,8 @@ app.get("/health", (req, res) => {
 
 // Registruojame maršrutus
 app.use("/api/pets", petRoutes);
+app.use("/api/achievements", achievementRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/questionnaire", questionnaireRouter);
 app.use("/api/shelters", shelterRoutes);
 

@@ -67,4 +67,48 @@ router.post('/broadcast-status', (req, res) => {
     res.json({ success: true, message: 'Real-time pranešimas išsiųstas' });
 });
 
+/**
+ * POST /api/pets/reservations
+ * Create a new reservation
+ */
+router.post('/reservations', async (req, res) => {
+    try {
+        const { user_id, pet_id, date, reservation_start, reservation_end } = req.body;
+        
+        if (!user_id || !pet_id || !date || !reservation_start || !reservation_end) {
+            return res.status(400).json({ error: 'Trūksta duomenų.' });
+        }
+        
+        const reservation = await petService.createReservation({
+            user_id: parseInt(user_id),
+            pet_id: parseInt(pet_id),
+            date,
+            reservation_start,
+            reservation_end
+        });
+        
+        res.status(201).json(reservation);
+    } catch (error) {
+        console.error('Klaida kuriant rezervaciją:', error);
+        res.status(500).json({ error: error.message || 'Nepavyko sukurti rezervacijos.' });
+    }
+});
+
+/**
+ * POST /api/pets/reservations/:id/cancel
+ * Cancel a reservation
+ */
+router.post('/reservations/:id/cancel', async (req, res) => {
+    try {
+        const reservationId = parseInt(req.params.id);
+        
+        const reservation = await petService.cancelReservation(reservationId);
+        
+        res.json(reservation);
+    } catch (error) {
+        console.error('Klaida atšaukiant rezervaciją:', error);
+        res.status(500).json({ error: error.message || 'Nepavyko atšaukti rezervacijos.' });
+    }
+});
+
 module.exports = router;
