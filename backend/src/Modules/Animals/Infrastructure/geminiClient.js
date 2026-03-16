@@ -1,3 +1,4 @@
+// Client used for communicating with the Gemini API
 const { GoogleGenAI } = require("@google/genai");
 
 const ai = new GoogleGenAI({
