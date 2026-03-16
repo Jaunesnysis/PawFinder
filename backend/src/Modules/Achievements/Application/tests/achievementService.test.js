@@ -86,4 +86,21 @@ describe('AchievementService Logika (FR1 + DeivM)', () => {
         expect(progress.next_achievement).toBeNull();
         expect(progress.message).toBe("Visi pasiekimai jau pasiekti!");
     });
+
+    // TESTAS 5: Critical Situation - User not found (UR4 related: sharing requires valid user)
+    test('Turėtų mesti klaidą, jei vartotojas nerastas (kritinė situacija)', async () => {
+        const userId = 999;
+        userService.getUserPoints.mockRejectedValue(new Error('User not found'));
+
+        await expect(achievementService.getAchievementProgress(userId)).rejects.toThrow('User not found');
+    });
+
+    // TESTAS 6: Critical Situation - Repository failure (UR4 related: sharing data unavailable)
+    test('Turėtų mesti klaidą, jei nepavyksta gauti pasiekimų iš repository (kritinė situacija)', async () => {
+        const userId = 1;
+        userService.getUserPoints.mockResolvedValue(10);
+        achievementRepository.getAllAchievements.mockRejectedValue(new Error('Database connection failed'));
+
+        await expect(achievementService.getAchievementProgress(userId)).rejects.toThrow('Database connection failed');
+    });
 });
