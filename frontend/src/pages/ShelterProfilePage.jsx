@@ -12,7 +12,7 @@ const ShelterProfilePage = () => {
         const fetchShelterProfile = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`http://localhost:5051/api/shelters/${shelterId}`);
+                const response = await fetch(`http://localhost:5050/api/shelters/${shelterId}`);
                 if (!response.ok) {
                     throw new Error('Shelter not found');
                 }

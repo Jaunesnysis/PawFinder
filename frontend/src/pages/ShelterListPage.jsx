@@ -10,7 +10,7 @@ const ShelterListPage = () => {
         const fetchShelters = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('http://localhost:5051/api/shelters');
+                const response = await fetch('http://localhost:5050/api/shelters');
                 if (!response.ok) {
                     throw new Error('Failed to load shelters');
                 }
