@@ -39,4 +39,4 @@ jobs:
         working-directory: ./backend
         env:
           NODE_OPTIONS: --max-old-space-size=4096  # ✅ prevent memory crash
-        run: npm test
+        run: npm test -- --runInBand 
