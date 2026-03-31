@@ -5,7 +5,7 @@ import ProgressInfo from '../../components/Achievements/ProgressInfo';
 
 const AchievementsPage = () => {
     const [data, setData] = useState(null);
-    const userId = 1; // Laikinai naudojame tavo ID: 1
+    const userId = 1;
 
     useEffect(() => {
         fetch(`http://localhost:5050/api/achievements/progress?userId=${userId}`)
@@ -16,20 +16,42 @@ const AchievementsPage = () => {
 
     if (!data) return <div>Kraunama...</div>;
 
+    // --- NAUJAS PATIKRINIMAS KLAIDOMS (TC5 ir TC6 dalis) ---
+    if (data.error) {
+        return (
+            <div style={{
+                padding: '40px',
+                textAlign: 'center',
+                backgroundColor: '#fff0f0',
+                borderRadius: '12px',
+                border: '1px solid #ffc1c1',
+                margin: '20px'
+            }}>
+                <h2 style={{ color: '#d32f2f' }}>⚠️ Prieiga apribota</h2>
+                <p style={{ fontSize: '1.1rem' }}>{data.error}</p>
+                <p style={{ color: '#666' }}>Prašome prisijungti arba kreiptis į administraciją.</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    style={{ padding: '10px 20px', cursor: 'pointer', marginTop: '10px' }}
+                >
+                    Bandyti dar kartą
+                </button>
+            </div>
+        );
+    }
+
+    // Jei klaidos nėra, rodomas normalus puslapis
     return (
         <div className="achievements-page">
             <h1>Sveiki, DeivM!</h1>
 
-            {/* AC1 */}
             <PointsCard points={data.total_points} />
 
-            {/* AC4 - ČIA BUVO KLAIDA: reikia pridėti totalPoints prop'są */}
             <ProgressInfo
                 totalPoints={data.total_points}
                 nextGoal={data.next_achievement}
             />
 
-            {/* Uždirbti ženkleliai */}
             <BadgesGrid earnedBadges={data.earned_badges} />
         </div>
     );

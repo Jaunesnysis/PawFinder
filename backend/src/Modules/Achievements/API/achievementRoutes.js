@@ -11,6 +11,7 @@ const authorizeUser = (req, res, next) => {
     // Pridedame prisijungusio vartotojo ID prie užklausos objekto
     req.user = { id: loggedInUserId };
     next();
+    //return res.status(401).json({ error: "Reikalinga autorizacija" });
 };
 /**
  * Maršrutas: GET /api/achievements/progress
@@ -20,9 +21,12 @@ const authorizeUser = (req, res, next) => {
 router.get('/progress', authorizeUser, async (req, res) => { // Pridėtas authorizeUser
     try {
         const { userId } = req.query;
-
+        // 1. Logas pačioje pradžioje patikrinti ar užklausa išvis ateina
+        console.log("Gauta užklausa! Query duomenys:", req.query);
+        console.log("Prisijungęs vartotojas (iš req.user):", req.user);
         // AC5: Tikriname, ar prašomas ID sutampa su prisijungusio vartotojo ID
         if (parseInt(userId) !== req.user.id) {
+            console.log("403");
             return res.status(403).json({
                 error: "Prieiga uždrausta. Galite matyti tik savo pasiekimus."
             });

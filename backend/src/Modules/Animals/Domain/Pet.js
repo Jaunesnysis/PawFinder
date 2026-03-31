@@ -20,3 +20,4 @@ class Pet {
         this.updated_at = updated_at;
     }
 }
+module.exports = { Pet };

@@ -7,7 +7,7 @@
 
 // Imituojame vartotojų duomenų bazę
 const mockUsers = [
-    { user_id: 1, name: "DeivM", points: 60 }
+    { user_id: 1, name: "DeivM", points: 20 }
 ];
 
 /**
