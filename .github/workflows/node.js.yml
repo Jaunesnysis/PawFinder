@@ -18,7 +18,7 @@ jobs:
       - name: Install and Build Frontend
         working-directory: ./frontend
         run: |
-          npm install
+          npm ci
           npm run build
 
   build-backend:
@@ -35,7 +35,7 @@ jobs:
       - name: Install and Build Backend
         working-directory: ./backend
         run: |
-          npm install
+          npm ci
       - name: Run tests
         working-directory: ./backend
         run: npm test -- --coverage --verbose
