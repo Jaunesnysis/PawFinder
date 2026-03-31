@@ -1,4 +1,6 @@
 const { get } = require("../API/petRoutes");
+const db = require('../../../Infrastructure/db'); // Įsitikink, kad taškų kiekis teisingas
+const { Pet } = require('../Domain/Pet');
 
 const mockPetsFull = [
     {
@@ -121,12 +123,44 @@ const mockPets = [
 ];
 
 // Funkcija, kurią vėliau pakeisime į SQL užklausą
+/*
 const findAvailableByCity = async (city) => {
-    return mockPets.filter(pet =>
+    return mockPetsFull.filter(pet =>
     pet.status === "Laisvas" &&
     pet.city.toLowerCase() === city.toLowerCase()
     );
 }
+ */
+const findAvailableByCity = async (city) => {
+    const result = await db.query(
+        "SELECT * FROM pets WHERE status = 'available' AND city = $1",
+        [city]
+    );
+
+    const petObjects = result.rows.map(row => {
+        return new Pet(
+            row.pet_id,
+            row.shelter_id,
+            row.name,
+            row.species,
+            row.breed,
+            row.age,
+            row.size,
+            row.weight,
+            row.activity_level,
+            row.health_info,
+            row.status,
+            row.city,
+            row.shelter_description,
+            row.ai_description,
+            row.created_at,
+            row.updated_at
+        )
+    })
+    return petObjects;
+};
+
+
 
 const getAllAvailablePets = async (filters = {}) => {
     let pets = mockPetsFull;
@@ -167,14 +201,6 @@ const findAvailableByShelterId = async (shelterId) => {
     return mockPetsFull.filter(pet => pet.status === "Laisvas" && Number(pet.shelter_id) === Number(shelterId));
 };
 
-/*
-const findAvailableByCity = async (city) => {
-    const result = await db.query(
-        "SELECT * FROM pets WHERE status = 'Laisvas' AND city = $1",
-        [city]
-    );
-    return result.rows;
-};
- */
+
 
 module.exports = { findAvailableByCity, getAllAvailablePets, findAvailableByShelterId };
