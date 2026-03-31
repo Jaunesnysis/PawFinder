@@ -8,13 +8,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]  # ✅ swap macOS → ubuntu
+        os: [macos-latest, windows-latest]  
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'                  # ✅ 18 → 20
+          node-version: '20'                  
       - name: Install and Build Frontend
         working-directory: ./frontend
         run: |
@@ -25,13 +25,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]  # ✅ swap macOS → ubuntu
+        os: [macos-latest, windows-latest]  
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'                  # ✅ 18 → 20
+          node-version: '20'           
       - name: Install Backend
         working-directory: ./backend
         run: npm ci
