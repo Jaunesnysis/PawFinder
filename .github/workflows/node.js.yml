@@ -36,7 +36,6 @@ jobs:
         working-directory: ./backend
         run: |
           npm install
-          npm run build
       - name: Run tests
         working-directory: ./backend
         run: npm test -- --coverage --verbose
