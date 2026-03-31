@@ -1,30 +1,42 @@
 name: Testing CI Pipeline
-
 on:
   push:
     branches: [ "main", "dev" ]
 
 jobs:
-  build-and-test:
+  build-frontend:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macOS-latest, windows-latest]
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' 
+          node-version: '18'
+      - name: Install and Build Frontend
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm run build
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project
-        run: npm run build
-
+  build-backend:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macOS-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install and Build Backend
+        working-directory: ./backend
+        run: |
+          npm install
+          npm run build
       - name: Run tests
+        working-directory: ./backend
         run: npm test -- --coverage --verbose
