@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]  # ✅ swap macOS → ubunt
+        os: [ubuntu-latest, windows-latest]  # ✅ swap macOS → ubuntu
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
