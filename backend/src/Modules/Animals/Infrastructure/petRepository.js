@@ -203,4 +203,37 @@ const findAvailableByShelterId = async (shelterId) => {
 
 
 
-module.exports = { findAvailableByCity, getAllAvailablePets, findAvailableByShelterId };
+let mockReservations = [];
+let nextReservationId = 1;
+
+const createReservation = async (reservation) => {
+    const pet = mockPetsFull.find(p => p.pet_id === reservation.pet_id);
+    if (!pet) throw new Error('Pet not found');
+    if (pet.status !== 'Laisvas') throw new Error('Pet not available');
+
+    const newReservation = {
+        reservation_id: nextReservationId++,
+        ...reservation,
+        status: 'pending',
+        created_at: new Date(),
+        cancelled_at: null
+    };
+    mockReservations.push(newReservation);
+    return newReservation;
+};
+
+const cancelReservation = async (reservationId) => {
+    const reservation = mockReservations.find(r => r.reservation_id === reservationId);
+    if (!reservation) throw new Error('Reservation not found');
+    if (reservation.status === 'cancelled') throw new Error('Already cancelled');
+
+    reservation.status = 'cancelled';
+    reservation.cancelled_at = new Date();
+    return reservation;
+};
+
+const getReservationById = async (reservationId) => {
+    return mockReservations.find(r => r.reservation_id === reservationId);
+};
+
+module.exports = { findAvailableByCity, getAllAvailablePets, findAvailableByShelterId, createReservation, cancelReservation, getReservationById };

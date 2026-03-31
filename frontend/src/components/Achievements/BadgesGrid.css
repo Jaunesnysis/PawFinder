@@ -18,6 +18,7 @@
     border-radius: 12px;
     background: #fff;
     transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
 }
 
 .badge-item.earned {
@@ -46,6 +47,54 @@
     font-size: 0.7rem;
     color: #999;
     margin-top: 4px;
+}
+
+.share-btn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.share-btn:hover {
+    background: #1976D2;
+}
+
+.share-options {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10;
+    display: flex;
+    gap: 5px;
+}
+
+.share-options button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.share-options button:nth-child(1) {
+    background: #4267B2;
+    color: white;
+}
+
+.share-options button:nth-child(2) {
+    background: #1DA1F2;
+    color: white;
 }
 
 .badge-item:hover {
