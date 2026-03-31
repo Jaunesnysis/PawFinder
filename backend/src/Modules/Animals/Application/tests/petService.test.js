@@ -1,7 +1,7 @@
 // ✅ ALL mocks BEFORE any require
 jest.mock("../../Infrastructure/petRepository");
 jest.mock("../../../Notifications/Application/notificationService");
-jest.mock("../../../Infrastructure/db", () => ({ query: jest.fn() }));
+jest.mock("../../../../Infrastructure/db", () => ({ query: jest.fn() }));
 
 const petService = require("../petService");
 const petRepository = require("../../Infrastructure/petRepository");
