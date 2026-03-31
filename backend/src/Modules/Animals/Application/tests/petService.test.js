@@ -1,33 +1,35 @@
-const petService = require('../petService');
-const petRepository = require('../../Infrastructure/petRepository');
+// ✅ ALL mocks BEFORE any require
+jest.mock("../../Infrastructure/petRepository");
+jest.mock("../../../Notifications/Application/notificationService");
 
-jest.mock('../../Infrastructure/petRepository');
+const petService = require("../petService");
+const petRepository = require("../../Infrastructure/petRepository");
 
-describe('PetService - getAvailablePets', () => {
+describe("PetService - getAvailablePets", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-    test('turi grąžinti tik laisvus gyvūnus pasirinktame mieste', async () => {
-        // 1. Paruošiame netikrus duomenis, kuriuos "vaidins" Repository
-        const mockData = [
-            { id: 1, name: 'Rikis', city: 'Vilnius', status: 'Laisvas' },
-            { id: 2, name: 'Bosas', city: 'Vilnius', status: 'Rezervuotas' }
-        ];
+  test("turi grąžinti tik laisvus gyvūnus pasirinktame mieste", async () => {
+    const mockData = [
+      { id: 1, name: "Rikis", city: "Vilnius", status: "Laisvas" },
+      { id: 2, name: "Bosas", city: "Vilnius", status: "Rezervuotas" },
+    ];
 
-        // Pasakome, kad repository visada grąžins šiuos duomenis
-        petRepository.findAvailableByCity.mockResolvedValue([mockData[0]]);
+    petRepository.findAvailableByCity.mockResolvedValue([mockData[0]]);
 
-        // 2. Iškviečiame Service funkciją
-        const result = await petService.getAvailablePets('Vilnius');
+    const result = await petService.getAvailablePets("Vilnius");
 
-        // 3. Tikriname rezultatus (Assertions)
-        expect(result).toHaveLength(1); // Turime gauti 1 gyvūną
-        expect(result[0].name).toBe('Rikis'); // Tai turi būti Rikis
-        expect(result[0].status).toBe('Laisvas'); // Statusas turi būti Laisvas
-    });
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("Rikis");
+    expect(result[0].status).toBe("Laisvas");
+  });
 
-    test('turi iškviesti repository su teisingu miesto pavadinimu', async () => {
-        await petService.getAvailablePets('Kaunas');
+  test("turi iškviesti repository su teisingu miesto pavadinimu", async () => {
+    petRepository.findAvailableByCity.mockResolvedValue([]);
 
-        // Tikriname, ar Service sluoksnis kreipėsi į Repository su teisingu parametru
-        expect(petRepository.findAvailableByCity).toHaveBeenCalledWith('Kaunas');
-    });
+    await petService.getAvailablePets("Kaunas");
+
+    expect(petRepository.findAvailableByCity).toHaveBeenCalledWith("Kaunas");
+  });
 });
