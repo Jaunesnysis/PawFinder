@@ -38,4 +38,4 @@ jobs:
           npm ci
       - name: Run tests
         working-directory: ./backend
-        run: npm test -- --coverage --verbose
+        run: npm test -- --coverage --runInBand
