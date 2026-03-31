@@ -8,13 +8,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]  # ✅ swap macOS → ubuntu
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'                  # ✅ 18 → 20
       - name: Install and Build Frontend
         working-directory: ./frontend
         run: |
@@ -25,17 +25,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]  # ✅ swap macOS → ubuntu
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-      - name: Install and Build Backend
+          node-version: '20'                  # ✅ 18 → 20
+      - name: Install Backend
         working-directory: ./backend
-        run: |
-          npm ci
+        run: npm ci
       - name: Run tests
         working-directory: ./backend
-        run: npm test 
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096  # ✅ prevent memory crash
+        run: npm test
