@@ -8,6 +8,7 @@ import ShelterListPage from './pages/ShelterListPage';
 import './App.css';
 import AchievementsPage from "./pages/AchievementsPage/AchievementsPage.jsx";
 import NotificationsPage from "./pages/NotificationsPage/NotificationsPage.jsx";
+import RegistrationPage from './pages/RegistrationPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Link to="/shelters" style={{ marginRight: '40px', color: '#333' }}>Priegaudos</Link>
             <Link to="/animals" style={{ marginRight: '40px', color: '#333' }}>Savanoriams (Gyvūnai)</Link>
             <Link to="/questionnaire" style={{marginRight: '40px', color: '#333'}}>Klausimynas </Link>
+            <Link to="/register" style={{ marginRight: '40px', color: '#333' }}>Registracija</Link>
             <Link to="/achievements" style={{ marginRight: '40px', color: '#4CAF50', fontWeight: 'bold' }}>🏆 Pasiekimai(laikinai)</Link>
             <Link to="/notifications" style={{ marginRight: '40px', color: '#FF9800', fontWeight: 'bold' }}>🔔 Pranešimai</Link>
         </nav>
@@ -31,6 +33,7 @@ function App() {
           <Route path="/shelters/:shelterId" element={<ShelterProfilePage />} />
             <Route path="/achievements" element={<AchievementsPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/register" element={<RegistrationPage />} />
         </Routes>
       </div>
   );

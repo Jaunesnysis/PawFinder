@@ -11,6 +11,7 @@ const achievementRoutes = require('./src/Modules/Achievements/API/achievementRou
 const notificationRoutes = require('./src/Modules/Notifications/API/notificationRoutes');
 const questionnaireRouter = require("./src/Modules/Questionnaire/API/questionnaire");
 const shelterRoutes = require("./src/Modules/Shelters/API/shelterRoutes");
+const userRoutes = require("./src/Modules/Users/API/userRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -45,6 +46,7 @@ app.use("/api/achievements", achievementRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/questionnaire", questionnaireRouter);
 app.use("/api/shelters", shelterRoutes);
+app.use("/api/users", userRoutes);
 
 io.on("connection", (socket) => {
   console.log(`Vartotojas prisijungė: ${socket.id}`);
@@ -59,5 +61,3 @@ app.post(
   "/api/animals/generate-description",
   animalsController.generateDescription,
 );
-
-app.use('/api/achievements', achievementRoutes);
