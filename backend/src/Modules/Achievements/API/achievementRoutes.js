@@ -22,8 +22,7 @@ router.get('/progress', authorizeUser, async (req, res) => { // Pridėtas author
     try {
         const { userId } = req.query;
         // 1. Logas pačioje pradžioje patikrinti ar užklausa išvis ateina
-        console.log("Gauta užklausa! Query duomenys:", req.query);
-        console.log("Prisijungęs vartotojas (iš req.user):", req.user);
+        console.log("Gauta užklausa i Achievement routes! Query duomenys:", req.query);
         // AC5: Tikriname, ar prašomas ID sutampa su prisijungusio vartotojo ID
         if (parseInt(userId) !== req.user.id) {
             console.log("403");
@@ -35,6 +34,7 @@ router.get('/progress', authorizeUser, async (req, res) => { // Pridėtas author
         const progress = await achievementService.getAchievementProgress(userId);
         res.json(progress);
     } catch (error) {
+        console.log("Serverio klaida Achievement Routes GET achievements");
         res.status(500).json({ error: "Serverio klaida." });
     }
 });
@@ -55,6 +55,7 @@ router.post('/add-activity', authorizeUser, async (req, res) => {
         const result = await achievementService.addPoints(userId, pointsToAdd);
         res.json({ message: "Sėkmingai", data: result });
     } catch (error) {
+        console.log("Serverio klaida Achievement Routes Add activity: ", error.message)
         res.status(500).json({ error: "Serverio klaida." });
     }
 });
