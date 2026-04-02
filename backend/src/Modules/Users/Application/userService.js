@@ -1,33 +1,22 @@
 // Modules/Users/Application/userService.js
 //Cia tik mock duomenys, kurie reikalingi achievement servisui
-/**
- * LAIKINAS MOCK SERVISAS
- * Kol kolega nebaigė Users modulio, naudojame šį pakaitalą.
- */
-
-// Imituojame vartotojų duomenų bazę
-const mockUsers = [
-    { user_id: 1, name: "DeivM", points: 20 }
-];
+const userRepository = require("../Infrastructure/userRepository");
 
 /**
  * Prideda taškus vartotojui
  * Naudojamas Achievements modulyje: const updatedUser = await userService.addPointsToUser(...)
  */
 const addPointsToUser = async (userId, amount) => {
-    let user = mockUsers.find(u => u.user_id === parseInt(userId));
-
-    // Jei vartotojo nėra, laikinai jį sukuriam (kad testai nesustotų)
+    const user = await userRepository.findById(userId);
     if (!user) {
-        user = { user_id: parseInt(userId), name: "Naujas Vartotojas", points: 0 };
-        mockUsers.push(user);
+        throw new Error(`Vartotojas su ID ${userId} nerastas.`);
     }
 
-    user.points += amount;
+    user.points+=amount;
 
-    console.log(`[UserService Mock] Vartotojui ${userId} pridėta ${amount} tšk. Viso: ${user.points}`);
+    await userRepository.update(user);
+    console.log(`[UserService] Vartotojui ${userId} pridėta ${amount} tšk. Viso: ${user.points}`);
 
-    // Grąžiname vartotojo objektą, kaip tikisi AchievementService
     return user;
 };
 
@@ -36,7 +25,7 @@ const addPointsToUser = async (userId, amount) => {
  * Naudojamas Achievements modulyje: const currentPoints = await userService.getUserPoints(...)
  */
 const getUserPoints = async (userId) => {
-    const user = mockUsers.find(u => u.user_id === parseInt(userId));
+    const user = await userRepository.findById(userId)
 
     if (!user) return 0;
 

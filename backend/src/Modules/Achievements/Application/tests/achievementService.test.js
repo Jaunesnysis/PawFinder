@@ -1,6 +1,7 @@
 const achievementService = require('../achievementService');
 const achievementRepository = require('../../Infrastructure/achievementRepository');
 const userService = require('../../../Users/Application/userService');
+jest.mock("../../../../Infrastructure/db", () => ({ query: jest.fn() }));
 
 // 1. Mock'iname (imituojame) priklausomybes, kad testuotume tik serviso logiką
 jest.mock('../../Infrastructure/achievementRepository');
