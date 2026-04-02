@@ -2,11 +2,9 @@ const bcrypt = require('bcrypt');
 const User = require('../Domain/User');
 const userRepository = require('../Infrastructure/userRepository');
 
-// Temporary mock users still needed by Achievements module
-const mockUsers = [
-    { user_id: 1, name: "DeivM", points: 20 }
-];
-
+/**
+ * Registruoja naują vartotoją
+ */
 const registerUser = async (userData) => {
     const user = new User(userData);
     const validationErrors = user.validate();
@@ -36,28 +34,33 @@ const registerUser = async (userData) => {
 };
 
 /**
- * Temporary mock logic for Achievements module
+ * Prideda taškus vartotojui
+ * Naudojamas Achievements modulyje
  */
 const addPointsToUser = async (userId, amount) => {
-    let user = mockUsers.find(u => u.user_id === parseInt(userId));
+    const user = await userRepository.findById(userId);
 
     if (!user) {
-        user = { user_id: parseInt(userId), name: "Naujas Vartotojas", points: 0 };
-        mockUsers.push(user);
+        throw new Error(`Vartotojas su ID ${userId} nerastas.`);
     }
 
     user.points += amount;
 
-    console.log(`[UserService Mock] Vartotojui ${userId} pridėta ${amount} tšk. Viso: ${user.points}`);
+    await userRepository.update(user);
+    console.log(`[UserService] Vartotojui ${userId} pridėta ${amount} tšk. Viso: ${user.points}`);
+
     return user;
 };
 
 /**
- * Temporary mock logic for Achievements module
+ * Grąžina vartotojo taškų kiekį
+ * Naudojamas Achievements modulyje
  */
 const getUserPoints = async (userId) => {
-    const user = mockUsers.find(u => u.user_id === parseInt(userId));
+    const user = await userRepository.findById(userId);
+
     if (!user) return 0;
+
     return user.points;
 };
 
