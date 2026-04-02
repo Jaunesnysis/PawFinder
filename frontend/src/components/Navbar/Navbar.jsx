@@ -1,9 +1,8 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
     const location = useLocation();
-    const navigate = useNavigate();
     const token = localStorage.getItem('token');
 
     // 1. Jei esame Login puslapyje (keliu "/"), navigacijos nerodome
