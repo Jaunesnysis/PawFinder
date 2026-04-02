@@ -17,6 +17,7 @@ const PORT = process.env.PORT || 5050;
 
 const recommendationsController = require("./src/Modules/Recommendations/API/recommendations.controller");
 const animalsController = require("./src/Modules/Animals/API/animals.controller");
+const userRoutes = require('./src/Modules/Users/API/userRoutes');
 
 // Svarbu: naudojame http.createServer, kad veiktų WebSockets
 const server = http.createServer(app);
@@ -45,6 +46,7 @@ app.use("/api/achievements", achievementRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/questionnaire", questionnaireRouter);
 app.use("/api/shelters", shelterRoutes);
+app.use('/api/users', userRoutes);
 
 io.on("connection", (socket) => {
   console.log(`Vartotojas prisijungė: ${socket.id}`);
