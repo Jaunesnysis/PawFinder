@@ -1,0 +1,42 @@
+name: Testing CI Pipeline
+on:
+  push:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build-frontend:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]  
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'                  
+      - name: Install and Build Frontend
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build
+
+  build-backend:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]  
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'           
+      - name: Install Backend
+        working-directory: ./backend
+        run: npm ci
+      - name: Run tests
+        working-directory: ./backend
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096  # ✅ prevent memory crash
+        run: npm test -- --runInBand 

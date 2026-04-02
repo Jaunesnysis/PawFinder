@@ -7,7 +7,10 @@ require("dotenv").config();
 
 // Importuojame abiejų darbus
 const petRoutes = require("./src/Modules/Animals/API/petRoutes");
+const achievementRoutes = require('./src/Modules/Achievements/API/achievementRoutes');
+const notificationRoutes = require('./src/Modules/Notifications/API/notificationRoutes');
 const questionnaireRouter = require("./src/Modules/Questionnaire/API/questionnaire");
+const shelterRoutes = require("./src/Modules/Shelters/API/shelterRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -36,9 +39,12 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK", message: "Backend veikia" });
 });
 
-// Registruojame abu maršrutus
+// Registruojame maršrutus
 app.use("/api/pets", petRoutes);
+app.use("/api/achievements", achievementRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/questionnaire", questionnaireRouter);
+app.use("/api/shelters", shelterRoutes);
 
 io.on("connection", (socket) => {
   console.log(`Vartotojas prisijungė: ${socket.id}`);
@@ -53,3 +59,5 @@ app.post(
   "/api/animals/generate-description",
   animalsController.generateDescription,
 );
+
+app.use('/api/achievements', achievementRoutes);
