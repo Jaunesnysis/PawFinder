@@ -77,6 +77,7 @@ const RegistrationPage = () => {
                 setErrors({ general: data.error || 'Registracija nepavyko' });
             }
         } catch (error) {
+            console.error(error);
             setErrors({ general: 'Tinklo klaida. Bandykite vėliau.' });
         } finally {
             setIsSubmitting(false);
