@@ -1,6 +1,5 @@
 const db = require('../../../Infrastructure/db');
 const {User} = require('../Domain/User')
-const {Achievement} = require("../../Achievements/Domain/Achievement");
 
 const findByEmail = async (email) => {
     const query = 'SELECT * FROM users WHERE email = $1';
@@ -12,11 +11,7 @@ const findByEmail = async (email) => {
         if (!row) return null;
 
         // Grąžiname User klasės objektą
-        return new User(
-            row.user_id, row.name, row.surname, row.email, row.phone,
-            row.birth_date, row.password_hash, row.role, row.city,
-            row.points, row.last_earned_at, row.created_at, row.consent_given_at
-        );
+        return new User(row);
     } catch (error) {
         throw new Error(`[userRepository.findByEmail] ${error.message}`);
     }
@@ -31,21 +26,7 @@ const findById = async (userId) => {
 
         if(!row) return null;
 
-        return new User(
-            row.user_id,
-            row.name,
-            row.surname,
-            row.email,
-            row.phone,
-            row.birth_date,
-            row.password_hash,
-            row.role,
-            row.city,
-            row.points,
-            row.last_earned_at,
-            row.created_at,
-            row.consent_given_at
-        );
+        return new User(row);
 
     }catch (error) {
         console.error("Klaida userRepository.findById:", error);
@@ -85,4 +66,18 @@ const update = async (user) => {
         throw error;
     }
 }
-module.exports = {update, findById, findByEmail};
+
+const create = async (userData) => {
+    const { name, surname, email, phone, birthDate, passwordHash } = userData;
+
+    const result = await db.query(
+        `INSERT INTO users (name, surname, email, phone, birth_date, password_hash)
+             VALUES ($1, $2, $3, $4, $5, $6)
+             RETURNING user_id, name, surname, email, phone, birth_date, created_at`,
+        [name, surname, email, phone, birthDate, passwordHash]
+    );
+
+    return result.rows[0];
+}
+
+module.exports = {update, findById, findByEmail, create};

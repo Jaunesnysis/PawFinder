@@ -1,9 +1,8 @@
 // Modules/Users/Application/userService.js
-//Cia tik mock duomenys, kurie reikalingi achievement servisui
 const userRepository = require("../Infrastructure/userRepository");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const User = require('../Domain/User');
+const {User} = require('../Domain/User');
 
 /**
  * Registruoja naują vartotoją

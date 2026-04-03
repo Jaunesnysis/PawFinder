@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -79,7 +79,7 @@ const LoginPage = () => {
                 </form>
 
                 <p className="footer-text">
-                    Neturite paskyros? <span className="link">Registruotis</span>
+                    Neturite paskyros? <Link to="/register" className="link">Registruotis</Link>
                 </p>
             </div>
         </div>

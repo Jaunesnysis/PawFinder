@@ -5,7 +5,7 @@ import ProgressInfo from '../../components/Achievements/ProgressInfo';
 
 const AchievementsPage = () => {
     const [data, setData] = useState(null);
-    const userId = 1;
+    const userId = 1; //Hardcode keisis i token
 
     useEffect(() => {
         fetch(`http://localhost:5050/api/achievements/progress?userId=${userId}`)

@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import QuestionnairePage from './pages/QuestionnairePage';
 import AnimalListPage from "./pages/AnimalListPage/AnimalListPage.jsx";
@@ -10,9 +10,8 @@ import AchievementsPage from "./pages/AchievementsPage/AchievementsPage.jsx";
 import NotificationsPage from "./pages/NotificationsPage/NotificationsPage.jsx";
 import LoginPage from './pages/LoginPage/LoginPage';
 import WelcomePage from './pages/GuestPages/WelcomePage/WelcomePage.jsx';
-
-import './App.css';
-import RegistrationPage from './pages/RegistrationPage';
+import Navbar from './components/Navbar/Navbar';
+import RegistrationPage from './pages/RegistrationPage/RegistrationPage.jsx';
 
 function App() {
     return (

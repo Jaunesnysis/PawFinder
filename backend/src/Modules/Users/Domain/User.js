@@ -1,32 +1,20 @@
 class User {
-    constructor(
-        user_id,
-        name,
-        surname,
-        email,
-        phone,
-        birth_date,
-        password_hash,
-        role,
-        city,
-        points,
-        last_earned_at,
-        created_at,
-        consent_given_at
-    ) {
-        this.id = user_id;
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.phone = phone;
-        this.birth_date = birth_date;
-        this.password_hash = password_hash;
-        this.role = role || 'volunteer'; // Numatytasis vaidmuo
-        this.city = city;
-        this.points = points || 0;
-        this.last_earned_at = last_earned_at;
-        this.created_at = created_at;
-        this.consent_given_at = consent_given_at;
+    constructor(data = {}) {
+        this.id = data.user_id ?? data.id;
+        this.name = data.name;
+        this.surname = data.surname;
+        this.email = data.email;
+        this.phone = data.phone;
+        this.birthDate = data.birthDate ?? data.birth_date;
+        this.birth_date = data.birth_date ?? data.birthDate;
+        this.password = data.password;
+        this.password_hash = data.password_hash;
+        this.role = data.role || 'volunteer';
+        this.city = data.city;
+        this.points = data.points || 0;
+        this.last_earned_at = data.last_earned_at;
+        this.created_at = data.created_at;
+        this.consent_given_at = data.consent_given_at;
     }
 
     getFullName() {
@@ -68,4 +56,4 @@ class User {
     }
 }
 
-module.exports = User;
+module.exports = {User};
