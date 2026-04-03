@@ -29,6 +29,14 @@ class User {
         this.consent_given_at = consent_given_at;
     }
 
+    getFullName() {
+        return `${this.name} ${this.surname}`;
+    }
+
+    isAdmin() {
+        return this.role === 'admin';
+    }
+
     static validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
@@ -49,12 +57,15 @@ class User {
         if (!this.email || !User.validateEmail(this.email)) errors.push('Invalid email format');
         if (!this.phone || this.phone.trim().length === 0) errors.push('Phone is required');
         if (!this.birthDate) errors.push('Birth date is required');
-        if (!this.password || !User.validatePassword(this.password)) {
-            errors.push('Password must be 8-10 characters, contain at least one uppercase letter and one digit');
+
+        if (this.password !== undefined && this.password !== null) {
+            if (!User.validatePassword(this.password)) {
+                errors.push('Password must be 8-10 characters, contain at least one uppercase letter and one digit');
+            }
         }
 
         return errors;
     }
 }
 
-module.exports = { User };
+module.exports = User;

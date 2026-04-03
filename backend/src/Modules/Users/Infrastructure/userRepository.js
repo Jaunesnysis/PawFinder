@@ -23,7 +23,6 @@ const findByEmail = async (email) => {
 };
 
 const findById = async (userId) => {
-
     const query = 'SELECT * FROM users WHERE user_id = $1';
 
     try{

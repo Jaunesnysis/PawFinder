@@ -1,8 +1,40 @@
 // Modules/Users/Application/userService.js
 //Cia tik mock duomenys, kurie reikalingi achievement servisui
 const userRepository = require("../Infrastructure/userRepository");
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const User = require('../Domain/User');
+
+/**
+ * Registruoja naują vartotoją
+ */
+const registerUser = async (userData) => {
+    const user = new User(userData);
+    const validationErrors = user.validate();
+
+    if (validationErrors.length > 0) {
+        throw new Error(`Validation failed: ${validationErrors.join(', ')}`);
+    }
+
+    const existingUser = await userRepository.findByEmail(user.email);
+    if (existingUser) {
+        throw new Error('Email already exists');
+    }
+
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(user.password, saltRounds);
+
+    const createdUser = await userRepository.create({
+        name: user.name,
+        surname: user.surname,
+        email: user.email,
+        phone: user.phone,
+        birthDate: user.birthDate,
+        passwordHash
+    });
+
+    return createdUser;
+};
 
 /**
  * Prideda taškus vartotojui
@@ -66,6 +98,7 @@ const login = async (email, password) => {
 }
 
 module.exports = {
+    registerUser,
     addPointsToUser,
     getUserPoints,
     login

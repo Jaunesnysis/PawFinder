@@ -1,20 +1,18 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-
-// Komponentų importai
-import Navbar from './components/Navbar/Navbar';
+import { Routes, Route, Link } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import QuestionnairePage from './pages/QuestionnairePage';
 import AnimalListPage from "./pages/AnimalListPage/AnimalListPage.jsx";
 import MainAnimalsPage from './pages/MainAnimalsPage';
 import ShelterProfilePage from './pages/ShelterProfilePage';
 import ShelterListPage from './pages/ShelterListPage';
+import './App.css';
 import AchievementsPage from "./pages/AchievementsPage/AchievementsPage.jsx";
 import NotificationsPage from "./pages/NotificationsPage/NotificationsPage.jsx";
 import LoginPage from './pages/LoginPage/LoginPage';
 import WelcomePage from './pages/GuestPages/WelcomePage/WelcomePage.jsx';
 
 import './App.css';
+import RegistrationPage from './pages/RegistrationPage';
 
 function App() {
     return (
@@ -35,6 +33,7 @@ function App() {
                     <Route path="/shelters/:shelterId" element={<ShelterProfilePage />} />
                     <Route path="/achievements" element={<AchievementsPage />} />
                     <Route path="/notifications" element={<NotificationsPage />} />
+                    <Route path="/register" element={<RegistrationPage />} />
                 </Routes>
             </main>
         </div>

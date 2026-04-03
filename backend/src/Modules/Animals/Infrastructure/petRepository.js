@@ -161,9 +161,31 @@ const getAllAvailablePets = async (filters = {}) => {
 };
 
 const findAvailableByShelterId = async (shelterId) => {
-  return mockPetsFull.filter(
-    (pet) =>
-      pet.status === "Laisvas" && Number(pet.shelter_id) === Number(shelterId),
+  const result = await db.query(
+    "SELECT * FROM pets WHERE status = 'available' AND shelter_id = $1",
+    [shelterId]
+  );
+
+  return result.rows.map(
+    (row) =>
+      new Pet(
+        row.pet_id,
+        row.shelter_id,
+        row.name,
+        row.species,
+        row.breed,
+        row.age,
+        row.size,
+        row.weight,
+        row.activity_level,
+        row.health_info,
+        row.status,
+        row.city,
+        row.shelter_description,
+        row.ai_description,
+        row.created_at,
+        row.updated_at
+      )
   );
 };
 

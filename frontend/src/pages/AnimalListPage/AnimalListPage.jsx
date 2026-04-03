@@ -49,7 +49,8 @@ const AnimalListPage = () => {
                 }}>
                     {pets.length > 0 ? (
                         // 2. NAUDOK KORTELĘ ČIA
-                        pets.map(pet => <AnimalCard key={pet.id} pet={pet} />)
+                        //pets.map(pet => <AnimalCard key={pet.id} pet={pet} />)
+                        pets.map(pet => <AnimalCard key={pet.pet_id} pet={pet} />)
                     ) : (
                         <p>Šiame mieste laisvų augintinių nerasta.</p>
                     )}
