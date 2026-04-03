@@ -48,10 +48,45 @@ const isTimeSlotTaken = async (petId, date, reservationStart, reservationEnd) =>
   return result.rows.length > 0;
 };
 
+const getReservationDetails = async (reservationId) => {
+  const result = await db.query(
+    `SELECT r.*, p.name as pet_name, p.shelter_id, u.name as user_name
+     FROM reservations r
+     JOIN pets p ON r.pet_id = p.pet_id
+     JOIN users u ON r.user_id = u.user_id
+     WHERE r.reservation_id = $1`,
+    [reservationId],
+  );
+
+  return result.rows[0] || null;
+};
+
+const cancelReservation = async (reservationId) => {
+  const result = await db.query(
+    `UPDATE reservations 
+     SET status = 'cancelled', cancelled_at = CURRENT_TIMESTAMP 
+     WHERE reservation_id = $1 
+     RETURNING *`,
+    [reservationId],
+  );
+
+  if (result.rows[0]) {
+    // Update pet status back to available
+    const reservation = result.rows[0];
+    await db.query("UPDATE pets SET status = 'available' WHERE pet_id = $1", [
+      reservation.pet_id,
+    ]);
+  }
+
+  return result.rows[0] || null;
+};
+
 module.exports = {
   getPetById,
   getUserById,
   getReservedSlots,
   createReservation,
   isTimeSlotTaken,
+  getReservationDetails,
+  cancelReservation,
 };

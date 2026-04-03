@@ -26,4 +26,15 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.delete('/:id', async (req, res) => {
+  try {
+    const reservationId = parseInt(req.params.id, 10);
+    const cancelled = await reservationService.cancelReservation(reservationId);
+    res.status(200).json({ message: 'Reservation successfully cancelled.', reservation: cancelled });
+  } catch (error) {
+    console.error('Reservation cancellation error:', error);
+    res.status(error.status || 500).json({ error: error.message || 'Internal server error' });
+  }
+});
+
 module.exports = router;

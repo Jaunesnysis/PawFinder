@@ -103,7 +103,36 @@ const createReservation = async (reservation) => {
   return created;
 };
 
+const cancelReservation = async (reservationId) => {
+  if (!reservationId) {
+    throw { status: 400, message: "Reservation ID required" };
+  }
+
+  const reservation = await reservationRepository.getReservationDetails(reservationId);
+  if (!reservation) {
+    throw { status: 404, message: "Reservation not found" };
+  }
+
+  if (reservation.status === "cancelled") {
+    throw { status: 400, message: "Reservation is already cancelled" };
+  }
+
+  const cancelled = await reservationRepository.cancelReservation(reservationId);
+
+  await notificationService.createCancellationNotification(
+    reservation.shelter_id,
+    reservationId,
+    reservation.pet_name,
+    reservation.date,
+    reservation.reservation_start,
+    reservation.reservation_end,
+  );
+
+  return cancelled;
+};
+
 module.exports = {
   getAvailableTimeslots,
   createReservation,
+  cancelReservation,
 };
