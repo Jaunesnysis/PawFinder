@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const petService = require('../Application/petService');
+const reservationService = require('../../Reservations/Application/reservationService');
 
 
 // Front-ende tu kvieti: http://localhost:5050/api/mainAnimals
@@ -71,6 +72,19 @@ router.post('/broadcast-status', (req, res) => {
  * POST /api/pets/reservations
  * Create a new reservation
  */
+router.get('/:id/timeslots', async (req, res) => {
+    try {
+        const petId = parseInt(req.params.id, 10);
+        const date = req.query.date || new Date().toISOString().split('T')[0];
+
+        const slots = await reservationService.getAvailableTimeslots(petId, date);
+        res.json({ pet_id: petId, date, slots });
+    } catch (error) {
+        console.error('Klaida gaunant laisvus slotus:', error);
+        res.status(error.status || 500).json({ error: error.message || 'Nepavyko gauti laisvų slotų.' });
+    }
+});
+
 router.post('/reservations', async (req, res) => {
     try {
         const { user_id, pet_id, date, reservation_start, reservation_end } = req.body;
@@ -87,10 +101,10 @@ router.post('/reservations', async (req, res) => {
             reservation_end
         });
         
-        res.status(201).json(reservation);
+        res.status(201).json({ message: 'Reservation successfully created.', reservation });
     } catch (error) {
         console.error('Klaida kuriant rezervaciją:', error);
-        res.status(500).json({ error: error.message || 'Nepavyko sukurti rezervacijos.' });
+        res.status(error.status || 500).json({ error: error.message || 'Nepavyko sukurti rezervacijos.' });
     }
 });
 
