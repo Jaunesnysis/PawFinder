@@ -78,10 +78,15 @@ const login = async (email, password) => {
         role: user.role
     };
 
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+        throw new Error("JWT_SECRET is not defined. Add JWT_SECRET to backend/.env");
+    }
+
     // expiresIn: '1h' reiškia, kad vartotojas bus atjungtas po valandos
     const token = jwt.sign(
         payload,
-        process.env.JWT_SECRET,
+        jwtSecret,
         { expiresIn: '1h' }
     );
 

@@ -3,7 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const http = require("http");
 const { Server } = require("socket.io");
-require("dotenv").config();
+require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 
 // Importuojame abiejų darbus
 const petRoutes = require("./src/Modules/Animals/API/petRoutes");
@@ -48,6 +48,9 @@ app.use("/api/questionnaire", questionnaireRouter);
 app.use("/api/shelters", shelterRoutes);
 app.use("/api/users", userRoutes);
 app.post("/api/recommendations", recommendationsController.submitQuestionnaire);
+
+const reservationRoutes = require("./src/Modules/Reservations/API/reservationRoutes");
+app.use("/api/reservations", reservationRoutes);
 
 io.on("connection", (socket) => {
   console.log(`Vartotojas prisijungė: ${socket.id}`);
