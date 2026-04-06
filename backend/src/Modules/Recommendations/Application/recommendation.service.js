@@ -1,3 +1,4 @@
+// Service responsible for generating recommendations based on questionnaire answers
 const { getDogs, getCats } = require("../Infrastructure/apiNinjasClient");
 
 async function getRecommendations(data) {
