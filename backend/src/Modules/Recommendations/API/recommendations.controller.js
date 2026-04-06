@@ -1,3 +1,5 @@
+// Controller responsible for handling recommendation requests
+
 const recommendationService = require("../Application/recommendation.service");
 
 async function submitQuestionnaire(req, res) {
