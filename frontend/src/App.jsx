@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import QuestionnairePage from './pages/QuestionnairePage';
+import AnimalListPage from "./pages/AnimalListPage/AnimalListPage.jsx";
+import MainAnimalsPage from './pages/MainAnimalsPage';
+import ShelterProfilePage from './pages/ShelterProfilePage';
+import ShelterListPage from './pages/ShelterListPage';
+import './App.css';
+import AchievementsPage from "./pages/AchievementsPage/AchievementsPage.jsx";
+import NotificationsPage from "./pages/NotificationsPage/NotificationsPage.jsx";
+import LoginPage from './pages/LoginPage/LoginPage';
+import WelcomePage from './pages/GuestPages/WelcomePage/WelcomePage.jsx';
+import Navbar from './components/Navbar/Navbar';
+import RegistrationPage from './pages/RegistrationPage/RegistrationPage.jsx';
 
 function App() {
-  const [count, setCount] = useState(0)
+    return (
+        <div className="app-main-container">
+            {/* Navbar pats nusprendžia ar ir ką rodyti */}
+            <Navbar />
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+            {/* Pagrindinis turinys */}
+            <main style={{ padding: '0 20px' }}>
+                <Routes>
+                    <Route path="/" element={<WelcomePage />} />
+                    <Route path="/login" element={<LoginPage/>}/>
+                    <Route path="/home" element={<HomePage />} />
+                    <Route path="/questionnaire" element={<QuestionnairePage />} />
+                    <Route path="/animals" element={<AnimalListPage />} />
+                    <Route path="/mainAnimals" element={<MainAnimalsPage />} />
+                    <Route path="/shelters" element={<ShelterListPage />} />
+                    <Route path="/shelters/:shelterId" element={<ShelterProfilePage />} />
+                    <Route path="/achievements" element={<AchievementsPage />} />
+                    <Route path="/notifications" element={<NotificationsPage />} />
+                    <Route path="/register" element={<RegistrationPage />} />
+                </Routes>
+            </main>
+        </div>
+    );
 }
 
-export default App
+export default App;
