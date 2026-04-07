@@ -5,6 +5,18 @@ jest.mock("../Application/recommendation.service", () => ({
   getRecommendations: jest.fn(),
 }));
 
+// Nutildome console.log ir console.error pranešimus šio testo metu
+beforeAll(() => {
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+
+// Po visų testų sugrąžiname standartinį konsolės veikimą
+afterAll(() => {
+    console.log.mockRestore();
+    console.error.mockRestore();
+});
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
