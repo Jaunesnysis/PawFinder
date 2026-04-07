@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const authorizeUser = require('../../../Infrastructure/Middleware/authMiddleware');
 
 // POST /api/questionnaire
-router.post('/', (req, res) => {
+router.post('/', authorizeUser, (req, res) => {
   try {
     const data = req.body;
     // Validate that data is object

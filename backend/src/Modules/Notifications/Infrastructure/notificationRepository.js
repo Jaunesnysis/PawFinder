@@ -16,8 +16,8 @@ const createNotification = async (notification) => {
     return newNotification;
 };
 
-const getNotificationsByShelter = async (shelterId) => {
-    return mockNotifications.filter(n => n.shelter_id === shelterId);
+const getNotificationsByUser = async (userId) => {
+    return mockNotifications.filter(n => n.shelter_id === userId);
 };
 
 const markAsRead = async (notificationId) => {
@@ -31,6 +31,6 @@ const markAsRead = async (notificationId) => {
 
 module.exports = {
     createNotification,
-    getNotificationsByShelter,
+    getNotificationsByUser,
     markAsRead
 };

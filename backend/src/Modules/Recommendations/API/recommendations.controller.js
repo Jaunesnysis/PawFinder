@@ -1,6 +1,7 @@
 // Controller responsible for handling recommendation requests
 
 const recommendationService = require("../Application/recommendation.service");
+const authorizeUser = require('../../../Infrastructure/Middleware/authMiddleware');
 
 async function submitQuestionnaire(req, res) {
   try {

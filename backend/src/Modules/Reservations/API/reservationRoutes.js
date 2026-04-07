@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const reservationService = require('../Application/reservationService');
+const authorizeUser = require('../../../Infrastructure/Middleware/authMiddleware');
 
 router.get('/pets/:id/timeslots', async (req, res) => {
   try {
@@ -15,10 +16,14 @@ router.get('/pets/:id/timeslots', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authorizeUser, async (req, res) => {
   try {
-    const payload = req.body;
-    const reservation = await reservationService.createReservation(payload);
+    const bodyData = req.body;
+    const securePayload = {
+          ...bodyData,
+          user_id: req.user.id
+    };
+    const reservation = await reservationService.createReservation(securePayload);
     res.status(201).json({ message: 'Reservation successfully created.', reservation });
   } catch (error) {
     console.error('Reservation creation error:', error);

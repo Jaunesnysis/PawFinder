@@ -18,6 +18,7 @@ const PORT = process.env.PORT || 5050;
 const recommendationsController = require("./src/Modules/Recommendations/API/recommendations.controller");
 const animalsController = require("./src/Modules/Animals/API/animals.controller");
 const userRoutes = require("./src/Modules/Users/API/userRoutes");
+const authorizeUser = require('./src/Infrastructure/Middleware/authMiddleware');
 
 // Svarbu: naudojame http.createServer, kad veiktų WebSockets
 const server = http.createServer(app);
@@ -47,7 +48,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/questionnaire", questionnaireRouter);
 app.use("/api/shelters", shelterRoutes);
 app.use("/api/users", userRoutes);
-app.post("/api/recommendations", recommendationsController.submitQuestionnaire);
+app.post("/api/recommendations", authorizeUser, recommendationsController.submitQuestionnaire);
 
 const reservationRoutes = require("./src/Modules/Reservations/API/reservationRoutes");
 app.use("/api/reservations", reservationRoutes);
