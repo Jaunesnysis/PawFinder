@@ -40,4 +40,5 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: npm test -- --runInBand 
