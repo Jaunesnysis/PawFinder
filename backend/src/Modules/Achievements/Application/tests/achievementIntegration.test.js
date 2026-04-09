@@ -1,6 +1,8 @@
 const achievementService = require('../achievementService');
 const pool = require('../../../../Infrastructure/db');
 
+jest.setTimeout(30000);
+
 describe('Integracija: AchievementService + UserService + real DB', () => {
     const TEST_USER_ID = 4;
 
