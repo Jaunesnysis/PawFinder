@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { questions } from '../data/questions';
+import {useNavigate} from "react-router-dom";
 
 function Questionnaire() {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [petType, setPetType] = useState(null);
+  const navigate = useNavigate();
 
   const handleAnswer = (key, value, type) => {
     const processedValue = type === 'scale' ? parseInt(value) : value;
@@ -60,12 +62,18 @@ function Questionnaire() {
         }
       });
     }
+      const token = localStorage.getItem('token');
 
+      if (!token) {
+          navigate('/login');
+          return;
+      }
     // Send to backend
     try {
-      const res = await fetch('http://localhost:5000/api/questionnaire', {
+      const res = await fetch('http://localhost:5050/api/questionnaire', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`},
         body: JSON.stringify(data)
       });
       const result = await res.json();
