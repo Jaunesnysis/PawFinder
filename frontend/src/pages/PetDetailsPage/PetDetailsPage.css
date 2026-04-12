@@ -1,0 +1,272 @@
+.details-wrapper {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.back-link {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.details-card {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr; /* Kairė dalis šiek tiek platesnė */
+    gap: 40px;
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+}
+
+/* RESPONSIVE: Šitą pamatysi telefone */
+@media (max-width: 950px) {
+    .details-card {
+        grid-template-columns: 1fr; /* Vienas stulpelis */
+        padding: 20px;
+    }
+}
+
+/* Galerija */
+.main-stage {
+    width: 100%;
+    height: 500px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.main-stage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnails {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+}
+
+.thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 3px solid transparent;
+}
+
+.thumb.active {
+    border-color: #4CAF50;
+}
+
+/* Informacija */
+.info-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Bendras ženkliuko stilius */
+.badge-status {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+/* Žalias stilius (Laisvas) */
+.status-available {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+/* Raudonas stilius (Rezervuotas / Kita) */
+.status-reserved {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+/* Pranešimas, kai rezervuota */
+.reserved-message {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    color: #666;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 500;
+    border: 1px dashed #ccc;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2x2 tinklelis savybėms */
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.stat-item {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.stat-item .label {
+    display: block;
+    font-size: 0.75rem;
+    color: #999;
+    text-transform: uppercase;
+}
+
+.stat-item .value {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.ai-section {
+    background: #f0f7ff;
+    border-left: 5px solid #2196F3;
+    padding: 20px;
+    border-radius: 0 15px 15px 0;
+    margin: 20px 0;
+}
+
+.ai-header {
+    font-weight: bold;
+    color: #2196F3;
+    margin-bottom: 5px;
+}
+
+.cta-reserve {
+    width: 100%;
+    padding: 20px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+}
+/* Foninis sluoksnis, kuris užtamsina viską aplinkui */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Užtamsinimas */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Kad būtų virš visko */
+}
+
+/* Pats langelis su turiniu */
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: slideUp 0.3s ease-out;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+/* Laikų pasirinkimo tinklelis */
+.slots-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.slot-btn {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.slot-btn:hover {
+    border-color: #4CAF50;
+    background: #e8f5e9;
+}
+
+.slot-btn.active {
+    background: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+/* Mygtukai apačioje */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    padding: 10px 20px;
+    background: #eee;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-confirm {
+    padding: 10px 20px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Sėkmės pranešimas */
+.success-banner {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    z-index: 10000;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -53,6 +53,30 @@ router.get('/', async (req, res) => {
     }
 });
 
+/**
+ * Maršrutas: GET /api/pets/:id
+ * Naudojimas: /api/pets/5
+ * Parametras: id (Path parameter)
+ */
+router.get('/:id', async (req, res) => {
+    try {
+        // req.params.id paima skaičių tiesiai iš URL adreso
+        const petId = req.params.id;
+
+        const pet = await petService.getPetById(petId);
+        res.json(pet);
+
+    } catch (error) {
+        console.error("Klaida gaunant gyvūno detales:", error.message);
+
+        // Jei klaida "nerastas", grąžiname 404, kitu atveju 500
+        if (error.message.includes("nerastas")) {
+            return res.status(404).json({ error: error.message });
+        }
+        res.status(500).json({ error: "Sistemos klaida bandant gauti gyvūno duomenis." });
+    }
+});
+
 // Šitas maršrutas imituoja AC1.2 - statuso pasikeitimą realiu laiku
 router.post('/broadcast-status', (req, res) => {
     // Pasiimame 'io' objektą, kurį užsetinom server.js faile

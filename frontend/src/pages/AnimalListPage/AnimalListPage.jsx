@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import AnimalCard from '../../components/AnimalCard/AnimalCard.jsx'; // 1. IMPORTUOK KORTELĘ
+import AnimalCard from '../../components/AnimalCard/AnimalCard.jsx';
+import AnimalCardVolunteer from "../../components/AnimalCard/AnimalCardVolunteer.jsx"; // 1. IMPORTUOK KORTELĘ
 
 const socket = io('http://localhost:5050');
 
@@ -50,7 +51,7 @@ const AnimalListPage = () => {
                     {pets.length > 0 ? (
                         // 2. NAUDOK KORTELĘ ČIA
                         //pets.map(pet => <AnimalCard key={pet.id} pet={pet} />)
-                        pets.map(pet => <AnimalCard key={pet.pet_id} pet={pet} />)
+                        pets.map(pet => <AnimalCardVolunteer key={pet.pet_id} pet={pet} />)
                     ) : (
                         <p>Šiame mieste laisvų augintinių nerasta.</p>
                     )}

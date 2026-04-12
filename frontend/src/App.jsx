@@ -12,6 +12,8 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import WelcomePage from './pages/GuestPages/WelcomePage/WelcomePage.jsx';
 import Navbar from './components/Navbar/Navbar';
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage.jsx';
+import PetDetailsPage from './pages/PetDetailsPage/PetDetailsPage';
+
 
 function App() {
     return (
@@ -33,6 +35,7 @@ function App() {
                     <Route path="/achievements" element={<AchievementsPage />} />
                     <Route path="/notifications" element={<NotificationsPage />} />
                     <Route path="/register" element={<RegistrationPage />} />
+                    <Route path="/pets/:id" element={<PetDetailsPage />} />
                 </Routes>
             </main>
         </div>
