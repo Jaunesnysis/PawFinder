@@ -1,28 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReservationModal from '../../components/Reservation/ReservationModal';
 import './PetDetailsPage.css';
 
 const PetDetailsPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // Pagrindinės būsenos
     const [pet, setPet] = useState(null);
     const [activeImg, setActiveImg] = useState(0);
     const [showModal, setShowModal] = useState(false);
-
-    // Rezervacijos būsenos
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [slots, setSlots] = useState([]);
-    const [selectedSlot, setSelectedSlot] = useState(null);
     const [statusMessage, setStatusMessage] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-    const [loadingSlots, setLoadingSlots] = useState(false);
 
-    // Saugumo duomenys
-    const token = localStorage.getItem('token');
-
-    // 1. Užkrauname gyvūno duomenis
     useEffect(() => {
         fetch(`http://localhost:5050/api/pets/${id}`)
             .then(res => {
@@ -31,57 +20,16 @@ const PetDetailsPage = () => {
             })
             .then(data => {
                 setPet(data);
-                // Jei yra nuotraukų, surandame pagrindinę
                 const primaryIdx = data.images.findIndex(img => img.is_primary);
                 if (primaryIdx !== -1) setActiveImg(primaryIdx);
             })
             .catch(err => console.error("Klaida:", err));
     }, [id]);
 
-    // 2. Užkrauname laisvus laikus pasirinktai datai
-    const fetchSlots = async (date) => {
-        setLoadingSlots(true);
-        try {
-            const response = await fetch(`http://localhost:5050/api/pets/${id}/timeslots?date=${date}`);
-            const data = await response.json();
-            setSlots(data.slots || []);
-        } catch (error) {
-            setErrorMessage('Nepavyko užkrauti laikų');
-        } finally {
-            setLoadingSlots(false);
-        }
-    };
-
-    // 3. Rezervacijos kūrimas
-    const handleCreateReservation = async () => {
-        if (!selectedSlot) return setErrorMessage('Pasirinkite laiką.');
-
-        try {
-            const response = await fetch('http://localhost:5050/api/reservations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    pet_id: pet.id,
-                    date: selectedDate,
-                    reservation_start: selectedSlot.reservation_start,
-                    reservation_end: selectedSlot.reservation_end,
-                }),
-            });
-
-            if (!response.ok) throw new Error('Rezervacija nepavyko. Bandykite dar kartą.');
-
-            setStatusMessage('Rezervacija sėkmingai sukurta! 🐾');
-            setShowModal(false);
-            // Po 3 sekundžių nuimame sėkmės pranešimą
-            setTimeout(() => {
-                window.location.reload();
-            }, 3000);
-        } catch (error) {
-            setErrorMessage(error.message);
-        }
+    const handleReservationSuccess = () => {
+        setStatusMessage('Rezervacija sėkmingai sukurta! 🐾');
+        setShowModal(false);
+        setTimeout(() => window.location.reload(), 2000);
     };
 
     if (!pet) return <div className="loading-screen">Kraunama informacija... 🐾</div>;
@@ -101,7 +49,7 @@ const PetDetailsPage = () => {
                         <img
                             src={pet.images && pet.images.length > 0
                                 ? pet.images[activeImg]?.url
-                                : 'https://via.placeholder.com/600x400?text=Nėra+nuotraukos'}
+                                : 'https://placehold.co/600x400?text=Nėra+nuotraukos'}
                             alt={pet.name}
                         />
                     </div>
@@ -163,12 +111,10 @@ const PetDetailsPage = () => {
                         </div>
                     )}
 
+                    {/* VEIKSMO ZONA: Mygtukas rodomas tik jei laisvas */}
                     <div className="action-area">
                         {pet.status === 'available' ? (
-                            <button
-                                className="cta-reserve"
-                                onClick={() => { setShowModal(true); fetchSlots(selectedDate); }}
-                            >
+                            <button className="cta-reserve" onClick={() => setShowModal(true)}>
                                 Rezervuoti pasivaikščiojimą
                             </button>
                         ) : (
@@ -180,51 +126,13 @@ const PetDetailsPage = () => {
                 </div>
             </div>
 
-            {/* Rezervacijos Modalinis langas */}
+            {/* IŠKELTAS KOMPONENTAS (MODALAS) */}
             {showModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h3>Rezervuoti laiką su {pet.name}</h3>
-
-                        <div className="modal-body">
-                            <label>Pasirinkite datą:</label>
-                            <input
-                                type="date"
-                                value={selectedDate}
-                                onChange={(e) => {
-                                    setSelectedDate(e.target.value);
-                                    fetchSlots(e.target.value);
-                                }}
-                            />
-
-                            {loadingSlots ? (
-                                <p className="loading-text">Ieškome laisvų laikų...</p>
-                            ) : (
-                                <div className="slots-container">
-                                    <p>Galimi laikai:</p>
-                                    <div className="slots-grid">
-                                        {slots.length > 0 ? slots.map(slot => (
-                                            <button
-                                                key={slot.reservation_start}
-                                                className={`slot-btn ${selectedSlot?.reservation_start === slot.reservation_start ? 'active' : ''}`}
-                                                onClick={() => setSelectedSlot(slot)}
-                                            >
-                                                {slot.reservation_start.slice(0,5)}
-                                            </button>
-                                        )) : <p className="no-slots">Šiai dienai laisvų laikų nėra.</p>}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {errorMessage && <p className="error-text-modal">{errorMessage}</p>}
-
-                        <div className="modal-actions">
-                            <button className="btn-cancel" onClick={() => setShowModal(false)}>Atšaukti</button>
-                            <button className="btn-confirm" onClick={handleCreateReservation}>Patvirtinti</button>
-                        </div>
-                    </div>
-                </div>
+                <ReservationModal
+                    pet={pet}
+                    onClose={() => setShowModal(false)}
+                    onSuccess={handleReservationSuccess}
+                />
             )}
         </div>
     );
