@@ -1,0 +1,52 @@
+
+.achievements-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.achievements-page h1 {
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.error-container {
+    padding: 40px;
+    text-align: center;
+    background-color: #fff0f0;
+    border-radius: 12px;
+    border: 1px solid #ffc1c1;
+    margin: 20px;
+}
+
+.error-container h2 {
+    color: #d32f2f;
+    margin-top: 0;
+}
+
+.error-message-text {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.error-hint {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.retry-btn {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border: 1px solid #d32f2f;
+    color: #d32f2f;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.retry-btn:hover {
+    background-color: #d32f2f;
+    color: #ffffff;
+}
