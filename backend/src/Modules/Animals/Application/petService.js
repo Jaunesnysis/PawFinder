@@ -39,14 +39,18 @@ const cancelReservation = async (reservationId) => {
 };
 
 const getPetById = async (id) => {
-    // Čia ateityje galėtum tikrinti teises arba transformuoti duomenis
-    const pet = await petRepository.findPetById(id);
+  // Čia ateityje galėtum tikrinti teises arba transformuoti duomenis
+  const pet = await petRepository.findPetById(id);
 
-    if (!pet) {
-        throw new Error("Apgailestaujame, šis gyvūnas nerastas.");
-    }
+  if (!pet) {
+    throw new Error("Apgailestaujame, šis gyvūnas nerastas.");
+  }
 
-    return pet;
+  return pet;
+};
+
+const getDistinctBreeds = async (species) => {
+  return await petRepository.getDistinctBreeds(species);
 };
 
 module.exports = {
@@ -54,5 +58,6 @@ module.exports = {
   getAllAvailablePets,
   createReservation,
   cancelReservation,
-  getPetById
+  getPetById,
+  getDistinctBreeds,
 };
