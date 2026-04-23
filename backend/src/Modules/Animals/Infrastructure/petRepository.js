@@ -57,7 +57,7 @@ const findAvailableByCity = async (city) => {
 }
  */
 const findAvailableByCity = async (city) => {
-    const query = `
+  const query = `
         SELECT p.*, 
         COALESCE(
             (SELECT json_agg(json_build_object(
@@ -71,14 +71,13 @@ const findAvailableByCity = async (city) => {
         FROM pets p
         WHERE p.status = 'available' AND p.city ILIKE $1
     `;
-    try {
-        const result = await db.query(query, [city]);
-        return result.rows.map(row => new Pet(row));
-    } catch (error) {
-        console.error("Klaida findAvailableByCity:", error.message);
-        throw error;
-    }
-
+  try {
+    const result = await db.query(query, [city]);
+    return result.rows.map((row) => new Pet(row));
+  } catch (error) {
+    console.error("Klaida findAvailableByCity:", error.message);
+    throw error;
+  }
 };
 
 const getAllAvailablePets = async (filters = {}) => {
@@ -132,22 +131,16 @@ const getAllAvailablePets = async (filters = {}) => {
   }
 
   const result = await db.query(query, values);
-  return result.rows.map(
-    (row) =>
-      new Pet(row)
-  );
+  return result.rows.map((row) => new Pet(row));
 };
 
 const findAvailableByShelterId = async (shelterId) => {
   const result = await db.query(
     "SELECT * FROM pets WHERE status = 'available' AND shelter_id = $1",
-    [shelterId]
+    [shelterId],
   );
 
-  return result.rows.map(
-    (row) =>
-      new Pet(row)
-  );
+  return result.rows.map((row) => new Pet(row));
 };
 
 let mockReservations = [];
@@ -186,7 +179,7 @@ const getReservationById = async (reservationId) => {
 };
 
 const findPetById = async (id) => {
-    const query = `
+  const query = `
         SELECT p.*,
                COALESCE(
                        (SELECT json_agg(json_build_object(
@@ -201,14 +194,28 @@ const findPetById = async (id) => {
         WHERE p.pet_id = $1
     `;
 
-    try {
-        const result = await db.query(query, [id]);
+  try {
+    const result = await db.query(query, [id]);
 
-        // Jei nerado - grąžiname null, jei rado - supakuojame į Pet klasę
-        return result.rows[0] ? new Pet(result.rows[0]) : null;
-    } catch (error) {
-        throw new Error(`[petRepository.findPetById] ${error.message}`);
-    }
+    // Jei nerado - grąžiname null, jei rado - supakuojame į Pet klasę
+    return result.rows[0] ? new Pet(result.rows[0]) : null;
+  } catch (error) {
+    throw new Error(`[petRepository.findPetById] ${error.message}`);
+  }
+};
+
+const getDistinctBreeds = async (species) => {
+  const speciesMap = {
+    dog: "Šuo",
+    cat: "Katė",
+  };
+  const mappedSpecies = speciesMap[species] || species;
+
+  const result = await db.query(
+    `SELECT DISTINCT breed FROM pets WHERE breed IS NOT NULL AND species ILIKE $1 ORDER BY breed`,
+    [mappedSpecies],
+  );
+  return result.rows.map((row) => row.breed);
 };
 
 module.exports = {
@@ -218,5 +225,6 @@ module.exports = {
   createReservation,
   cancelReservation,
   getReservationById,
-  findPetById
+  findPetById,
+  getDistinctBreeds,
 };
