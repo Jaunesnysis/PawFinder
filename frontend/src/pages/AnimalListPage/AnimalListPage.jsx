@@ -10,8 +10,8 @@ const AnimalListPage = () => {
     const [city, setCity] = useState('Vilnius');
     const [loading, setLoading] = useState(false);
 
-    const fetchPets = async (selectedCity) => {
-        setLoading(true);
+    const fetchPets = async (selectedCity, showLoading = true) => {
+        if (showLoading) setLoading(true);
         try {
             const response = await fetch(`http://localhost:5050/api/pets?city=${selectedCity}`);
 
@@ -25,14 +25,14 @@ const AnimalListPage = () => {
         } catch (error) {
             console.error("Klaida:", error);
         } finally {
-            setLoading(false);
+            if (showLoading) setLoading(false);
         }
     };
 
-    useEffect(()  => { fetchPets(city); }, [city]);
+    useEffect(()  => { fetchPets(city, true); }, [city]);
 
     useEffect(() => {
-        socket.on('StatusChanged', () => fetchPets(city));
+        socket.on('StatusChanged', () => fetchPets(city, false));
         return () => socket.off('StatusChanged');
     }, [city]);
 
