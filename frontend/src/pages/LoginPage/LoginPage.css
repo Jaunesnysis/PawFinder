@@ -1,0 +1,99 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* PAKEITIMAS: vietoj 100vh naudojame vh atėmus navigacijos aukštį */
+    min-height: calc(100vh - 100px);
+    width: 100%;
+    background-color: #f4f7f6;
+    /* IŠTRINK: position: fixed / absolute */
+    /* IŠTRINK: top: 0, left: 0 */
+    /* IŠTRINK: z-index: 9999 */
+}
+
+.login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 420px;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #777;
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.85rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Svarbu, kad padding neišpūstų pločio */
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 10px;
+}
+
+.login-btn:hover {
+    background-color: #45a049;
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+}
+
+.footer-text {
+    margin-top: 25px;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.link {
+    color: #4CAF50;
+    font-weight: bold;
+    cursor: pointer;
+}

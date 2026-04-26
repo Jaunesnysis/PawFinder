@@ -1,3 +1,4 @@
+// Client used for retrieving additional data from ApiNinjas API
 const axios = require("axios");
 
 const BASE_URL = "https://api.api-ninjas.com/v1";

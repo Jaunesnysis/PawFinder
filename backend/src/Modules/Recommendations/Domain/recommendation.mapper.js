@@ -1,3 +1,5 @@
+// Mapper used to convert recommendation results into response objects
+
 function mapApiResponse(items, petType) {
   return items.map((item) => ({
     breedName: item.name,

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import AnimalCard from '../../components/AnimalCard/AnimalCard.jsx'; // 1. IMPORTUOK KORTELĘ
+import AnimalCard from '../../components/AnimalCard/AnimalCard.jsx';
+import AnimalCardVolunteer from "../../components/AnimalCard/AnimalCardVolunteer.jsx"; // 1. IMPORTUOK KORTELĘ
 
 const socket = io('http://localhost:5050');
 
@@ -13,6 +14,12 @@ const AnimalListPage = () => {
         setLoading(true);
         try {
             const response = await fetch(`http://localhost:5050/api/pets?city=${selectedCity}`);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Įvyko klaida");
+            }
+
             const data = await response.json();
             setPets(data);
         } catch (error) {
@@ -22,7 +29,7 @@ const AnimalListPage = () => {
         }
     };
 
-    useEffect(() => { fetchPets(city); }, [city]);
+    useEffect(()  => { fetchPets(city); }, [city]);
 
     useEffect(() => {
         socket.on('StatusChanged', () => fetchPets(city));
@@ -44,12 +51,12 @@ const AnimalListPage = () => {
             {loading ? <p>Kraunama...</p> : (
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                     gap: '20px'
                 }}>
                     {pets.length > 0 ? (
-                        // 2. NAUDOK KORTELĘ ČIA
-                        pets.map(pet => <AnimalCard key={pet.id} pet={pet} />)
+
+                        pets.map(pet => <AnimalCardVolunteer key={pet.pet_id} pet={pet} />)
                     ) : (
                         <p>Šiame mieste laisvų augintinių nerasta.</p>
                     )}
