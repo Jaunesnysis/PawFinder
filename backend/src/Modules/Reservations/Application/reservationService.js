@@ -103,7 +103,57 @@ const createReservation = async (reservation) => {
   return created;
 };
 
+const cancelReservation = async (reservationId) => {
+  // Get reservation details to extract pet_id for pet info
+  const reservation = await reservationRepository.getReservationById(reservationId);
+  if (!reservation) {
+    throw { status: 404, message: "Reservation not found" };
+  }
+
+  // Get pet details for notification
+  const pet = await reservationRepository.getPetById(reservation.pet_id);
+  if (!pet) {
+    throw { status: 404, message: "Pet not found" };
+  }
+
+  // Cancel the reservation
+  const cancelled = await reservationRepository.cancelReservation(reservationId);
+
+  // Create cancellation notification
+  await notificationService.createCancellationNotification(
+    pet.shelter_id,
+    reservation.reservation_id,
+    pet.name,
+    reservation.date,
+    reservation.reservation_start,
+    reservation.reservation_end,
+  );
+
+  return cancelled;
+};
+
+const getUserReservations = async (userId) => {
+  if (!userId) {
+    throw { status: 400, message: "User ID required" };
+  }
+  
+  const reservations = await reservationRepository.getUserReservations(userId);
+  return reservations;
+};
+
+const getShelterReservations = async (shelterId) => {
+  if (!shelterId) {
+    throw { status: 400, message: "Shelter ID required" };
+  }
+  
+  const reservations = await reservationRepository.getShelterReservations(shelterId);
+  return reservations;
+};
+
 module.exports = {
   getAvailableTimeslots,
   createReservation,
+  cancelReservation,
+  getUserReservations,
+  getShelterReservations,
 };

@@ -74,6 +74,16 @@ const Navbar = () => {
                 {/* Bendras visiems */}
                 <Link to="/notifications" style={styles.notificationsLink}>🔔 Pranešimai</Link>
 
+                {/* TIK SAVANORIAMS IR VARTOTOJAMS - Mano rezervacijos */}
+                {(user.role === 'volunteer' || user.role === 'user') && (
+                    <Link to="/my-reservations" style={{...styles.link, color: '#9C27B0'}}>📅 Mano rezervacijos</Link>
+                )}
+
+                {/* TIK PRIEGLAUDOMS - Jų augintinių rezervacijos */}
+                {user.role === 'shelter' && (
+                    <Link to="/my-reservations" style={{...styles.link, color: '#9C27B0'}}>📅 Rezervacijos</Link>
+                )}
+
                 {/* VISIEMS APART PRIEGLAUDŲ - Mėgstamiausi */}
                 {(user.role !== 'shelter') && (
                     <Link to={`/favorites/${user.id}`} style={{...styles.link, color: '#e91e63'}}>❤️ Mėgstamiausi</Link>

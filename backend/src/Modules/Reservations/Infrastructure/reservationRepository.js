@@ -48,10 +48,73 @@ const isTimeSlotTaken = async (petId, date, reservationStart, reservationEnd) =>
   return result.rows.length > 0;
 };
 
+const getReservationById = async (reservationId) => {
+  const result = await db.query(
+    "SELECT * FROM reservations WHERE reservation_id = $1",
+    [reservationId],
+  );
+  return result.rows[0] || null;
+};
+
+const cancelReservation = async (reservationId) => {
+  // Get reservation details first (needed for notification)
+  const reservation = await getReservationById(reservationId);
+  if (!reservation) {
+    throw { status: 404, message: "Reservation not found" };
+  }
+
+  if (reservation.status === "cancelled") {
+    throw { status: 400, message: "Reservation is already cancelled" };
+  }
+
+  // Update reservation status to cancelled
+  const result = await db.query(
+    "UPDATE reservations SET status = 'cancelled' WHERE reservation_id = $1 RETURNING *",
+    [reservationId],
+  );
+
+  // Update pet status back to available
+  await db.query("UPDATE pets SET status = 'available' WHERE pet_id = $1", [
+    reservation.pet_id,
+  ]);
+
+  return result.rows[0];
+};
+
+const getUserReservations = async (userId) => {
+  const result = await db.query(
+    `SELECT r.*, p.name as pet_name, p.shelter_id
+     FROM reservations r
+     JOIN pets p ON r.pet_id = p.pet_id
+     WHERE r.user_id = $1
+     ORDER BY r.date DESC`,
+    [userId],
+  );
+  return result.rows;
+};
+
+const getShelterReservations = async (shelterId) => {
+  const result = await db.query(
+    `SELECT r.*, p.name as pet_name, p.shelter_id,
+            CONCAT(u.name, ' ', u.surname) as user_name, u.email as user_email
+     FROM reservations r
+     JOIN pets p ON r.pet_id = p.pet_id
+     JOIN users u ON r.user_id = u.user_id
+     WHERE p.shelter_id = $1
+     ORDER BY r.date DESC`,
+    [shelterId],
+  );
+  return result.rows;
+};
+
 module.exports = {
   getPetById,
   getUserById,
   getReservedSlots,
   createReservation,
   isTimeSlotTaken,
+  getReservationById,
+  cancelReservation,
+  getUserReservations,
+  getShelterReservations,
 };

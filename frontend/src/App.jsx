@@ -14,6 +14,7 @@ import WelcomePage from './pages/GuestPages/WelcomePage/WelcomePage.jsx';
 import Navbar from './components/Navbar/Navbar';
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage.jsx';
 import PetDetailsPage from './pages/PetDetailsPage/PetDetailsPage';
+import UserReservationsPage from './pages/UserReservationsPage/UserReservationsPage';
 
 
 function App() {
@@ -38,6 +39,8 @@ function App() {
                     <Route path="/register" element={<RegistrationPage />} />
                     <Route path="/favorites/:userid" element={<FavoritesPage/>} />
                     <Route path="/pets/:id" element={<PetDetailsPage />} />
+                    <Route path="/pet-details/:id" element={<PetDetailsPage />} />
+                    <Route path="/my-reservations" element={<UserReservationsPage />} />
                 </Routes>
             </main>
         </div>
