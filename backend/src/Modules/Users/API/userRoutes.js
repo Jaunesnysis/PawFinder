@@ -37,12 +37,12 @@ router.post('/register', async (req, res) => {
  */
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, shelterId } = req.body;
         if (!email || !password) {
             return res.status(400).json({ error: "El. paštas ir slaptažodis yra privalomi." });
         }
 
-        const result = await userService.login(email, password);
+        const result = await userService.login(email, password, shelterId);
 
         // Jei viskas gerai, siunčiame tokeną ir vartotojo info
         res.json(result);

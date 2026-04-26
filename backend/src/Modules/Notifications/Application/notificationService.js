@@ -20,8 +20,8 @@ const createCancellationNotification = async (shelterId, reservationId, petName,
     });
 };
 
-const getNotifications = async (userId) => {
-    return await notificationRepository.getNotificationsByUser(userId);
+const getNotifications = async (userId, shelterId) => {
+    return await notificationRepository.getNotificationsByUser(userId, shelterId);
 };
 
 const markNotificationAsRead = async (notificationId) => {

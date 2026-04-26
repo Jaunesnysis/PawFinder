@@ -19,7 +19,8 @@ const authorizeUser = (req, res, next) => {
         const decoded = jwt.verify(token[1], process.env.JWT_SECRET);
         req.user = {
             id: decoded.userId,
-            role: decoded.role
+            role: decoded.role,
+            shelterId: decoded.shelterId || null
         };
         next();
 

@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const {User} = require('../Domain/User');
 
+// User-Shelter mapping
+const userShelterMapping = require('../userShelterMapping.json');
+
 /**
  * Registruoja naują vartotoją
  */
@@ -73,9 +76,13 @@ const login = async (email, password) => {
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if(!isMatch) throw new Error("Neteisingas slaptažodis");
 
+    // Gauti shelter_id iš mapping'o
+    const shelterId = userShelterMapping[email] || null;
+
     const payload = {
         userId: user.id,
-        role: user.role
+        role: user.role,
+        shelterId: shelterId
     };
 
     const jwtSecret = process.env.JWT_SECRET;
@@ -97,7 +104,8 @@ const login = async (email, password) => {
             name: user.name,
             email: user.email,
             points: user.points,
-            role: user.role
+            role: user.role,
+            shelterId: shelterId
         }
     };
 }

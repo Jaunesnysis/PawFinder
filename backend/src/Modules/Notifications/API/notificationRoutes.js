@@ -10,7 +10,8 @@ const authorizeUser = require('../../../Infrastructure/Middleware/authMiddleware
  */
 router.get('/', authorizeUser, async (req, res) => {
     try {
-        const notifications = await notificationService.getNotifications(req.user.id);
+        // Gauti pranešimus pagal shelter_id iš JWT token'o
+        const notifications = await notificationService.getNotifications(req.user.id, req.user.shelterId);
         res.json(notifications);
     } catch (error) {
         res.status(500).json({ error: 'Serverio klaida.' });
