@@ -7,6 +7,8 @@ const AnimalCard = ({ pet }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(true);
 
+    const canShowFavorite = user.id && user.role !== 'shelter';
+
     useEffect(() => {
         const checkFavorite = async () => {
             if (!user.id || !pet.id) {
@@ -74,6 +76,7 @@ const AnimalCard = ({ pet }) => {
                     }}>
                         {pet.name}
                     </h3>
+                    {canShowFavorite && (
                     <button
                         onClick={toggleFavorite}
                         style={{
@@ -89,7 +92,7 @@ const AnimalCard = ({ pet }) => {
                         title={isFavorite ? 'Pašalinti iš mėgstamų' : 'Pridėti prie mėgstamų'}
                     >
                         {isFavorite ? '❤️' : '🤍'}
-                    </button>
+                    </button>)}
                 </div>
                 <div style={{
                     display: 'flex',
