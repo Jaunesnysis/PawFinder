@@ -105,10 +105,10 @@ describe('NotificationService', () => {
             notificationRepository.getNotificationsByUser.mockResolvedValue(mockNotifications);
 
             // Act
-            const result = await notificationService.getNotifications(101);
+            const result = await notificationService.getNotifications(101, null);
 
             // Assert
-            expect(notificationRepository.getNotificationsByUser).toHaveBeenCalledWith(101);
+            expect(notificationRepository.getNotificationsByUser).toHaveBeenCalledWith(101, null);
             expect(result).toEqual(mockNotifications);
         });
 
@@ -117,7 +117,7 @@ describe('NotificationService', () => {
             notificationRepository.getNotificationsByUser.mockResolvedValue([]);
 
             // Act
-            const result = await notificationService.getNotifications(101);
+            const result = await notificationService.getNotifications(101, null);
 
             // Assert
             expect(result).toEqual([]);
