@@ -36,6 +36,7 @@ function App() {
                     <Route path="/achievements" element={<AchievementsPage />} />
                     <Route path="/notifications" element={<NotificationsPage />} />
                     <Route path="/register" element={<RegistrationPage />} />
+                    <Route path="/favorites/:userid" element={<FavoritesPage/>} />
                     <Route path="/pets/:id" element={<PetDetailsPage />} />
                 </Routes>
             </main>

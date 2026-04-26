@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import io from 'socket.io-client';
 import AnimalCard from '../components/AnimalCard/AnimalCard.jsx';
 
 const socket = io('http://localhost:5050');
 
 const AnimalListPage = () => {
+    const {userid} = useParams();
     const [pets, setPets] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -12,7 +14,7 @@ const AnimalListPage = () => {
         setLoading(true);
         try {
             // Kreipiamės į pagrindinį gyvūnų sąrašą be filtrų
-            const response = await fetch('http://localhost:5050/api/pets/favorites');
+            const response = await fetch(`http://localhost:5050/api/pets/favorites/${userid}`);
             const data = await response.json();
             setPets(data);
         } catch (error) {

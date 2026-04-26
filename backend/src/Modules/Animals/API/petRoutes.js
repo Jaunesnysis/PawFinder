@@ -171,4 +171,46 @@ router.post("/reservations/:id/cancel", async (req, res) => {
   }
 });
 
+router.get("/favorites/:userid", async (req, res) => {
+  try {
+    const userId = req.params.userid;
+    const favorites = await petService.getFavoritesByUserId(userId);
+    res.json(favorites);
+  } catch (error) {
+    console.error("Klaida gaunant mėgstamiausius gyvūnus:", error);
+    res.status(500).json({ error: "Nepavyko gauti mėgstamiausių gyvūnų." });
+  }
+});
+
+router.get('/favorites/:userId/:petId', async (req, res) => {
+  try {
+    const { userId, petId } = req.params;
+    const isFav = await petService.isFavorite(userId, petId);
+    res.json({ isFavorite: isFav });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/favorites/:userId/:petId', async (req, res) => {
+  try {
+    const { userId, petId } = req.params;
+    const result = await petService.addFavorite(userId, petId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Pašalinti iš mėgstamiausių
+router.delete('/favorites/:userId/:petId', async (req, res) => {
+  try {
+    const { userId, petId } = req.params;
+    const result = await petService.removeFavorite(userId, petId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

@@ -73,6 +73,11 @@ const Navbar = () => {
 
                 {/* Bendras visiems */}
                 <Link to="/notifications" style={styles.notificationsLink}>🔔 Pranešimai</Link>
+
+                {/* VISIEMS APART PRIEGLAUDŲ - Mėgstamiausi */}
+                {(user.role !== 'shelter') && (
+                    <Link to={`/favorites/${user.id}`} style={{...styles.link, color: '#e91e63'}}>❤️ Mėgstamiausi</Link>
+                )}
             </div>
 
             {/* DEŠINĖ: Atsijungimas */}

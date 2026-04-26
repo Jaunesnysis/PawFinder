@@ -1,20 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AnimalCard = ({ pet }) => {
     const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const checkFavorite = async () => {
+            if (!user.id || !pet.id) {
+                setLoading(false);
+                return;
+            }
+            
+            try {
+                const response = await fetch(
+                    `http://localhost:5050/api/pets/favorites/${user.id}/${pet.id}`
+                );
+                const data = await response.json();
+                setIsFavorite(data.isFavorite || false);
+            } catch (error) {
+                console.error("Klaida tikrinant mėgstamumą:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkFavorite();
+    }, [user.id, pet.id]);
 
     // Funkcija navigacijai
     const goToDetails = () => {
         navigate(`/pets/${pet.id}`);
     };
 
-    const [isFavorite, setIsFavorite] = useState(false);
+    // funkcija su API iškvietimais
+    const toggleFavorite = async (e) => {
+    e.stopPropagation();
 
-    const toggleFavorite = (e) => {
-        e.stopPropagation(); // Prevent card click when clicking heart
+    try {
+        if (isFavorite) {
+            await fetch(
+                `http://localhost:5050/api/pets/favorites/${user.id}/${pet.id}`,
+                { method: 'DELETE' }
+            );
+        } else {
+            await fetch(
+                `http://localhost:5050/api/pets/favorites/${user.id}/${pet.id}`,
+                { method: 'POST' }
+            );
+        }
         setIsFavorite(!isFavorite);
-    };
+    } catch (error) {
+        console.error("Klaida:", error);
+    }
+};
 
     return (
         <div onClick={goToDetails} style={cardStyle}>

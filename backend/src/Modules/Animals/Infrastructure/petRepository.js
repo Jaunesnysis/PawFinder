@@ -81,7 +81,7 @@ const findAvailableByCity = async (city) => {
 };
 
 const getAllAvailablePets = async (filters = {}) => {
-  let query = "SELECT * FROM pets WHERE status = 'available'";
+  let query = "SELECT * FROM pets WHERE 1=1";
   const values = [];
   let index = 1;
 
@@ -218,6 +218,77 @@ const getDistinctBreeds = async (species) => {
   return result.rows.map((row) => row.breed);
 };
 
+const addFavorite = async (userId, petId) => {
+  try {
+    // Check if already favorited
+    const checkQuery = `
+      SELECT * FROM favourites 
+      WHERE user_id = $1 AND pet_id = $2
+    `;
+    const checkResult = await db.query(checkQuery, [userId, petId]);
+    
+    if (checkResult.rows.length > 0) {
+      return { alreadyExists: true };
+    }
+
+    // Insert new favorite
+    const insertQuery = `
+      INSERT INTO favourites (pet_id, user_id, date)
+      VALUES ($2, $1, NOW())
+      RETURNING *
+    `;
+    const result = await db.query(insertQuery, [userId, petId]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Klaida addFavorite:", error.message);
+    throw error;
+  }
+};
+
+const removeFavorite = async (userId, petId) => {
+  try {
+    const query = `
+      DELETE FROM favourites 
+      WHERE user_id = $1 AND pet_id = $2
+      RETURNING *
+    `;
+    const result = await db.query(query, [userId, petId]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Klaida removeFavorite:", error.message);
+    throw error;
+  }
+};
+
+const getFavoritesByUser = async (userId) => {
+  try {
+    const query = `
+      SELECT p.*
+      FROM favourites f
+      JOIN pets p ON p.pet_id = f.pet_id
+      WHERE f.user_id = $1
+    `;
+    const result = await db.query(query, [userId]);
+    return result.rows.map((row) => new Pet(row));
+  } catch (error) {
+    console.error("Klaida getFavoritesByUser:", error.message);
+    throw error;
+  }
+};
+
+const isFavorite = async (userId, petId) => {  try {
+    const query = `
+      SELECT * FROM favourites 
+      WHERE user_id = $1 AND pet_id = $2
+    `;
+    const result = await db.query(query, [userId, petId]);
+    return result.rows.length > 0;
+  } catch (error) {
+    console.error("Klaida isFavorite:", error.message);
+    throw error;
+  }
+};
+
 module.exports = {
   findAvailableByCity,
   getAllAvailablePets,
@@ -227,4 +298,8 @@ module.exports = {
   getReservationById,
   findPetById,
   getDistinctBreeds,
+  addFavorite,
+  removeFavorite,
+  getFavoritesByUser,
+  isFavorite,
 };
