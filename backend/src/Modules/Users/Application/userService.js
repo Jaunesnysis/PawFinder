@@ -78,10 +78,6 @@ const login = async (email, password) => {
     userId: user.id,
     role: user.role,
   };
-  const payload = {
-    userId: user.id,
-    role: user.role,
-  };
 
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
