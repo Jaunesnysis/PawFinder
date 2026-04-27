@@ -8,6 +8,8 @@ function Questionnaire() {
   const [petType, setPetType] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [retryUsed, setRetryUsed] = useState(false);
   const navigate = useNavigate();
 
   const handleAnswer = (key, value, type) => {
@@ -30,7 +32,8 @@ function Questionnaire() {
     }
   };
 
-  const submit = async () => {
+  const submit = async (isRetry = false) => {
+    setError(null);
     const requiredKeys = ["type"];
     for (let i = 0; i < 6; i++) {
       requiredKeys.push(`${petType}${i}`);
@@ -83,10 +86,24 @@ function Questionnaire() {
       if (result.success) {
         setModalData(result.recommendations);
       } else {
-        alert("Klaida: " + result.messageLt);
+        if (!isRetry) {
+          setError(
+            "Rekomendacijų paslauga šiuo metu nepasiekiama. Bandykite dar kartą.",
+          );
+        } else {
+          setError(
+            "Paslauga vis dar nepasiekiama. Pabandykite po kurio laiko.",
+          );
+        }
       }
     } catch (e) {
-      alert("Error submitting: " + e.message);
+      if (!isRetry) {
+        setError(
+          "Rekomendacijų paslauga šiuo metu nepasiekiama. Bandykite dar kartą.",
+        );
+      } else {
+        setError("Paslauga vis dar nepasiekiama. Pabandykite po kurio laiko.");
+      }
     } finally {
       setLoading(false);
     }
@@ -150,7 +167,9 @@ function Questionnaire() {
           Previous
         </button>
         {isLastStep ? (
-          <button onClick={submit}>Submit</button>
+          <button onClick={() => submit()} disabled={loading || !!error}>
+            Submit
+          </button>
         ) : (
           <button onClick={nextStep} disabled={!canNext}>
             Next
@@ -161,6 +180,39 @@ function Questionnaire() {
       {loading && (
         <div style={{ textAlign: "center", marginTop: "20px" }}>
           <p>🐾 Ieškome geriausio augintinio...</p>
+        </div>
+      )}
+      {error && (
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "20px",
+            padding: "16px",
+            backgroundColor: "#fff0f0",
+            borderRadius: "12px",
+            border: "1px solid #ffc1c1",
+          }}
+        >
+          <p style={{ color: "#d32f2f", marginBottom: "12px" }}>{error}</p>
+          {!retryUsed && (
+            <button
+              onClick={() => {
+                setError(null);
+                setRetryUsed(true);
+                submit(true);
+              }}
+              style={{
+                padding: "10px 24px",
+                backgroundColor: "#f5222d",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+              }}
+            >
+              Bandyti dar kartą
+            </button>
+          )}
         </div>
       )}
 

@@ -53,6 +53,48 @@ const getDistinctBreeds = async (species) => {
   return await petRepository.getDistinctBreeds(species);
 };
 
+const addFavorite = async (userId, petId) => {
+  const userIdNum = parseInt(userId, 10);
+  const petIdNum = parseInt(petId, 10);
+
+  if (isNaN(userIdNum) || isNaN(petIdNum)) {
+    throw new Error("Neteisingi ID.");
+  }
+
+  // Optional: patikrinti ar gyvūnas egzistuoja
+  const pet = await petRepository.findPetById(petIdNum);
+  if (!pet) {
+    throw new Error("Gyvūnas nerastas.");
+  }
+
+  return await petRepository.addFavorite(userIdNum, petIdNum);
+};
+
+const removeFavorite = async (userId, petId) => {
+  const userIdNum = parseInt(userId, 10);
+  const petIdNum = parseInt(petId, 10);
+
+  if (isNaN(userIdNum) || isNaN(petIdNum)) {
+    throw new Error("Neteisingi ID.");
+  }
+
+  return await petRepository.removeFavorite(userIdNum, petIdNum);
+};
+
+const getFavoritesByUserId = async (userId) => {
+  const userIdNum = parseInt(userId, 10);
+
+  if (isNaN(userIdNum)) {
+    throw new Error("Neteisingas user ID.");
+  }
+
+  return await petRepository.getFavoritesByUser(userIdNum);
+};
+
+const isFavorite = async (userId, petId) => {
+  return await petRepository.isFavorite(userId, petId);
+};
+
 module.exports = {
   getAvailablePets,
   getAllAvailablePets,
@@ -60,4 +102,8 @@ module.exports = {
   cancelReservation,
   getPetById,
   getDistinctBreeds,
+  addFavorite,
+  removeFavorite,
+  getFavoritesByUserId,
+  isFavorite,
 };
