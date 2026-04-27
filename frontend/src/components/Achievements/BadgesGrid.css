@@ -96,15 +96,74 @@
 }
 
 .share-options button {
-    padding: 8px 15px;
+    padding: 10px 12px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 1.2rem;
     font-weight: bold;
+    background: #2196F3;
+    color: white;
+    transition: all 0.3s ease;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.share-options button:hover {
+    background: #1976D2;
+    transform: scale(1.1);
 }
 
 .badge-item:hover {
     transform: translateY(-8px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Notifikacijos stiliai */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    animation: slideIn 0.3s ease-out;
+    z-index: 1000;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(450px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification-success {
+    background-color: #4CAF50;
+    color: white;
+    border-left: 4px solid #2e7d32;
+}
+
+.notification-error {
+    background-color: #f44336;
+    color: white;
+    border-left: 4px solid #d32f2f;
+}
+
+@media (max-width: 600px) {
+    .notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
 }

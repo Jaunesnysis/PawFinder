@@ -48,6 +48,20 @@ const isTimeSlotTaken = async (petId, date, reservationStart, reservationEnd) =>
   return result.rows.length > 0;
 };
 
+// Patikrina ar vartotojas jau turi aktyvią rezervaciją tam pačiam augintiniui tą pačią dieną
+const getUserReservationForPetOnDate = async (userId, petId, date) => {
+  const result = await db.query(
+    `SELECT * FROM reservations
+     WHERE user_id = $1
+       AND pet_id = $2
+       AND date = $3
+       AND status IN ('pending','confirmed')`,
+    [userId, petId, date],
+  );
+
+  return result.rows[0] || null;
+};
+
 const getReservationById = async (reservationId) => {
   const result = await db.query(
     "SELECT * FROM reservations WHERE reservation_id = $1",

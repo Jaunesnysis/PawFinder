@@ -43,28 +43,65 @@ const ReservationModal = ({ pet, onClose, onSuccess }) => {
                 }),
             });
 
-            if (!response.ok) throw new Error('Rezervacija nepavyko.');
+            const data = await response.json();
+
+            if (!response.ok) {
+                setErrorMessage('❌ ' + (data.error || 'Rezervacija nepavyko.'));
+                return;
+            }
 
             // Pranešame tėviniam komponentui apie sėkmę
             onSuccess();
         } catch (error) {
-            setErrorMessage(error.message);
+            setErrorMessage('❌ ' + (error.message || 'Klaida kuriant rezervaciją'));
         }
+    };
+
+    const handleSlotClick = (slot) => {
+        // Jei jau pasirinktas laikas, negalima keisti
+        if (selectedSlot !== null) {
+            setErrorMessage('⚠️ Jau pasirinktas laikas. Patvirtinkite arba atšaukite pasirinkimą.');
+            return;
+        }
+        setSelectedSlot(slot);
+        setErrorMessage('');
+    };
+
+    const handleResetSelection = () => {
+        setSelectedSlot(null);
+        setErrorMessage('');
     };
 
     return (
         <div className="modal-overlay">
             <div className="modal-content">
                 <h3>Rezervuoti laiką su {pet.name}</h3>
-                <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
+                
+                {/* Data input - disabled kai jau pasirinktas laikas */}
+                <div>
+                    <label>Pasirinkite datą:</label>
+                    <input 
+                        type="date" 
+                        value={selectedDate} 
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        disabled={selectedSlot !== null}
+                        style={{ opacity: selectedSlot !== null ? 0.5 : 1, cursor: selectedSlot !== null ? 'not-allowed' : 'pointer' }}
+                    />
+                </div>
 
+                {/* Laikai - mygtikai disabled kai jau vienas pasirinktas */}
                 {loadingSlots ? <p>Kraunama...</p> : (
                     <div className="slots-grid">
                         {slots.map(slot => (
                             <button
                                 key={slot.reservation_start}
                                 className={`slot-btn ${selectedSlot === slot ? 'active' : ''}`}
-                                onClick={() => setSelectedSlot(slot)}
+                                onClick={() => handleSlotClick(slot)}
+                                disabled={selectedSlot !== null && selectedSlot !== slot}
+                                style={{
+                                    opacity: selectedSlot !== null && selectedSlot !== slot ? 0.4 : 1,
+                                    cursor: selectedSlot !== null && selectedSlot !== slot ? 'not-allowed' : 'pointer'
+                                }}
                             >
                                 {slot.reservation_start.slice(0,5)}
                             </button>
@@ -72,11 +109,22 @@ const ReservationModal = ({ pet, onClose, onSuccess }) => {
                     </div>
                 )}
 
+                {/* Pasirinkto laiko info */}
+                {selectedSlot && (
+                    <div className="selected-info" style={{ padding: '12px', background: '#e8f5e9', borderRadius: '8px', marginTop: '15px' }}>
+                        <strong>✓ Pasirinktas laikas:</strong> {selectedSlot.reservation_start.slice(0,5)} - {selectedSlot.reservation_end.slice(0,5)}
+                    </div>
+                )}
+
                 {errorMessage && <p className="error-text">{errorMessage}</p>}
 
                 <div className="modal-actions">
-                    <button className="btn-cancel" onClick={onClose}>Atšaukti</button>
-                    <button className="btn-confirm" onClick={handleConfirm}>Patvirtinti</button>
+                    <button className="btn-cancel" onClick={selectedSlot ? handleResetSelection : onClose}>
+                        {selectedSlot ? 'Atšaukti pasirinkimą' : 'Atšaukti'}
+                    </button>
+                    <button className="btn-confirm" onClick={handleConfirm} disabled={!selectedSlot}>
+                        Patvirtinti
+                    </button>
                 </div>
             </div>
         </div>
