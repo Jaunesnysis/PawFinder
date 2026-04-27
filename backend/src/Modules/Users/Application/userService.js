@@ -78,9 +78,22 @@ const login = async (email, password) => {
     userId: user.id,
     role: user.role,
   };
+  const payload = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    throw new Error(
+      "JWT_SECRET is not defined. Add JWT_SECRET to backend/.env",
+    );
+  }
 
   // expiresIn: '1h' reiškia, kad vartotojas bus atjungtas po valandos
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+  // expiresIn: '1h' reiškia, kad vartotojas bus atjungtas po valandos
+  const token = jwt.sign(payload, jwtSecret, { expiresIn: "1h" });
 
   return {
     token: token,
@@ -89,21 +102,9 @@ const login = async (email, password) => {
       name: user.name,
       email: user.email,
       points: user.points,
+      role: user.role,
     },
   };
-};
-
-const getLeaderboard = async (limit = 10) => {
-  const users = await userRepository.getTopUsersByPoints(limit);
-  return users.map((user, index) => ({
-    rank: index + 1,
-    userId: user.user_id,
-    name: user.name,
-    surname: user.surname,
-    city: user.city || null,
-    points: user.points,
-    lastEarnedAt: user.last_earned_at || null,
-  }));
 };
 
 module.exports = {

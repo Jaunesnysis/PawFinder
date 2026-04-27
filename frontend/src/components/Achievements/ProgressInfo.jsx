@@ -1,4 +1,4 @@
-const ProgressInfo = ({ totalPoints, nextGoal }) => {
+const ProgressInfo = ({ totalPoints, nextGoal, userName }) => {
     // Saugiklis, jei duomenys dar kraunasi
     if (totalPoints === undefined) return null;
 
@@ -17,7 +17,7 @@ const ProgressInfo = ({ totalPoints, nextGoal }) => {
                     🏆 Visi pasiekimai pasiekti!
                 </h4>
                 <p style={{ margin: '10px 0 0 0', color: '#555' }}>
-                    Puikus darbas, DeivM! Tu pasiekei visus galimus tikslus.
+                    Puikus darbas, {userName}! Tu pasiekei visus galimus tikslus.
                 </p>
             </div>
         );

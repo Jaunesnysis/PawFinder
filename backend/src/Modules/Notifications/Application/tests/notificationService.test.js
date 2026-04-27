@@ -3,7 +3,7 @@ const notificationService = require('../notificationService');
 // Mock the repository
 jest.mock('../../Infrastructure/notificationRepository', () => ({
     createNotification: jest.fn(),
-    getNotificationsByShelter: jest.fn(),
+    getNotificationsByUser: jest.fn(),
     markAsRead: jest.fn()
 }));
 
@@ -96,28 +96,28 @@ describe('NotificationService', () => {
         });
     });
 
-    describe('getNotificationsForShelter', () => {
-        test('should return notifications for shelter', async () => {
+    describe('getNotifications', () => {
+        test('should return notifications', async () => {
             // Arrange
             const mockNotifications = [
                 { notification_id: 1, shelter_id: 101, message: 'Test' }
             ];
-            notificationRepository.getNotificationsByShelter.mockResolvedValue(mockNotifications);
+            notificationRepository.getNotificationsByUser.mockResolvedValue(mockNotifications);
 
             // Act
-            const result = await notificationService.getNotificationsForShelter(101);
+            const result = await notificationService.getNotifications(101);
 
             // Assert
-            expect(notificationRepository.getNotificationsByShelter).toHaveBeenCalledWith(101);
+            expect(notificationRepository.getNotificationsByUser).toHaveBeenCalledWith(101);
             expect(result).toEqual(mockNotifications);
         });
 
         test('should handle empty notifications list (edge case)', async () => {
             // Arrange
-            notificationRepository.getNotificationsByShelter.mockResolvedValue([]);
+            notificationRepository.getNotificationsByUser.mockResolvedValue([]);
 
             // Act
-            const result = await notificationService.getNotificationsForShelter(101);
+            const result = await notificationService.getNotifications(101);
 
             // Assert
             expect(result).toEqual([]);

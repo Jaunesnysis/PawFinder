@@ -1,3 +1,5 @@
+// Controller responsible for handling recommendation requests
+
 const recommendationService = require("../Application/recommendation.service");
 
 async function submitQuestionnaire(req, res) {
@@ -26,6 +28,13 @@ async function submitQuestionnaire(req, res) {
     console.error("Recommendation error message:", error.message);
     console.error("Recommendation error status:", error.response?.status);
     console.error("Recommendation error data:", error.response?.data);
+
+    if (error.message === "Invalid pet type") {
+      return res.status(400).json({
+        success: false,
+        messageLt: "Neteisingas augintinio tipas.",
+      });
+    }
 
     return res.status(503).json({
       success: false,

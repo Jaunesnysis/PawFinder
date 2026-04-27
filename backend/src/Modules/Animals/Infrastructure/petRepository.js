@@ -57,36 +57,31 @@ const findAvailableByCity = async (city) => {
 }
  */
 const findAvailableByCity = async (city) => {
-  const result = await db.query(
-    "SELECT * FROM pets WHERE status = 'available' AND city = $1",
-    [city],
-  );
-
-  const petObjects = result.rows.map((row) => {
-    return new Pet(
-      row.pet_id,
-      row.shelter_id,
-      row.name,
-      row.species,
-      row.breed,
-      row.age,
-      row.size,
-      row.weight,
-      row.activity_level,
-      row.health_info,
-      row.status,
-      row.city,
-      row.shelter_description,
-      row.ai_description,
-      row.created_at,
-      row.updated_at,
-    );
-  });
-  return petObjects;
+  const query = `
+        SELECT p.*, 
+        COALESCE(
+            (SELECT json_agg(json_build_object(
+                'image_id', img.image_id, 
+                'url', img.image_url, 
+                'is_primary', img.is_primary
+            )) 
+             FROM pet_images img 
+             WHERE img.pet_id = p.pet_id), 
+        '[]') as images
+        FROM pets p
+        WHERE p.status = 'available' AND p.city ILIKE $1
+    `;
+  try {
+    const result = await db.query(query, [city]);
+    return result.rows.map((row) => new Pet(row));
+  } catch (error) {
+    console.error("Klaida findAvailableByCity:", error.message);
+    throw error;
+  }
 };
 
 const getAllAvailablePets = async (filters = {}) => {
-  let query = "SELECT * FROM pets WHERE status = 'available'";
+  let query = "SELECT * FROM pets WHERE 1=1";
   const values = [];
   let index = 1;
 
@@ -136,57 +131,16 @@ const getAllAvailablePets = async (filters = {}) => {
   }
 
   const result = await db.query(query, values);
-
-  return result.rows.map(
-    (row) =>
-      new Pet(
-        row.pet_id,
-        row.shelter_id,
-        row.name,
-        row.species,
-        row.breed,
-        row.age,
-        row.size,
-        row.weight,
-        row.activity_level,
-        row.health_info,
-        row.status,
-        row.city,
-        row.shelter_description,
-        row.ai_description,
-        row.created_at,
-        row.updated_at
-      )
-  );
+  return result.rows.map((row) => new Pet(row));
 };
 
 const findAvailableByShelterId = async (shelterId) => {
   const result = await db.query(
     "SELECT * FROM pets WHERE status = 'available' AND shelter_id = $1",
-    [shelterId]
+    [shelterId],
   );
 
-  return result.rows.map(
-    (row) =>
-      new Pet(
-        row.pet_id,
-        row.shelter_id,
-        row.name,
-        row.species,
-        row.breed,
-        row.age,
-        row.size,
-        row.weight,
-        row.activity_level,
-        row.health_info,
-        row.status,
-        row.city,
-        row.shelter_description,
-        row.ai_description,
-        row.created_at,
-        row.updated_at
-      )
-  );
+  return result.rows.map((row) => new Pet(row));
 };
 
 let mockReservations = [];
@@ -195,7 +149,7 @@ let nextReservationId = 1;
 const createReservation = async (reservation) => {
   const pet = mockPetsFull.find((p) => p.pet_id === reservation.pet_id);
   if (!pet) throw new Error("Pet not found");
-  if (pet.status !== "Laisvas") throw new Error("Pet not available");
+  if (pet.status !== "available") throw new Error("Pet not available");
 
   const newReservation = {
     reservation_id: nextReservationId++,
@@ -224,6 +178,117 @@ const getReservationById = async (reservationId) => {
   return mockReservations.find((r) => r.reservation_id === reservationId);
 };
 
+const findPetById = async (id) => {
+  const query = `
+        SELECT p.*,
+               COALESCE(
+                       (SELECT json_agg(json_build_object(
+                               'image_id', img.image_id,
+                               'url', img.image_url,
+                               'is_primary', img.is_primary
+                                        ))
+                        FROM pet_images img
+                        WHERE img.pet_id = p.pet_id),
+                       '[]') as images
+        FROM pets p
+        WHERE p.pet_id = $1
+    `;
+
+  try {
+    const result = await db.query(query, [id]);
+
+    // Jei nerado - grąžiname null, jei rado - supakuojame į Pet klasę
+    return result.rows[0] ? new Pet(result.rows[0]) : null;
+  } catch (error) {
+    throw new Error(`[petRepository.findPetById] ${error.message}`);
+  }
+};
+
+const getDistinctBreeds = async (species) => {
+  const speciesMap = {
+    dog: "Šuo",
+    cat: "Katė",
+  };
+  const mappedSpecies = speciesMap[species] || species;
+
+  const result = await db.query(
+    `SELECT DISTINCT breed FROM pets WHERE breed IS NOT NULL AND species ILIKE $1 ORDER BY breed`,
+    [mappedSpecies],
+  );
+  return result.rows.map((row) => row.breed);
+};
+
+const addFavorite = async (userId, petId) => {
+  try {
+    // Check if already favorited
+    const checkQuery = `
+      SELECT * FROM favourites 
+      WHERE user_id = $1 AND pet_id = $2
+    `;
+    const checkResult = await db.query(checkQuery, [userId, petId]);
+    
+    if (checkResult.rows.length > 0) {
+      return { alreadyExists: true };
+    }
+
+    // Insert new favorite
+    const insertQuery = `
+      INSERT INTO favourites (pet_id, user_id, date)
+      VALUES ($2, $1, NOW())
+      RETURNING *
+    `;
+    const result = await db.query(insertQuery, [userId, petId]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Klaida addFavorite:", error.message);
+    throw error;
+  }
+};
+
+const removeFavorite = async (userId, petId) => {
+  try {
+    const query = `
+      DELETE FROM favourites 
+      WHERE user_id = $1 AND pet_id = $2
+      RETURNING *
+    `;
+    const result = await db.query(query, [userId, petId]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Klaida removeFavorite:", error.message);
+    throw error;
+  }
+};
+
+const getFavoritesByUser = async (userId) => {
+  try {
+    const query = `
+      SELECT p.*
+      FROM favourites f
+      JOIN pets p ON p.pet_id = f.pet_id
+      WHERE f.user_id = $1
+    `;
+    const result = await db.query(query, [userId]);
+    return result.rows.map((row) => new Pet(row));
+  } catch (error) {
+    console.error("Klaida getFavoritesByUser:", error.message);
+    throw error;
+  }
+};
+
+const isFavorite = async (userId, petId) => {  try {
+    const query = `
+      SELECT * FROM favourites 
+      WHERE user_id = $1 AND pet_id = $2
+    `;
+    const result = await db.query(query, [userId, petId]);
+    return result.rows.length > 0;
+  } catch (error) {
+    console.error("Klaida isFavorite:", error.message);
+    throw error;
+  }
+};
+
 module.exports = {
   findAvailableByCity,
   getAllAvailablePets,
@@ -231,4 +296,10 @@ module.exports = {
   createReservation,
   cancelReservation,
   getReservationById,
+  findPetById,
+  getDistinctBreeds,
+  addFavorite,
+  removeFavorite,
+  getFavoritesByUser,
+  isFavorite,
 };

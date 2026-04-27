@@ -5,6 +5,7 @@ import AnimalListPage from "./pages/AnimalListPage/AnimalListPage.jsx";
 import MainAnimalsPage from './pages/MainAnimalsPage';
 import ShelterProfilePage from './pages/ShelterProfilePage';
 import ShelterListPage from './pages/ShelterListPage';
+import FavoritesPage from './pages/FavoritesPage.jsx';
 import './App.css';
 import AchievementsPage from "./pages/AchievementsPage/AchievementsPage.jsx";
 import NotificationsPage from "./pages/NotificationsPage/NotificationsPage.jsx";
@@ -12,6 +13,8 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import WelcomePage from './pages/GuestPages/WelcomePage/WelcomePage.jsx';
 import Navbar from './components/Navbar/Navbar';
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage.jsx';
+import PetDetailsPage from './pages/PetDetailsPage/PetDetailsPage';
+
 
 function App() {
     return (
@@ -33,6 +36,8 @@ function App() {
                     <Route path="/achievements" element={<AchievementsPage />} />
                     <Route path="/notifications" element={<NotificationsPage />} />
                     <Route path="/register" element={<RegistrationPage />} />
+                    <Route path="/favorites/:userid" element={<FavoritesPage/>} />
+                    <Route path="/pets/:id" element={<PetDetailsPage />} />
                 </Routes>
             </main>
         </div>

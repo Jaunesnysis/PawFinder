@@ -3,12 +3,12 @@ const cors = require("cors");
 const helmet = require("helmet");
 const http = require("http");
 const { Server } = require("socket.io");
-require("dotenv").config();
+require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 
 // Importuojame abiejų darbus
 const petRoutes = require("./src/Modules/Animals/API/petRoutes");
-const achievementRoutes = require('./src/Modules/Achievements/API/achievementRoutes');
-const notificationRoutes = require('./src/Modules/Notifications/API/notificationRoutes');
+const achievementRoutes = require("./src/Modules/Achievements/API/achievementRoutes");
+const notificationRoutes = require("./src/Modules/Notifications/API/notificationRoutes");
 const questionnaireRouter = require("./src/Modules/Questionnaire/API/questionnaire");
 const shelterRoutes = require("./src/Modules/Shelters/API/shelterRoutes");
 
@@ -17,7 +17,8 @@ const PORT = process.env.PORT || 5050;
 
 const recommendationsController = require("./src/Modules/Recommendations/API/recommendations.controller");
 const animalsController = require("./src/Modules/Animals/API/animals.controller");
-const userRoutes = require('./src/Modules/Users/API/userRoutes');
+const userRoutes = require("./src/Modules/Users/API/userRoutes");
+const authorizeUser = require('./src/Infrastructure/Middleware/authMiddleware');
 
 // Svarbu: naudojame http.createServer, kad veiktų WebSockets
 const server = http.createServer(app);
@@ -46,7 +47,11 @@ app.use("/api/achievements", achievementRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/questionnaire", questionnaireRouter);
 app.use("/api/shelters", shelterRoutes);
-app.use('/api/users', userRoutes);
+app.use("/api/users", userRoutes);
+app.post("/api/recommendations", authorizeUser, recommendationsController.submitQuestionnaire);
+
+const reservationRoutes = require("./src/Modules/Reservations/API/reservationRoutes");
+app.use("/api/reservations", reservationRoutes);
 
 io.on("connection", (socket) => {
   console.log(`Vartotojas prisijungė: ${socket.id}`);
@@ -62,4 +67,4 @@ app.post(
   animalsController.generateDescription,
 );
 
-app.use('/api/achievements', achievementRoutes);
+app.use("/api/achievements", achievementRoutes);

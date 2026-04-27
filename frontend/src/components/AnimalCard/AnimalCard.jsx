@@ -1,34 +1,99 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-// Šis komponentas gauna "pet" objektą per "props"
 const AnimalCard = ({ pet }) => {
-    return (
-        <div style={{
-            border: '1px solid #e1e5e9',
-            padding: '20px',
-            borderRadius: '16px',
-            minWidth: '280px',
-            maxWidth: '320px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-            backgroundColor: 'white',
-            textAlign: 'left',
-            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-            cursor: 'pointer',
-            '@media (max-width: 768px)': {
-                minWidth: 'auto',
-                maxWidth: 'none',
-                padding: '16px'
+    const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    const canShowFavorite = user.id && user.role !== 'shelter';
+
+    useEffect(() => {
+        const checkFavorite = async () => {
+            if (!user.id || !pet.id) {
+                setLoading(false);
+                return;
             }
-        }}>
+            
+            try {
+                const response = await fetch(
+                    `http://localhost:5050/api/pets/favorites/${user.id}/${pet.id}`
+                );
+                const data = await response.json();
+                setIsFavorite(data.isFavorite || false);
+            } catch (error) {
+                console.error("Klaida tikrinant mėgstamumą:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkFavorite();
+    }, [user.id, pet.id]);
+
+    // Funkcija navigacijai
+    const goToDetails = () => {
+        navigate(`/pets/${pet.id}`);
+    };
+
+    // funkcija su API iškvietimais
+    const toggleFavorite = async (e) => {
+    e.stopPropagation();
+
+    try {
+        if (isFavorite) {
+            await fetch(
+                `http://localhost:5050/api/pets/favorites/${user.id}/${pet.id}`,
+                { method: 'DELETE' }
+            );
+        } else {
+            await fetch(
+                `http://localhost:5050/api/pets/favorites/${user.id}/${pet.id}`,
+                { method: 'POST' }
+            );
+        }
+        setIsFavorite(!isFavorite);
+    } catch (error) {
+        console.error("Klaida:", error);
+    }
+};
+
+    return (
+        <div onClick={goToDetails} style={cardStyle}>
             <div style={{ marginBottom: '16px' }}>
-                <h3 style={{
-                    margin: '0 0 8px 0',
-                    color: '#2c3e50',
-                    fontSize: '1.4em',
-                    fontWeight: '600'
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '8px'
                 }}>
-                    {pet.name}
-                </h3>
+                    <h3 style={{
+                        margin: '0',
+                        color: '#2c3e50',
+                        fontSize: '1.4em',
+                        fontWeight: '600'
+                    }}>
+                        {pet.name}
+                    </h3>
+                    {canShowFavorite && (
+                    <button
+                        onClick={toggleFavorite}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '2em',
+                            padding: '0',
+                            margin: '0',
+                            color: isFavorite ? '#ff4757' : '#666',
+                            transition: 'color 0.2s ease, transform 0.1s ease'
+                        }}
+                        title={isFavorite ? 'Pašalinti iš mėgstamų' : 'Pridėti prie mėgstamų'}
+                    >
+                        {isFavorite ? '❤️' : '🤍'}
+                    </button>)}
+                </div>
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -36,102 +101,41 @@ const AnimalCard = ({ pet }) => {
                     marginBottom: '8px'
                 }}>
                     <span style={{
-                        backgroundColor: pet.status === 'Laisvas' ? '#d4edda' : '#fff3cd',
-                        color: pet.status === 'Laisvas' ? '#155724' : '#856404',
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        fontSize: '0.85em',
-                        fontWeight: '500'
+                        backgroundColor: pet.status === 'available' ? '#d4edda' : '#fff3cd',
+                        padding: '4px 10px', borderRadius: '20px', fontSize: '0.85em'
                     }}>
                         {pet.status}
                     </span>
-                    <span style={{
-                        color: '#6c757d',
-                        fontSize: '0.9em',
-                        fontWeight: '500'
-                    }}>
-                        📍 {pet.city}
-                    </span>
+                    <span style={{ color: '#6c757d' }}>📍 {pet.city}</span>
                 </div>
             </div>
 
-            <div style={{ marginBottom: '16px' }}>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '12px',
-                    fontSize: '0.9em',
-                    '@media (max-width: 768px)': {
-                        gridTemplateColumns: '1fr',
-                        gap: '8px'
-                    }
-                }}>
-                    <div>
-                        <strong style={{ color: '#495057' }}>Rūšis:</strong>
-                        <p style={{ margin: '4px 0 0 0', color: '#6c757d' }}>{pet.species}</p>
-                    </div>
-                    <div>
-                        <strong style={{ color: '#495057' }}>Veislė:</strong>
-                        <p style={{ margin: '4px 0 0 0', color: '#6c757d' }}>{pet.breed || 'Nežinoma'}</p>
-                    </div>
-                    <div>
-                        <strong style={{ color: '#495057' }}>Amžius:</strong>
-                        <p style={{ margin: '4px 0 0 0', color: '#6c757d' }}>{pet.age} m.</p>
-                    </div>
-                    <div>
-                        <strong style={{ color: '#495057' }}>Dydis:</strong>
-                        <p style={{ margin: '4px 0 0 0', color: '#6c757d' }}>{pet.size}</p>
-                    </div>
-                    <div>
-                        <strong style={{ color: '#495057' }}>Svoris:</strong>
-                        <p style={{ margin: '4px 0 0 0', color: '#6c757d' }}>{pet.weight} kg</p>
-                    </div>
-                    <div>
-                        <strong style={{ color: '#495057' }}>Veikla:</strong>
-                        <p style={{ margin: '4px 0 0 0', color: '#6c757d' }}>{pet.activity_level}</p>
-                    </div>
-                </div>
+            <div style={traitsGridStyle}>
+                <div><strong>Rūšis:</strong> <p>{pet.species}</p></div>
+                <div><strong>Veislė:</strong> <p>{pet.breed || 'Nežinoma'}</p></div>
+                <div><strong>Amžius:</strong> <p>{pet.age} m.</p></div>
+                <div><strong>Svoris:</strong> <p>{pet.weight} kg</p></div>
             </div>
 
-            {pet.ai_description && (
-                <div style={{
-                    marginBottom: '16px',
-                    padding: '12px',
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: '8px',
-                    borderLeft: '4px solid #646cff'
-                }}>
-                    <p style={{
-                        margin: 0,
-                        fontSize: '0.9em',
-                        color: '#495057',
-                        lineHeight: '1.4'
-                    }}>
-                        {pet.ai_description}
-                    </p>
-                </div>
-            )}
-
-            <button style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '8px',
-                border: 'none',
-                backgroundColor: '#646cff',
-                color: 'white',
-                cursor: 'pointer',
-                fontWeight: '500',
-                fontSize: '0.95em',
-                transition: 'background-color 0.2s ease',
-                '@media (max-width: 768px)': {
-                    padding: '14px 16px',
-                    fontSize: '1em'
-                }
-            }}>
+            <button
+                onClick={(e) => { e.stopPropagation(); goToDetails(); }}
+                style={buttonStyle}
+            >
                 Daugiau informacijos
             </button>
         </div>
     );
+};
+
+// Paprasti stiliai (iš tavo kodo)
+const cardStyle = {
+    border: '1px solid #e1e5e9', padding: '20px', borderRadius: '16px',
+    backgroundColor: 'white', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
+};
+const traitsGridStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.9em' };
+const buttonStyle = {
+    width: '100%', padding: '12px', borderRadius: '8px', border: 'none',
+    backgroundColor: '#646cff', color: 'white', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px'
 };
 
 export default AnimalCard;

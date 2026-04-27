@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 const Navbar = () => {
     const location = useLocation();
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'))
 
     // 1. Jei esame Login puslapyje (keliu "/"), navigacijos nerodome
     //if (location.pathname === '/') return null;
@@ -41,34 +42,54 @@ const Navbar = () => {
 
     return (
         <nav style={styles.nav}>
-            {/* KAIRĖ: Logo dalis */}
+            {/* KAIRĖ: Logo */}
             <div style={styles.sideSection}>
                 <span style={styles.logo}>PawFinder</span>
             </div>
 
-            {/* CENTRAS: Visos pagrindinės nuorodos */}
+            {/* CENTRAS: Nuorodos pagal rolę */}
             <div style={styles.centerSection}>
+                {/* Bendros nuorodos visiems prisijungusiems */}
                 <Link to="/home" style={styles.link}>Pradžia</Link>
                 <Link to="/mainAnimals" style={styles.link}>Gyvūnai</Link>
                 <Link to="/shelters" style={styles.link}>Prieglaudos</Link>
-                <Link to="/animals" style={styles.link}>Savanoriams</Link>
-                <Link to="/questionnaire" style={styles.link}>Klausimynas</Link>
-                <Link to="/achievements" style={styles.achievementsLink}>🏆 Pasiekimai</Link>
+
+                {/* TIK SAVANORIAMS (Volunteer) */}
+                {(user.role === 'volunteer' || user.role ==='user') && (
+                    <>
+                        <Link to="/questionnaire" style={styles.link}>Klausimynas</Link>
+                        <Link to="/animals" style={styles.link}>Savanoriams</Link>
+                        <Link to="/achievements" style={styles.achievementsLink}>🏆 Pasiekimai</Link>
+                    </>
+                )}
+
+                {/* TIK PRIEGLAUDOMS (Shelter) - Pavyzdys ateičiai */}
+                {user.role === 'shelter' && (
+                    <>
+                        <Link to="/my-shelter-pets" style={styles.link}>Mano augintiniai</Link>
+                        <Link to="/add-pet" style={{...styles.link, color: '#2196F3'}}>➕ Pridėti</Link>
+                    </>
+                )}
+
+                {/* Bendras visiems */}
                 <Link to="/notifications" style={styles.notificationsLink}>🔔 Pranešimai</Link>
+
+                {/* VISIEMS APART PRIEGLAUDŲ - Mėgstamiausi */}
+                {(user.role !== 'shelter') && (
+                    <Link to={`/favorites/${user.id}`} style={{...styles.link, color: '#e91e63'}}>❤️ Mėgstamiausi</Link>
+                )}
             </div>
 
-            {/* DEŠINĖ: Atsijungimo mygtukas */}
+            {/* DEŠINĖ: Atsijungimas */}
             <div style={styles.sideSectionRight}>
-                {token && (
-                    <button
-                        onClick={handleLogout}
-                        style={styles.logoutBtn}
-                        onMouseOver={(e) => e.target.style.backgroundColor = '#ffccc7'}
-                        onMouseOut={(e) => e.target.style.backgroundColor = '#fff1f0'}
-                    >
-                        Atsijungti
-                    </button>
-                )}
+                <button
+                    onClick={handleLogout}
+                    style={styles.logoutBtn}
+                    onMouseOver={(e) => e.target.style.backgroundColor = '#ffccc7'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = '#fff1f0'}
+                >
+                    Atsijungti
+                </button>
             </div>
         </nav>
     );

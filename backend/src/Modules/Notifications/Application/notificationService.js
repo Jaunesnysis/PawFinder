@@ -20,8 +20,8 @@ const createCancellationNotification = async (shelterId, reservationId, petName,
     });
 };
 
-const getNotificationsForShelter = async (shelterId) => {
-    return await notificationRepository.getNotificationsByShelter(shelterId);
+const getNotifications = async (userId) => {
+    return await notificationRepository.getNotificationsByUser(userId);
 };
 
 const markNotificationAsRead = async (notificationId) => {
@@ -31,6 +31,6 @@ const markNotificationAsRead = async (notificationId) => {
 module.exports = {
     createReservationNotification,
     createCancellationNotification,
-    getNotificationsForShelter,
+    getNotifications,
     markNotificationAsRead
 };
