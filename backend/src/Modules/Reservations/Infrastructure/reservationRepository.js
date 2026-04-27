@@ -29,9 +29,6 @@ const createReservation = async (reservationData) => {
     [user_id, pet_id, date, reservation_start, reservation_end],
   );
 
-  // Update pet status to reserved in the pets table
-  await db.query("UPDATE pets SET status = 'reserved' WHERE pet_id = $1", [pet_id]);
-
   return result.rows[0];
 };
 
@@ -86,11 +83,6 @@ const cancelReservation = async (reservationId) => {
     "UPDATE reservations SET status = 'cancelled' WHERE reservation_id = $1 RETURNING *",
     [reservationId],
   );
-
-  // Update pet status back to available
-  await db.query("UPDATE pets SET status = 'available' WHERE pet_id = $1", [
-    reservation.pet_id,
-  ]);
 
   return result.rows[0];
 };

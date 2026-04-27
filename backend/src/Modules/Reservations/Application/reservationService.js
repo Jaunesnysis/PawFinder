@@ -53,8 +53,8 @@ const createReservation = async (reservation) => {
 
   const pet = await reservationRepository.getPetById(pet_id);
   if (!pet) throw { status: 404, message: "Pet not found" };
-  if (pet.status !== "available") {
-    throw { status: 400, message: "Pet status is not available" };
+  if (pet.status === "adopted") {
+    throw { status: 400, message: "Pet is already adopted" };
   }
 
   const normalizedStart = normalizeTime(reservation_start);

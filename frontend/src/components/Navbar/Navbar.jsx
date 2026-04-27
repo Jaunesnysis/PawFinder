@@ -71,8 +71,10 @@ const Navbar = () => {
                     </>
                 )}
 
-                {/* Bendras visiems */}
-                <Link to="/notifications" style={styles.notificationsLink}>🔔 Pranešimai</Link>
+                {/* TIK PRIEGLAUDOMS - Pranešimai */}
+                {user.role === 'shelter' && (
+                    <Link to="/notifications" style={styles.notificationsLink}>🔔 Pranešimai</Link>
+                )}
 
                 {/* TIK SAVANORIAMS IR VARTOTOJAMS - Mano rezervacijos */}
                 {(user.role === 'volunteer' || user.role === 'user') && (
