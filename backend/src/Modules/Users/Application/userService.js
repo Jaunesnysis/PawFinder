@@ -46,7 +46,7 @@ const addPointsToUser = async (userId, amount) => {
   }
 
   user.points += amount;
-
+  user.last_earned_at = new Date();
   await userRepository.update(user);
   console.log(
     `[UserService] Vartotojui ${userId} pridėta ${amount} tšk. Viso: ${user.points}`,
@@ -87,8 +87,6 @@ const login = async (email, password) => {
   }
 
   // expiresIn: '1h' reiškia, kad vartotojas bus atjungtas po valandos
-  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
-  // expiresIn: '1h' reiškia, kad vartotojas bus atjungtas po valandos
   const token = jwt.sign(payload, jwtSecret, { expiresIn: "1h" });
 
   return {
@@ -102,7 +100,18 @@ const login = async (email, password) => {
     },
   };
 };
-
+const getLeaderboard = async (limit = 10) => {
+  const users = await userRepository.getTopUsersByPoints(limit);
+  return users.map((user, index) => ({
+    rank: index + 1,
+    userId: user.user_id,
+    name: user.name,
+    surname: user.surname,
+    city: user.city || null,
+    points: user.points,
+    lastEarnedAt: user.last_earned_at || null,
+  }));
+};
 module.exports = {
   registerUser,
   addPointsToUser,

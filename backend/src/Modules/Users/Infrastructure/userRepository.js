@@ -81,11 +81,11 @@ const create = async (userData) => {
 
 const getTopUsersByPoints = async (limit = 10) => {
   const query = `
-        SELECT user_id, name, surname, city, points, last_earned_at
-        FROM users
-        ORDER BY points DESC
-        LIMIT $1
-    `;
+    SELECT user_id, name, surname, city, points, last_earned_at
+    FROM users
+    ORDER BY points DESC, last_earned_at ASC NULLS LAST
+    LIMIT $1
+`;
   try {
     const result = await db.query(query, [limit]);
     return result.rows;
