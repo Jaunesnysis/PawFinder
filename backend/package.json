@@ -25,7 +25,12 @@
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
+    "eslint": "^9.39.5",
+    "eslint-plugin-sonarjs": "^3.0.7",
+    "globals": "^17.13.0",
     "jest": "^30.3.0",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "ts-api-utils": "^2.5.0",
+    "typescript": "^5.8.3"
   }
 }
