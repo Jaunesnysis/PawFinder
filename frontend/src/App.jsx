@@ -15,6 +15,7 @@ import Navbar from "./components/Navbar/Navbar";
 import RegistrationPage from "./pages/RegistrationPage/RegistrationPage.jsx";
 import PetDetailsPage from "./pages/PetDetailsPage/PetDetailsPage";
 import LeaderboardPage from "./pages/LeaderboardPage/LeaderboardPage.jsx";
+import MyReservationsPage from "./pages/MyReservationsPage.jsx";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="/favorites/:userid" element={<FavoritesPage />} />
           <Route path="/pets/:id" element={<PetDetailsPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/my-reservations" element={<MyReservationsPage />} />
         </Routes>
       </main>
     </div>

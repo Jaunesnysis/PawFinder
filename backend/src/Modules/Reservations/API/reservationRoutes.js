@@ -31,4 +31,14 @@ router.post('/', authorizeUser, async (req, res) => {
   }
 });
 
+router.get('/me', authorizeUser, async (req, res) => {
+  try {
+    const reservations = await reservationService.getUserReservations(req.user.id);
+    res.json(reservations);
+  } catch (error) {
+    console.error('Get my reservations error:', error);
+    res.status(error.status || 500).json({ error: error.message || 'Internal server error' });
+  }
+});
+
 module.exports = router;

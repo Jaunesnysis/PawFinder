@@ -48,10 +48,37 @@ const isTimeSlotTaken = async (petId, date, reservationStart, reservationEnd) =>
   return result.rows.length > 0;
 };
 
+const getReservationsByUserId = async (userId) => {
+  const result = await db.query(
+    `SELECT r.reservation_id,
+            r.user_id,
+            r.pet_id,
+            r.date,
+            r.reservation_start,
+            r.reservation_end,
+            r.status,
+            r.created_at,
+            p.name AS pet_name,
+            p.species AS pet_species,
+            p.breed AS pet_breed,
+            s.name AS shelter_name,
+            s.shelter_id
+     FROM reservations r
+     JOIN pets p ON p.pet_id = r.pet_id
+     JOIN shelters s ON s.shelter_id = p.shelter_id
+     WHERE r.user_id = $1
+     ORDER BY r.date DESC, r.reservation_start DESC`,
+    [userId],
+  );
+
+  return result.rows;
+};
+
 module.exports = {
   getPetById,
   getUserById,
   getReservedSlots,
   createReservation,
   isTimeSlotTaken,
+  getReservationsByUserId,
 };

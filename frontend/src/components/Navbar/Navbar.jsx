@@ -79,6 +79,9 @@ const Navbar = () => {
             <Link to="/animals" style={styles.link}>
               Savanoriams
             </Link>
+            <Link to="/my-reservations" style={styles.link}>
+              📅 Mano rezervacijos
+            </Link>
             <Link to="/achievements" style={styles.achievementsLink}>
               🏆 Pasiekimai
             </Link>
