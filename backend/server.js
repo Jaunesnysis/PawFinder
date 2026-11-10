@@ -53,6 +53,9 @@ app.post("/api/recommendations", authorizeUser, recommendationsController.submit
 const reservationRoutes = require("./src/Modules/Reservations/API/reservationRoutes");
 app.use("/api/reservations", reservationRoutes);
 
+const lifestyleRoutes = require("./src/Modules/Lifestyle/API/lifestyleRoutes");
+app.use("/api/lifestyle", lifestyleRoutes);
+
 io.on("connection", (socket) => {
   console.log(`Vartotojas prisijungė: ${socket.id}`);
 });

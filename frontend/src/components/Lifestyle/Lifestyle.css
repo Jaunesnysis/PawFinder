@@ -1,0 +1,260 @@
+/* US-02 gyvenimo būdo aprašymas. Visos klasės su "lifestyle-" prefiksu,
+   kad nesikirstų su kitų komponentų globaliu CSS. */
+
+.lifestyle-section {
+  margin-bottom: 32px;
+  text-align: left;
+}
+
+/* ---------- Forma ---------- */
+
+.lifestyle-card {
+  padding: 24px;
+  border: 1px solid #c7dbf0;
+  border-radius: 16px;
+  background-color: #eaf2fb;
+}
+
+.lifestyle-card__title {
+  margin: 0 0 6px;
+  color: #3b82c4;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.lifestyle-card__lead {
+  margin: 0 0 16px;
+  max-width: 70ch;
+  color: #2c3e50;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+
+.lifestyle-textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 120px;
+  padding: 12px 14px;
+  border: 1px solid #ced4da;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #2c3e50;
+  font: inherit;
+  font-size: 0.95em;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.lifestyle-textarea:focus-visible {
+  outline: 2px solid #3b82c4;
+  outline-offset: 1px;
+  border-color: #3b82c4;
+}
+
+.lifestyle-textarea--invalid {
+  border-color: #e74c3c;
+}
+
+.lifestyle-counter {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  color: #6c757d;
+  font-size: 0.85em;
+}
+
+.lifestyle-counter--over {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.lifestyle-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  color: #2c3e50;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.lifestyle-consent input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.lifestyle-consent label {
+  cursor: pointer;
+}
+
+.lifestyle-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* ---------- Mygtukai ---------- */
+
+.lifestyle-btn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.lifestyle-btn:focus-visible {
+  outline: 2px solid #3b82c4;
+  outline-offset: 2px;
+}
+
+.lifestyle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lifestyle-btn--primary {
+  min-width: 140px;
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
+.lifestyle-btn--primary:not(:disabled):hover {
+  background-color: #43a047;
+}
+
+.lifestyle-btn--secondary {
+  background-color: #e9ecef;
+  color: #2c3e50;
+}
+
+.lifestyle-btn--secondary:not(:disabled):hover {
+  background-color: #dde1e5;
+}
+
+/* ---------- Pranešimai ---------- */
+
+.lifestyle-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #f5c6cb;
+  border-radius: 10px;
+  background-color: #fdecea;
+  color: #a94442;
+  font-size: 0.9em;
+}
+
+.lifestyle-muted {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.95em;
+}
+
+.lifestyle-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Pasiūlymai ---------- */
+
+.lifestyle-suggestions__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.lifestyle-suggestions__title {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.3em;
+  font-weight: 700;
+}
+
+.lifestyle-carousel {
+  position: relative;
+}
+
+.lifestyle-carousel__track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 4px;
+  padding: 4px 4px 14px;
+}
+
+.lifestyle-carousel__item {
+  flex: 0 0 280px;
+  scroll-snap-align: start;
+}
+
+.lifestyle-carousel__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid #ced4da;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: #2c3e50;
+  font-size: 1.4em;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transform: translateY(-50%);
+}
+
+.lifestyle-carousel__arrow:focus-visible {
+  outline: 2px solid #3b82c4;
+  outline-offset: 2px;
+}
+
+.lifestyle-carousel__arrow--left {
+  left: -10px;
+}
+
+.lifestyle-carousel__arrow--right {
+  right: -10px;
+}
+
+@media (max-width: 600px) {
+  .lifestyle-card {
+    padding: 16px;
+  }
+
+  .lifestyle-carousel__item {
+    flex-basis: 85%;
+  }
+
+  .lifestyle-carousel__arrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lifestyle-btn {
+    transition: none;
+  }
+}
