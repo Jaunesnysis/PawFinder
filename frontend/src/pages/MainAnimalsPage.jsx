@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import io from "socket.io-client";
 import AnimalCard from "../components/AnimalCard/AnimalCard.jsx"; // 1. IMPORTUOK KORTELĘ
+import LifestyleSection from "../components/Lifestyle/LifestyleSection.jsx";
 
 const socket = io("http://localhost:5050");
 
@@ -146,6 +147,9 @@ const MainAnimalsPage = () => {
         >
           Rask savo naują geriausią draugą iš mūsų augintinių
         </p>
+
+        {/* US-02: GYVENIMO BŪDO APRAŠYMAS / PASIŪLYMAI */}
+        <LifestyleSection />
 
         {/* FILTRŲ SKYRIUS */}
         <div
