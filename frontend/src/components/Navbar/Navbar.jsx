@@ -60,46 +60,56 @@ const Navbar = () => {
       {/* CENTRAS: Nuorodos pagal rolę */}
       <div style={styles.centerSection}>
         {/* Bendros nuorodos visiems prisijungusiems */}
-        <Link to="/home" style={styles.link}>
-          Pradžia
-        </Link>
-        <Link to="/mainAnimals" style={styles.link}>
-          Gyvūnai
-        </Link>
-        <Link to="/shelters" style={styles.link}>
-          Prieglaudos
-        </Link>
-
+        {/*<Link to="/home" style={styles.link}>*/}
+        {/*  Pradžia*/}
+        {/*</Link>*/}
         {/* TIK SAVANORIAMS (Volunteer) */}
-        {(user.role === "volunteer" || user.role === "user") && (
+        {(user.role === "user") && (
           <>
-            <Link to="/questionnaire" style={styles.link}>
-              Klausimynas
-            </Link>
             <Link to="/animals" style={styles.link}>
               Savanoriams
             </Link>
-            <Link to="/my-reservations" style={styles.link}>
-              📅 Mano rezervacijos
-            </Link>
+              <Link to="/mainAnimals" style={styles.link}>
+                  Gyvūnai
+              </Link>
+              <Link to="/shelters" style={styles.link}>
+                  Prieglaudos
+              </Link>
+              <Link to="/" style={styles.link}>
+                  Mano rezervacijos
+              </Link>
+              <Link to="/" style={styles.link}>
+                  Mano profilis
+              </Link>
+
             <Link to="/achievements" style={styles.achievementsLink}>
               🏆 Pasiekimai
             </Link>
-            <Link to="/leaderboard" style={styles.achievementsLink}>
-              📋 Lyderiai
+            <Link
+                  to={`/favorites/${user.id}`}
+                  style={{ ...styles.link, color: "#e91e63" }}>
+                  ❤️ Patikę
             </Link>
+
           </>
         )}
 
         {/* TIK PRIEGLAUDOMS (Shelter) - Pavyzdys ateičiai */}
         {user.role === "shelter" && (
           <>
-            <Link to="/my-shelter-pets" style={styles.link}>
+            <Link to="/myShelterPets" style={styles.link}>
               Mano augintiniai
             </Link>
-            <Link to="/add-pet" style={{ ...styles.link, color: "#2196F3" }}>
-              ➕ Pridėti
+            <Link to="/shelterReservations" style={styles.link}>
+              Prieglaudos rezervacijos
             </Link>
+              <Link to="/statistics" style={styles.link}>
+                  Statistika
+              </Link>
+              <Link to="/shelterProfile" style={styles.link}>
+                  Prieglaudos profilis
+              </Link>
+
           </>
         )}
 
@@ -108,15 +118,6 @@ const Navbar = () => {
           🔔 Pranešimai
         </Link>
 
-        {/* VISIEMS APART PRIEGLAUDŲ - Mėgstamiausi */}
-        {user.role !== "shelter" && (
-          <Link
-            to={`/favorites/${user.id}`}
-            style={{ ...styles.link, color: "#e91e63" }}
-          >
-            ❤️ Mėgstamiausi
-          </Link>
-        )}
       </div>
 
       {/* DEŠINĖ: Atsijungimas */}
@@ -150,13 +151,13 @@ const styles = {
     boxSizing: "border-box",
   },
   sideSection: {
-    flex: 1,
+    flex: "0 0 auto",
     display: "flex",
     justifyContent: "flex-start",
     minWidth: "120px", // Užtikrina, kad logotipas nesusitrauktų
   },
   sideSectionRight: {
-    flex: 1,
+    flex: "0 0 auto",
     display: "flex",
     justifyContent: "flex-end",
     minWidth: "120px",

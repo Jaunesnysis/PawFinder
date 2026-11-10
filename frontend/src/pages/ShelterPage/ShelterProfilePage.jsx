@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import AnimalCard from '../components/AnimalCard/AnimalCard.jsx';
+import AnimalCard from '../../components/AnimalCard/AnimalCard.jsx';
 
 const ShelterProfilePage = () => {
     const { shelterId } = useParams();
