@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import AnimalCardShelter from "../../components/AnimalCard/AnimalCardShelter.jsx";
 import './ShelterPetsListPage.css';
 
-const AnimalListPage = () => {
+const ShelterPetsListPage = () => {
     const [pets, setPets] = useState([]);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -82,4 +82,4 @@ const AnimalListPage = () => {
 };
 
 
-export default AnimalListPage;
+export default ShelterPetsListPage;
