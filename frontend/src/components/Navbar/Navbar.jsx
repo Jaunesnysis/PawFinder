@@ -75,7 +75,7 @@ const Navbar = () => {
               <Link to="/shelters" style={styles.link}>
                   Prieglaudos
               </Link>
-              <Link to="/" style={styles.link}>
+              <Link to="/myReservationsPage" style={styles.link}>
                   Mano rezervacijos
               </Link>
               <Link to="/" style={styles.link}>
@@ -100,7 +100,7 @@ const Navbar = () => {
             <Link to="/myShelterPets" style={styles.link}>
               Mano augintiniai
             </Link>
-            <Link to="/shelterReservations" style={styles.link}>
+            <Link to="/myReservationsPage" style={styles.link}>
               Prieglaudos rezervacijos
             </Link>
               <Link to="/statistics" style={styles.link}>

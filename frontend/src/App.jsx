@@ -40,7 +40,7 @@ function App() {
           <Route path="/favorites/:userid" element={<FavoritesPage />} />
           <Route path="/pets/:id" element={<PetDetailsPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="/my-reservations" element={<MyReservationsPage />} />
+          <Route path="/myReservationsPage" element={<MyReservationsPage/>}></Route>
         </Routes>
       </main>
     </div>
