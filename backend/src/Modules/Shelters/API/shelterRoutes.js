@@ -2,6 +2,30 @@ const express = require('express');
 const router = express.Router();
 
 const shelterService = require('../Application/shelterService');
+const { Shelter } = require('../Domain/Shelter');
+
+// POST /api/shelters/register (naujas: validacija + Shelter klasė + id atsakyme)
+router.post('/register', async (req, res) => {
+    try {
+        const shelter = new Shelter(req.body);
+        const errors = shelter.validate();
+
+        if (errors.length > 0) {
+            return res.status(400).json({ error: errors.join(', ') });
+        }
+
+        const result = await shelterService.registerShelter(shelter);
+        res.status(201).json(result);
+    } catch (error) {
+        console.error('Shelter registration error:', error);
+
+        if (error.code === '23505') {
+            return res.status(409).json({ error: 'Shelter with this data already exists' });
+        }
+
+        res.status(500).json({ error: 'Unable to register shelter' });
+    }
+});
 
 // GET /api/shelters
 // Returns a list of all shelters

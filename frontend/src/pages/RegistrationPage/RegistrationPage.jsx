@@ -146,6 +146,9 @@ const RegistrationPage = () => {
                 <p className="footer-text">
                     Jau turite paskyrą? <Link to="/login" className="link">Prisijungti</Link>
                 </p>
+                <p className="footer-text">
+                    Esate prieglauda? <Link to="/register-shelter" className="link">Registruokitės čia</Link>
+                </p>
             </div>
         </div>
     );

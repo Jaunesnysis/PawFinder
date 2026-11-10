@@ -5,6 +5,7 @@ const mapShelter = (row) => ({
     name: row.name,
     description: row.description,
     city: row.city,
+    donation_account: row.donation_account || null, // <-- PRIDĖTI ČIA
     contact: {
         email: row.email || null,
         phone: row.phone || null,
@@ -12,6 +13,26 @@ const mapShelter = (row) => ({
         website: null
     }
 });
+
+const registerShelter = async (shelter) => {
+    const query = `
+        INSERT INTO shelters (name, description, city, address, email, phone, donation_account)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING shelter_id
+    `;
+
+    const result = await db.query(query, [
+        shelter.name,
+        shelter.description,
+        shelter.city,
+        shelter.address,
+        shelter.email,
+        shelter.phone,
+        shelter.donation_account
+    ]);
+
+    return result.rows[0].shelter_id;
+};
 
 const findShelterById = async (shelterId) => {
     const query = `
@@ -57,5 +78,6 @@ const getAllShelters = async () => {
 
 module.exports = {
     findShelterById,
-    getAllShelters
+    getAllShelters,
+    registerShelter
 }; 
