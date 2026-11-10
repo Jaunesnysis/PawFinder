@@ -67,13 +67,21 @@ const update = async (user) => {
 };
 
 const create = async (userData) => {
-  const { name, surname, email, phone, birthDate, passwordHash } = userData;
+  const { 
+    name, 
+    surname, 
+    email, 
+    phone, 
+    birthDate, 
+    passwordHash, 
+    shelterId = null // <-- Jei neperduotas, bus null
+  } = userData;
 
   const result = await db.query(
-    `INSERT INTO users (name, surname, email, phone, birth_date, password_hash)
-             VALUES ($1, $2, $3, $4, $5, $6)
-             RETURNING user_id, name, surname, email, phone, birth_date, created_at`,
-    [name, surname, email, phone, birthDate, passwordHash],
+    `INSERT INTO users (name, surname, email, phone, birth_date, password_hash, shelter_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING user_id, name, surname, email, phone, birth_date, shelter_id, created_at`,
+    [name, surname, email, phone, birthDate, passwordHash, shelterId]
   );
 
   return result.rows[0];

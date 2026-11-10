@@ -13,6 +13,7 @@ class User {
         this.city = data.city;
         this.points = data.points || 0;
         this.last_earned_at = data.last_earned_at;
+        this.shelter_id = data.shelterId ?? data.shelter_id ?? null;
         this.created_at = data.created_at;
         this.consent_given_at = data.consent_given_at;
     }

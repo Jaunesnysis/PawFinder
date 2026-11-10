@@ -23,6 +23,7 @@ const registerUser = async (userData) => {
   const saltRounds = 10;
   const passwordHash = await bcrypt.hash(user.password, saltRounds);
 
+  // PRIDĖTA: shelterId perduodamas į DB kūrimą
   const createdUser = await userRepository.create({
     name: user.name,
     surname: user.surname,
@@ -30,6 +31,7 @@ const registerUser = async (userData) => {
     phone: user.phone,
     birthDate: user.birthDate,
     passwordHash,
+    shelterId: user.shelter_id,
   });
 
   return createdUser;

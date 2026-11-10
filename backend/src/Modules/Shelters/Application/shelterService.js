@@ -2,6 +2,14 @@ const shelterRepository = require('../Infrastructure/shelterRepository');
 const petRepository = require('../../Animals/Infrastructure/petRepository');
 
 /**
+ * Creates a new shelter and returns it (including shelter_id).
+ */
+const registerShelter = async (shelter) => {
+    const shelterId = await shelterRepository.registerShelter(shelter);
+    return { id: shelterId, shelter_id: shelterId };
+};
+
+/**
  * Returns shelter profile with associated active pets.
  * This is where we apply transformation/formatting logic before sending to the client.
  */
@@ -46,4 +54,4 @@ const getAllShelters = async () => {
     }));
 };
 
-module.exports = { getShelterProfile, getAllShelters };
+module.exports = { getShelterProfile, getAllShelters, registerShelter };

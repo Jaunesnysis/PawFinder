@@ -26,6 +26,7 @@ router.post("/register", async (req, res) => {
       birthDate,
       password,
       passwordConfirmation,
+      shelterId, // <-- PRIDĖTA
     } = req.body;
 
     if (password !== passwordConfirmation) {
@@ -34,7 +35,16 @@ router.post("/register", async (req, res) => {
         .json({ error: "Password confirmation does not match" });
     }
 
-    const userData = { name, surname, email, phone, birthDate, password };
+    const userData = { 
+      name, 
+      surname, 
+      email, 
+      phone, 
+      birthDate, 
+      password,
+      shelterId: shelterId || null 
+    };
+    
     const user = await userService.registerUser(userData);
 
     res.status(201).json({
