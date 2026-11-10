@@ -137,8 +137,44 @@ const getUserReservations = async (userId, now = new Date()) => {
   };
 };
 
+const getShelterReservations = async (shelterId, now = new Date()) => {
+  if (!shelterId) {
+    throw { status: 400, message: "Shelter id is required" };
+  }
+
+  const reservations = await reservationRepository.getReservationsByShelterId(shelterId);
+
+  const future = [];
+  const past = [];
+
+  reservations.forEach((reservation) => {
+    const reservationDateTime = new Date(`${reservation.date}T${reservation.reservation_end}`);
+    const isPast = reservationDateTime < now;
+
+    const item = {
+      ...reservation,
+      pet_name: reservation.pet_name || "Gyvūnas",
+      volunteer_name: reservation.volunteer_name ? `${reservation.volunteer_name} ${reservation.volunteer_surname || ""}`.trim() : "Savanoris",
+      shelter_name: reservation.shelter_name || "Prieglauda",
+      is_past: isPast,
+    };
+
+    if (isPast) {
+      past.push(item);
+    } else {
+      future.push(item);
+    }
+  });
+
+  return {
+    future: future.sort((a, b) => new Date(`${a.date}T${a.reservation_start}`) - new Date(`${b.date}T${b.reservation_start}`)),
+    past: past.sort((a, b) => new Date(`${b.date}T${b.reservation_end}`) - new Date(`${a.date}T${a.reservation_end}`)),
+  };
+};
+
 module.exports = {
   getAvailableTimeslots,
   createReservation,
   getUserReservations,
+  getShelterReservations,
 };

@@ -74,6 +74,32 @@ const getReservationsByUserId = async (userId) => {
   return result.rows;
 };
 
+const getReservationsByShelterId = async (shelterId) => {
+  const result = await db.query(
+    `SELECT r.reservation_id,
+            r.user_id,
+            r.pet_id,
+            r.date,
+            r.reservation_start,
+            r.reservation_end,
+            r.status,
+            r.created_at,
+            p.name AS pet_name,
+            u.name AS volunteer_name,
+            u.surname AS volunteer_surname,
+            s.name AS shelter_name
+     FROM reservations r
+     JOIN pets p ON p.pet_id = r.pet_id
+     JOIN shelters s ON s.shelter_id = p.shelter_id
+     JOIN users u ON u.shelter_id = s.shelter_id
+     WHERE p.shelter_id = $1
+     ORDER BY r.date DESC, r.reservation_start DESC`,
+    [shelterId],
+  );
+
+  return result.rows;
+};
+
 module.exports = {
   getPetById,
   getUserById,
@@ -81,4 +107,5 @@ module.exports = {
   createReservation,
   isTimeSlotTaken,
   getReservationsByUserId,
+  getReservationsByShelterId,
 };

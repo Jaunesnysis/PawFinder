@@ -33,6 +33,15 @@ router.post('/', authorizeUser, async (req, res) => {
 
 router.get('/me', authorizeUser, async (req, res) => {
   try {
+    if (req.user.role === 'shelter') {
+      const shelterId = parseInt(req.query.shelterId, 10);
+      if (!shelterId) {
+        return res.status(400).json({ error: 'Shelter id is required' });
+      }
+      const reservations = await reservationService.getShelterReservations(shelterId);
+      return res.json(reservations);
+    }
+
     const reservations = await reservationService.getUserReservations(req.user.id);
     res.json(reservations);
   } catch (error) {
