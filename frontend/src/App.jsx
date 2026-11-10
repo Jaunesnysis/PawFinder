@@ -17,6 +17,7 @@ import PetDetailsPage from "./pages/PetDetailsPage/PetDetailsPage";
 import LeaderboardPage from "./pages/LeaderboardPage/LeaderboardPage.jsx";
 import MyReservationsPage from "./pages/MyReservationsPage.jsx";
 import RegistrationPageShelter from './pages/RegistrationPage/RegistrationPageShelter';
+import ShelterPetsListPage from "./pages/ShelterPage/ShelterPetsListPage.jsx";
 
 function App() {
   return (
@@ -43,6 +44,8 @@ function App() {
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/myReservationsPage" element={<MyReservationsPage/>}></Route>
           <Route path="/register-shelter" element={<RegistrationPageShelter />} />
+          <Route path="/mySheltersPets" element={<ShelterPetsListPage />} />
+          <Route path="/addNewPet" element={<ShelterPetsListPage />} /> {/* Pakeisti sukurus */}
         </Routes>
       </main>
     </div>

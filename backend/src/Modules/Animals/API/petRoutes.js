@@ -3,6 +3,8 @@ const router = express.Router();
 
 const petService = require("../Application/petService");
 const reservationService = require("../../Reservations/Application/reservationService");
+const authorizeUser = require("../../../Infrastructure/Middleware/authMiddleware");
+
 
 // Front-ende tu kvieti: http://localhost:5050/api/mainAnimals
 router.get("/mainAnimals", async (req, res) => {
@@ -211,6 +213,17 @@ router.delete('/favorites/:userId/:petId', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+router.get('/shelter/petList', authorizeUser, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const pets = await petService.getSheltersPets(userId);
+        res.json(pets);
+
+    } catch (error) {
+        console.log("Serverio klaida Animal routes: GET sheltersPets");
+        res.status(500).json({ error: "Serverio klaida." });
+    }
 });
 
 module.exports = router;

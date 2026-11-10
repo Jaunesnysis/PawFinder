@@ -289,6 +289,32 @@ const isFavorite = async (userId, petId) => {  try {
   }
 };
 
+const findSheltersPets = async (userId) => {
+
+    const query = `
+        SELECT p.*, 
+        COALESCE(
+            (SELECT json_agg(json_build_object(
+                'image_id', img.image_id, 
+                'url', img.image_url, 
+                'is_primary', img.is_primary
+            )) 
+             FROM pet_images img 
+             WHERE img.pet_id = p.pet_id), 
+        '[]') as images
+        FROM pets p
+        JOIN users u ON u.shelter_id = p.shelter_id
+        WHERE u.user_id = $1
+    `;
+    try {
+        const result = await db.query(query, [userId]);
+        return result.rows.map((row) => new Pet(row));
+    } catch (error) {
+        console.error("Klaida findSheltersPets:", error.message);
+        throw error;
+    }
+}
+
 module.exports = {
   findAvailableByCity,
   getAllAvailablePets,
@@ -302,4 +328,5 @@ module.exports = {
   removeFavorite,
   getFavoritesByUser,
   isFavorite,
+  findSheltersPets,
 };

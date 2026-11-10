@@ -97,7 +97,7 @@ const Navbar = () => {
         {/* TIK PRIEGLAUDOMS (Shelter) - Pavyzdys ateičiai */}
         {user.role === "shelter" && (
           <>
-            <Link to="/myShelterPets" style={styles.link}>
+            <Link to="/mySheltersPets" style={styles.link}>
               Mano augintiniai
             </Link>
             <Link to="/myReservationsPage" style={styles.link}>

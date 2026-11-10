@@ -1,0 +1,49 @@
+.shelter-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.shelter-search {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.shelter-search label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #667085;
+}
+
+.shelter-search input {
+    padding: 10px 14px;
+    border: 1px solid #d0d5dd;
+    border-radius: 10px;
+    font-size: 1rem;
+    min-width: 260px;
+}
+
+.shelter-search input:focus {
+    outline: none;
+    border-color: #4caf50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+}
+
+.shelter-add-btn {
+    padding: 12px 22px;
+    background-color: #4caf50;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    border-radius: 10px;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+}
+
+.shelter-add-btn:hover {
+    background: #45a049;
+}

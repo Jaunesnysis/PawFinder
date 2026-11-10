@@ -95,6 +95,10 @@ const isFavorite = async (userId, petId) => {
   return await petRepository.isFavorite(userId, petId);
 };
 
+const getSheltersPets = async (userId)=> {
+  return await petRepository.findSheltersPets(userId);
+};
+
 module.exports = {
   getAvailablePets,
   getAllAvailablePets,
@@ -106,4 +110,5 @@ module.exports = {
   removeFavorite,
   getFavoritesByUserId,
   isFavorite,
+  getSheltersPets,
 };
