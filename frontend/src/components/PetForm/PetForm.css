@@ -144,3 +144,19 @@
     background: #fff;
     color: #b42318;
 }
+.pet-form textarea.no-resize {
+    resize: none;
+}
+.pet-form-back {
+    display: inline-block;
+    max-width: 900px;
+    margin: 0 auto 12px;
+    color: #4caf50;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.pet-form-back:hover {
+    color: #43a047;
+    text-decoration: underline;
+}

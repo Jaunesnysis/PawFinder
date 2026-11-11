@@ -1,14 +1,20 @@
 import { useState } from "react";
 import "./PetForm.css"
+import { Link } from "react-router-dom";
 
 const emptyPet = {
-    name: "", species: "", age: "", breed: "", size: "", weight: "",
-    activity_level: "", shelter_description: "",
+    name: "", species: "", breed: "", age: "", size: "", weight: "",
+    activity_level: "", health_info: "", shelter_description: "",
     status: "available",
 };
 
 const PetForm = ({ initialValues, mode, onSubmit, submitting }) => {
-    const [values, setValues] = useState({ ...emptyPet, ...initialValues });
+    const pickFormValues = (pet) =>
+        Object.fromEntries(
+            Object.keys(emptyPet).map((key) => [key, pet?.[key] ?? emptyPet[key]])
+        );
+
+    const [values, setValues] = useState(() => pickFormValues(initialValues));
     const [errors, setErrors] = useState({});
 
     const isEdit = mode === "edit";
@@ -68,7 +74,7 @@ const PetForm = ({ initialValues, mode, onSubmit, submitting }) => {
         if (!values.name.trim()) e.name = "Įveskite vardą.";
         if (!values.species) e.species = "Pasirinkite rūšį.";
         if (values.age === "" || Number(values.age) < 0) e.age = "Įveskite amžių.";
-        if (images.length === 0) e.images = "Pridėkite bent vieną nuotrauką.";
+        //if (images.length === 0) e.images = "Pridėkite bent vieną nuotrauką.";
         setErrors(e);
         return Object.keys(e).length === 0;
     };
@@ -91,6 +97,9 @@ const PetForm = ({ initialValues, mode, onSubmit, submitting }) => {
 
     return (
         <form className="pet-form" onSubmit={handleSubmit}>
+            <Link to="/mySheltersPets" className="pet-form-back">
+                ← Atgal į mano augintinius
+            </Link>
             <div className="pet-form-grid">
                 <label>Vardas
                     <input name="name" value={values.name} onChange={handleChange} />
@@ -136,6 +145,11 @@ const PetForm = ({ initialValues, mode, onSubmit, submitting }) => {
                         <option value="moderate">Vidutinis</option>
                         <option value="high">Aukštas</option>
                     </select>
+                </label>
+
+                <label>Sveikatos informacija
+                    <textarea name="health_info" rows="3" className="no-resize"
+                              value={values.health_info} onChange={handleChange} />
                 </label>
 
                 {isEdit && (
