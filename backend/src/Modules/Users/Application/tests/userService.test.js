@@ -46,7 +46,8 @@ describe("UserService - registerUser", () => {
             email: "john@example.com",
             phone: "123456789",
             birthDate: "1990-01-01",
-            passwordHash: "hashedPassword"
+            passwordHash: "hashedPassword",
+            shelterId: null
         });
         expect(result).toEqual({
             user_id: 1,
