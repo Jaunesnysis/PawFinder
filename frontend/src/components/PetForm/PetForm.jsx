@@ -109,8 +109,8 @@ const PetForm = ({ initialValues, mode, onSubmit, submitting }) => {
                 <label>Rūšis
                     <select name="species" value={values.species} onChange={handleChange}>
                         <option value="">Pasirinkite</option>
-                        <option value="dog">Šuo</option>
-                        <option value="cat">Katė</option>
+                        <option value="Šuo">Šuo</option>
+                        <option value="Katė">Katė</option>
                     </select>
                     {errors.species && <span className="field-error">{errors.species}</span>}
                 </label>

@@ -145,3 +145,7 @@
 .more-info-btn:hover {
     background: #45a049;
 }
+/* ženkliukas ant nuotraukos */
+.pet-status-badge.shelter-status-available { background: #2e9e57; color: #fff; }
+.pet-status-badge.shelter-status-reserved  { background: #f5a623; color: #fff; }
+.pet-status-badge.shelter-status-adopted   { background: #e30f0f; color: #fff; }
