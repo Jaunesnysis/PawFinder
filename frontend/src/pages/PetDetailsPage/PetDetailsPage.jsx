@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReservationModal from '../../components/Reservation/ReservationModal';
+import { imageUrl } from '../../utils/imageUrl';
 import './PetDetailsPage.css';
 
 const PetDetailsPage = () => {
@@ -48,7 +49,7 @@ const PetDetailsPage = () => {
                     <div className="main-stage">
                         <img
                             src={pet.images && pet.images.length > 0
-                                ? pet.images[activeImg]?.url
+                                ? imageUrl(pet.images[activeImg]?.url)
                                 : 'https://placehold.co/600x400?text=Nėra+nuotraukos'}
                             alt={pet.name}
                         />
@@ -58,7 +59,7 @@ const PetDetailsPage = () => {
                             {pet.images.map((img, index) => (
                                 <img
                                     key={index}
-                                    src={img.url}
+                                    src={imageUrl(img.url)}
                                     className={activeImg === index ? 'thumb active' : 'thumb'}
                                     onClick={() => setActiveImg(index)}
                                     alt=""

@@ -250,4 +250,51 @@ router.put("/:id", authorizeUser, async (req, res) => {
     }
 });
 
+const multer = require('multer');
+const crypto = require('crypto');
+const path = require('path');
+const fs = require('fs');
+
+console.log("UPLOADS_DIR:", petService.UPLOADS_DIR);
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: petService.UPLOADS_DIR,
+        filename: (req, file, cb) =>
+            cb(null, crypto.randomUUID() + path.extname(file.originalname).toLowerCase()),
+    }),
+    fileFilter: (req, file, cb) => cb(null, ['image/jpeg', 'image/png'].includes(file.mimetype)),
+    limits: { fileSize: 5 * 1024 * 1024, files: 10 },
+});
+
+router.post('/:id/images', authorizeUser, upload.array('images', 10), async (req, res) => {
+    try {
+        const pet = await petService.addImages(
+            req.user.id, Number(req.params.id), req.files, req.body.primaryIndex);
+        res.status(201).json(pet);
+    } catch (e) {
+        (req.files || []).forEach((f) => fs.unlink(f.path, () => {}));   // neleisti likti nereikalingų failų
+        sendError(res, e, 'POST /pets/:id/images');
+    }
+});
+
+router.delete('/:id/images/:imageId', authorizeUser, async (req, res) => {
+    try {
+        const pet = await petService.deleteImage(
+            req.user.id, Number(req.params.id), Number(req.params.imageId));
+        res.json(pet);
+    } catch (e) {
+        sendError(res, e, 'DELETE /pets/:id/images/:imageId');
+    }
+});
+
+router.put('/:id/images/:imageId/primary', authorizeUser, async (req, res) => {
+    try {
+        const pet = await petService.setPrimaryImage(
+            req.user.id, Number(req.params.id), Number(req.params.imageId));
+        res.json(pet);
+    } catch (e) {
+        sendError(res, e, 'PUT /pets/:id/images/:imageId/primary');
+    }
+});
+
 module.exports = router;

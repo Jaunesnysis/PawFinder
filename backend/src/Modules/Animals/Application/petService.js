@@ -124,17 +124,54 @@ const createPet = async (userId, raw) => {
 };
 
 const updatePet = async (userId, petId, raw) => {
-    const shelterId = await requireShelterId(userId);
-    const petShelterId = await petRepository.findPetShelterId(petId);
-    if (petShelterId == null) throw httpError(404, 'Gyvūnas nerastas.');
-    if (String(petShelterId) !== String(shelterId))
-        throw httpError(403, 'Šis gyvūnas nepriklauso jūsų prieglaudai.');
-
+    await assertOwnsPet(userId, petId);
     const pet = buildValidPet(raw, true);
     await petRepository.updatePet(petId, pet);
     return petRepository.findPetById(petId);
 };
 
+const path = require('path');
+const fs = require('fs');
+
+const UPLOADS_DIR = path.join(__dirname, '../../../../uploads');   // backend/uploads
+
+const assertOwnsPet = async (userId, petId) => {
+    const shelterId = await requireShelterId(userId);
+    const petShelterId = await petRepository.findPetShelterId(petId);
+    if (petShelterId == null) throw httpError(404, 'Gyvūnas nerastas.');
+    if (String(petShelterId) !== String(shelterId))
+        throw httpError(403, 'Šis gyvūnas nepriklauso jūsų prieglaudai.');
+};
+
+const addImages = async (userId, petId, files, primaryIndex) => {
+    await assertOwnsPet(userId, petId);
+    if (!files || files.length === 0)
+        throw httpError(400, 'Pasirinkite bent vieną JPG arba PNG failą.');
+
+    const urls = files.map((f) => `/uploads/${f.filename}`);
+    const idx = primaryIndex === undefined || primaryIndex === '' ? null : Number(primaryIndex);
+    await petRepository.addPetImages(petId, urls, idx);
+    return petRepository.findPetById(petId);
+};
+
+const deleteImage = async (userId, petId, imageId) => {
+    await assertOwnsPet(userId, petId);
+    const img = await petRepository.findPetImage(petId, imageId);
+    if (!img) throw httpError(404, 'Nuotrauka nerasta.');
+
+    await petRepository.deletePetImage(petId, imageId);
+    if (img.image_url.startsWith('/uploads/'))      // trinam failą tik jei jis mūsų
+        fs.unlink(path.join(UPLOADS_DIR, path.basename(img.image_url)), () => {});
+    return petRepository.findPetById(petId);
+};
+
+const setPrimaryImage = async (userId, petId, imageId) => {
+    await assertOwnsPet(userId, petId);
+    const img = await petRepository.findPetImage(petId, imageId);
+    if (!img) throw httpError(404, 'Nuotrauka nerasta.');
+    await petRepository.setPrimaryImage(petId, imageId);
+    return petRepository.findPetById(petId);
+};
 
 
 module.exports = {
@@ -151,4 +188,8 @@ module.exports = {
   getSheltersPets,
   createPet,
   updatePet,
+  addImages,
+  deleteImage,
+  setPrimaryImage,
+  UPLOADS_DIR,
 };

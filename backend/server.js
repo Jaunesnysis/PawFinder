@@ -30,9 +30,12 @@ const io = new Server(server, {
   },
 });
 
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(cors());
 app.use(express.json());
+
+const path = require("path");   // jei dar nėra
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Paduodame 'io' į visus maršrutus
 app.set("io", io);

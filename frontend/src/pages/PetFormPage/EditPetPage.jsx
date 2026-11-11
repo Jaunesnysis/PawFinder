@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PetForm from "../../components/PetForm/PetForm.jsx";
+import { uploadImages, deleteImage, setPrimaryImage } from "../../api/petImages";
 
 const EditPetPage = () => {
     const { id } = useParams();
@@ -22,7 +23,7 @@ const EditPetPage = () => {
         loadPet();
     }, [id]);
 
-    const handleSubmit = async ({ values }) => {
+    const handleSubmit = async ({ values, newImages, keepImageIds, primaryExistingId, primaryNewIndex }) => {
         setSubmitting(true);
         setError("");
         try {
@@ -40,6 +41,22 @@ const EditPetPage = () => {
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.error || "Nepavyko išsaugoti pakeitimų.");
+            }
+            // 2) ištrinam nuotraukas, kurias vartotojas pašalino
+            const removedIds = (pet.images ?? [])
+                .map((img) => img.image_id)
+                .filter((imageId) => !keepImageIds.includes(imageId));
+            for (const imageId of removedIds) {
+                await deleteImage(id, imageId);
+            }
+
+            // 3) įkeliame naujas (jei pagrindinė yra viena iš jų, serveris ją ir nustato)
+            await uploadImages(id, newImages, primaryNewIndex);
+
+            // 4) jei pagrindinė yra viena iš senų ir ji pasikeitė
+            const currentPrimaryId = (pet.images ?? []).find((img) => img.is_primary)?.image_id;
+            if (primaryExistingId !== null && primaryExistingId !== currentPrimaryId) {
+                await setPrimaryImage(id, primaryExistingId);
             }
 
             navigate("/mySheltersPets");

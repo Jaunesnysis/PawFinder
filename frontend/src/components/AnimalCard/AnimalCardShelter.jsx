@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './AnimalCardShelter.css';
 import { useNavigate } from 'react-router-dom';
+import { imageUrl } from '../../utils/imageUrl';
 
 const STATUS = {
     available: { label: 'Laisvas',     className: 'shelter-status-available' },
@@ -17,9 +18,9 @@ const AnimalCardShelter = ({ pet }) => {
     // Jei gyvūnas neturi nuotraukų, naudojame laikiną "placeholder"
     const hasImages = pet.images && pet.images.length > 0;
     const images = hasImages
-        ? pet.images
+        ? [...pet.images].sort((a, b) => Number(!!b.is_primary) - Number(!!a.is_primary))
         : [{ url: 'https://via.placeholder.com/400x300?text=Nėra+nuotraukos' }];
-
+    const currentImage = images[currentImageIndex] ?? images[0];
     const status = STATUS[pet.status] ?? { label: pet.status, className: '' };
 
     return (
@@ -27,7 +28,7 @@ const AnimalCardShelter = ({ pet }) => {
             {/* NUOTRAUKOS DALIS */}
             <div className="pet-image-container">
                 <img
-                    src={images[currentImageIndex].url}
+                    src={imageUrl(currentImage.url)}
                     alt={pet.name}
                     className="pet-image"
                 />

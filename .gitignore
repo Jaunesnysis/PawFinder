@@ -4,3 +4,5 @@ frontend/node_modules/
 .env
 backend/coverage/
 backend/report/
+backend/uploads/*
+!backend/uploads/.gitkeep

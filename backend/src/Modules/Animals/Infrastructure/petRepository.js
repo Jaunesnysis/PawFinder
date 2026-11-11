@@ -345,6 +345,47 @@ const findPetShelterId = async (petId) => {
     return r.rows[0]?.shelter_id ?? null;
 };
 
+const ensurePrimaryImage = async (petId) => {
+    await db.query(
+        `UPDATE pet_images SET is_primary = TRUE
+         WHERE image_id = (SELECT image_id FROM pet_images WHERE pet_id = $1 ORDER BY image_id LIMIT 1)
+           AND NOT EXISTS (SELECT 1 FROM pet_images WHERE pet_id = $1 AND is_primary = TRUE)`,
+        [petId]);
+};
+
+const setPrimaryImage = async (petId, imageId) => {
+    await db.query(
+        "UPDATE pet_images SET is_primary = (image_id = $2) WHERE pet_id = $1",
+        [petId, imageId]);
+};
+
+const addPetImages = async (petId, urls, primaryIndex = null) => {
+    const ids = [];
+    for (const url of urls) {
+        const r = await db.query(
+            "INSERT INTO pet_images (pet_id, image_url, is_primary) VALUES ($1, $2, FALSE) RETURNING image_id",
+            [petId, url]);
+        ids.push(r.rows[0].image_id);
+    }
+    if (primaryIndex !== null && ids[primaryIndex] !== undefined) {
+        await setPrimaryImage(petId, ids[primaryIndex]);   // vartotojas pasirinko naują kaip pagrindinę
+    } else {
+        await ensurePrimaryImage(petId);                   // kitaip, jei nėra pagrindinės, pirma tampa
+    }
+};
+
+const findPetImage = async (petId, imageId) => {
+    const r = await db.query(
+        "SELECT image_id, image_url FROM pet_images WHERE image_id = $1 AND pet_id = $2",
+        [imageId, petId]);
+    return r.rows[0] ?? null;
+};
+
+const deletePetImage = async (petId, imageId) => {
+    await db.query("DELETE FROM pet_images WHERE image_id = $1 AND pet_id = $2", [imageId, petId]);
+    await ensurePrimaryImage(petId);   // ištrynus pagrindinę, kita tampa pagrindine
+};
+
 module.exports = {
   findAvailableByCity,
   getAllAvailablePets,
@@ -362,4 +403,8 @@ module.exports = {
   createPet,
   updatePet,
   findPetShelterId,
+  addPetImages,
+  findPetImage,
+  deletePetImage,
+  setPrimaryImage
 };

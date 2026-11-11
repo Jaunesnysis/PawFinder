@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./PetForm.css"
 import { Link } from "react-router-dom";
+import { imageUrl } from "../../utils/imageUrl";
 
 const emptyPet = {
     name: "", species: "", breed: "", age: "", size: "", weight: "",
@@ -23,7 +24,7 @@ const PetForm = ({ initialValues, mode, onSubmit, submitting }) => {
         const list = (initialValues?.images ?? []).map((img) => ({
             key: `e-${img.image_id}`,
             id: img.image_id,
-            url: img.url,
+            url: imageUrl(img.url),
             isPrimary: img.is_primary,
         }));
         if (list.length > 0 && !list.some((i) => i.isPrimary)) list[0].isPrimary = true;
@@ -74,7 +75,7 @@ const PetForm = ({ initialValues, mode, onSubmit, submitting }) => {
         if (!values.name.trim()) e.name = "Įveskite vardą.";
         if (!values.species) e.species = "Pasirinkite rūšį.";
         if (values.age === "" || Number(values.age) < 0) e.age = "Įveskite amžių.";
-        //if (images.length === 0) e.images = "Pridėkite bent vieną nuotrauką.";
+        if (images.length === 0) e.images = "Pridėkite bent vieną nuotrauką.";
         setErrors(e);
         return Object.keys(e).length === 0;
     };
