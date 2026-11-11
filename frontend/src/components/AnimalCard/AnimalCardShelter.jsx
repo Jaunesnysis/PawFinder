@@ -67,7 +67,7 @@ const AnimalCardShelter = ({ pet }) => {
                 {/* 3. ŠTAI TAVO MYGTUKAS PAČIAME GALE */}
                 <button
                     className="edit-btn"
-                    onClick={() => navigate(`/pets/${pet.id}`)} //keisti
+                    onClick={() => navigate(`/editPet/${pet.id}`)} //keisti
                 >
                     Redaguoti
                 </button>
