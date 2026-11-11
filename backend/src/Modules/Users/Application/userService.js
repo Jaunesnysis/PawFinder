@@ -114,10 +114,16 @@ const getLeaderboard = async (limit = 10) => {
     lastEarnedAt: user.last_earned_at || null,
   }));
 };
+
+const getShelterIdByUserId = async (userId) => {
+    return userRepository.getShelterIdByUserId(userId);
+};
+
 module.exports = {
   registerUser,
   addPointsToUser,
   getUserPoints,
   login,
   getLeaderboard,
+  getShelterIdByUserId,
 };

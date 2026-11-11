@@ -2,6 +2,10 @@ const petRepository = require("../Infrastructure/petRepository");
 const notificationService = require("../../Notifications/Application/notificationService");
 const reservationService = require("../../Reservations/Application/reservationService");
 
+const { Pet } = require('../Domain/Pet');
+const userService = require('../../Users/Application/userService'); // pritaikykite kelią
+
+const httpError = (status, message) => Object.assign(new Error(message), { status });
 /**
  * Funkcija skirta gauti laisvus augintiniuas pasirinktame mieste
  */
@@ -99,6 +103,40 @@ const getSheltersPets = async (userId)=> {
   return await petRepository.findSheltersPets(userId);
 };
 
+const requireShelterId = async (userId) => {
+    const shelterId = await userService.getShelterIdByUserId(userId);
+    if (!shelterId) throw httpError(403, "Tik prieglaudos darbuotojai gali valdyti gyvūnus.");
+    return shelterId;
+};
+
+const buildValidPet = (raw, isEdit) => {
+    const pet = Pet.fromInput(raw, isEdit);
+    const errors = pet.validate();
+    if (errors.length > 0) throw httpError(400, errors.join('; '));
+    return pet;
+};
+
+const createPet = async (userId, raw) => {
+    const shelterId = await requireShelterId(userId);
+    const pet = buildValidPet(raw, false);
+    const petId = await petRepository.createPet({ ...pet, shelter_id: shelterId });
+    return petRepository.findPetById(petId);
+};
+
+const updatePet = async (userId, petId, raw) => {
+    const shelterId = await requireShelterId(userId);
+    const petShelterId = await petRepository.findPetShelterId(petId);
+    if (petShelterId == null) throw httpError(404, 'Gyvūnas nerastas.');
+    if (String(petShelterId) !== String(shelterId))
+        throw httpError(403, 'Šis gyvūnas nepriklauso jūsų prieglaudai.');
+
+    const pet = buildValidPet(raw, true);
+    await petRepository.updatePet(petId, pet);
+    return petRepository.findPetById(petId);
+};
+
+
+
 module.exports = {
   getAvailablePets,
   getAllAvailablePets,
@@ -111,4 +149,6 @@ module.exports = {
   getFavoritesByUserId,
   isFavorite,
   getSheltersPets,
+  createPet,
+  updatePet,
 };

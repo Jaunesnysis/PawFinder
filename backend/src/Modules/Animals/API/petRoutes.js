@@ -226,4 +226,28 @@ router.get('/shelter/petList', authorizeUser, async (req, res) => {
     }
 });
 
+const sendError = (res, error, where) => {
+    console.error(`Klaida ${where}:`, error.message);
+    const status = error.status ?? 500;
+    res.status(status).json({ error: status === 500 ? "Serverio klaida." : error.message });
+};
+
+router.post("/", authorizeUser, async (req, res) => {
+    try {
+        const pet = await petService.createPet(req.user.id, req.body);
+        res.status(201).json(pet);
+    } catch (e) {
+        sendError(res, e, "POST /pets");
+    }
+});
+
+router.put("/:id", authorizeUser, async (req, res) => {
+    try {
+        const pet = await petService.updatePet(req.user.id, Number(req.params.id), req.body);
+        res.json(pet);
+    } catch (e) {
+        sendError(res, e, "PUT /pets/:id");
+    }
+});
+
 module.exports = router;

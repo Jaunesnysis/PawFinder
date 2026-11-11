@@ -102,4 +102,12 @@ const getTopUsersByPoints = async (limit = 10) => {
   }
 };
 
-module.exports = { update, findById, findByEmail, create, getTopUsersByPoints };
+const getShelterIdByUserId = async (userId) => {
+    const result = await db.query(
+        "SELECT shelter_id FROM users WHERE user_id = $1",
+        [userId]
+    );
+    return result.rows[0]?.shelter_id ?? null;
+};
+
+module.exports = { update, findById, findByEmail, create, getTopUsersByPoints, getShelterIdByUserId };

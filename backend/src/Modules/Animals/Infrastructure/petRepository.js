@@ -314,6 +314,36 @@ const findSheltersPets = async (userId) => {
         throw error;
     }
 }
+const createPet = async (p) => {
+    const result = await db.query(
+        `INSERT INTO pets
+         (name, species, breed, age, size, weight, activity_level,
+          health_info, shelter_description, status, shelter_id, city)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+                 (SELECT city FROM shelters WHERE shelter_id = $11))
+             RETURNING pet_id`,
+        [p.name, p.species, p.breed, p.age, p.size, p.weight, p.activity_level,
+            p.health_info, p.shelter_description, p.status, p.shelter_id]
+    );
+    return result.rows[0].pet_id;
+};
+
+const updatePet = async (petId, p) => {
+    await db.query(
+        `UPDATE pets
+         SET name = $2, species = $3, breed = $4, age = $5, size = $6,
+             weight = $7, activity_level = $8, health_info = $9,
+             shelter_description = $10, status = $11, updated_at = NOW()
+         WHERE pet_id = $1`,
+        [petId, p.name, p.species, p.breed, p.age, p.size, p.weight,
+            p.activity_level, p.health_info, p.shelter_description, p.status]
+    );
+};
+
+const findPetShelterId = async (petId) => {
+    const r = await db.query("SELECT shelter_id FROM pets WHERE pet_id = $1", [petId]);
+    return r.rows[0]?.shelter_id ?? null;
+};
 
 module.exports = {
   findAvailableByCity,
@@ -329,4 +359,7 @@ module.exports = {
   getFavoritesByUser,
   isFavorite,
   findSheltersPets,
+  createPet,
+  updatePet,
+  findPetShelterId,
 };
