@@ -386,6 +386,21 @@ const deletePetImage = async (petId, imageId) => {
     await ensurePrimaryImage(petId);   // ištrynus pagrindinę, kita tampa pagrindine
 };
 
+const saveAiProfile = async (petId, description, tagNames) => {
+    if (!description && (!tagNames || tagNames.length === 0)) return;   // nėra ką saugoti
+
+    if (description) {
+        await db.query("UPDATE pets SET ai_description = $2 WHERE pet_id = $1", [petId, description]);
+    }
+    if (tagNames && tagNames.length > 0) {
+        await db.query("DELETE FROM pet_tag WHERE pet_id = $1", [petId]);   // pakeičiame senas žymes
+        await db.query(
+            `INSERT INTO pet_tag (pet_id, tag_id)
+             SELECT DISTINCT $1::integer, tag_id FROM tag WHERE tag_name = ANY($2::text[])`,
+            [petId, tagNames]);
+    }
+};
+
 module.exports = {
   findAvailableByCity,
   getAllAvailablePets,
@@ -406,5 +421,6 @@ module.exports = {
   addPetImages,
   findPetImage,
   deletePetImage,
-  setPrimaryImage
+  setPrimaryImage,
+  saveAiProfile,
 };

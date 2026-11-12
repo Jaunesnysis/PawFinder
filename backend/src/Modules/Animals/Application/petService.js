@@ -1,4 +1,5 @@
 const petRepository = require("../Infrastructure/petRepository");
+const petDI = require("../Infrastructure/geminiClient");
 const notificationService = require("../../Notifications/Application/notificationService");
 const reservationService = require("../../Reservations/Application/reservationService");
 
@@ -120,6 +121,7 @@ const createPet = async (userId, raw) => {
     const shelterId = await requireShelterId(userId);
     const pet = buildValidPet(raw, false);
     const petId = await petRepository.createPet({ ...pet, shelter_id: shelterId });
+    await refreshAiProfile(petId);
     return petRepository.findPetById(petId);
 };
 
@@ -127,6 +129,7 @@ const updatePet = async (userId, petId, raw) => {
     await assertOwnsPet(userId, petId);
     const pet = buildValidPet(raw, true);
     await petRepository.updatePet(petId, pet);
+    await refreshAiProfile(petId);
     return petRepository.findPetById(petId);
 };
 
@@ -171,6 +174,17 @@ const setPrimaryImage = async (userId, petId, imageId) => {
     if (!img) throw httpError(404, 'Nuotrauka nerasta.');
     await petRepository.setPrimaryImage(petId, imageId);
     return petRepository.findPetById(petId);
+};
+
+// DI klaida neturi sugadinti gyvūno išsaugojimo, todėl viską gaudome čia
+const refreshAiProfile = async (petId) => {
+    try {
+        const pet = await petRepository.findPetById(petId);                 // pilni, jau išsaugoti duomenys
+        const profile = await petDI.generateProfile(pet);         // aprašymas ir žymės iš DI
+        await petRepository.saveAiProfile(petId, profile.description, profile.tags);
+    } catch (e) {
+        console.error('DI profilio generavimas nepavyko:', e.message);
+    }
 };
 
 
