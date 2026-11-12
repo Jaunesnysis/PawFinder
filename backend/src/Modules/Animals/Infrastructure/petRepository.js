@@ -412,7 +412,7 @@ const incrementViewCount = async (petId) => {
      VALUES ($1, CURRENT_DATE, 1)
      ON CONFLICT (pet_id, date)
      DO UPDATE SET views_count = pet_statistics.views_count + 1`,
-    [petId]
+    [petId],
   );
 };
 
@@ -430,7 +430,7 @@ const getStatsSummary = async (shelterId, days, petId = null) => {
        AND ($3::int IS NULL OR p.pet_id = $3::int)
      GROUP BY p.pet_id, p.name
      ORDER BY views DESC, p.name`,
-    [shelterId, days, petId]
+    [shelterId, days, petId],
   );
   return result.rows;
 };
@@ -450,9 +450,28 @@ const getStatsDaily = async (shelterId, days, petId = null) => {
      ) ON s.date = d::date
      GROUP BY d
      ORDER BY d`,
-    [shelterId, days, petId]
+    [shelterId, days, petId],
   );
   return result.rows;
+};
+
+const saveAiProfile = async (petId, description, tagNames) => {
+  if (!description && (!tagNames || tagNames.length === 0)) return; // nėra ką saugoti
+
+  if (description) {
+    await db.query("UPDATE pets SET ai_description = $2 WHERE pet_id = $1", [
+      petId,
+      description,
+    ]);
+  }
+  if (tagNames && tagNames.length > 0) {
+    await db.query("DELETE FROM pet_tag WHERE pet_id = $1", [petId]); // pakeičiame senas žymes
+    await db.query(
+      `INSERT INTO pet_tag (pet_id, tag_id)
+             SELECT DISTINCT $1::integer, tag_id FROM tag WHERE tag_name = ANY($2::text[])`,
+      [petId, tagNames],
+    );
+  }
 };
 
 module.exports = {
@@ -477,5 +496,6 @@ module.exports = {
   setPrimaryImage,
   incrementViewCount,
   getStatsSummary,
-  getStatsDaily
+  getStatsDaily,
+  saveAiProfile,
 };

@@ -13,4 +13,13 @@ async function generateAnimalDescription(prompt) {
   return (response.text || "").trim();
 }
 
-module.exports = { generateAnimalDescription };
+// Kol kas DI neįgyvendintas, todėl grąžiname tuščią rezultatą.
+// Vėliau čia bus Gemini kvietimas; likusi sistema nesikeis.
+//
+// Įeina: gyvūnas (Pet su name, species, breed, age, size, activity_level, health_info, shelter_description)
+// Išeina: { description: string | null, tags: string[] }
+const generateProfile = async (pet) => {
+    return { description: null, tags: [] };
+};
+
+module.exports = { generateAnimalDescription, generateProfile };

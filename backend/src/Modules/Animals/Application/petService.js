@@ -1,4 +1,5 @@
 const petRepository = require("../Infrastructure/petRepository");
+const aiService = require("../../AI/Application/aiService");
 const notificationService = require("../../Notifications/Application/notificationService");
 const reservationService = require("../../Reservations/Application/reservationService");
 
@@ -104,6 +105,7 @@ const createPet = async (userId, raw) => {
     ...pet,
     shelter_id: shelterId,
   });
+  await refreshAiProfile(petId);
   return petRepository.findPetById(petId);
 };
 
@@ -111,6 +113,7 @@ const updatePet = async (userId, petId, raw) => {
   await assertOwnsPet(userId, petId);
   const pet = buildValidPet(raw, true);
   await petRepository.updatePet(petId, pet);
+  await refreshAiProfile(petId);
   return petRepository.findPetById(petId);
 };
 
@@ -199,6 +202,17 @@ const getStatistics = async (userId, { days, petId } = {}) => {
   return { days: d, summary, daily };
 };
 
+// DI klaida neturi sugadinti gyvūno išsaugojimo, todėl viską gaudome čia
+const refreshAiProfile = async (petId) => {
+  try {
+    const pet = await petRepository.findPetById(petId); // pilni, jau išsaugoti duomenys
+    const profile = await aiService.generateAnimalProfile(pet); // aprašymas ir žymės iš DI
+    await petRepository.saveAiProfile(petId, profile.description, profile.tags);
+  } catch (e) {
+    console.error("DI profilio generavimas nepavyko:", e.message);
+  }
+};
+
 module.exports = {
   getAvailablePets,
   getAllAvailablePets,
@@ -217,5 +231,5 @@ module.exports = {
   setPrimaryImage,
   UPLOADS_DIR,
   addView,
-  getStatistics
+  getStatistics,
 };
