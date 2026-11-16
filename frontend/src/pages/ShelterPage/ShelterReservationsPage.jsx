@@ -1,41 +1,44 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CancelReservationModal from "../../components/Reservation/CancelReservationModal";
-import "./ShelterReservationsPage.css";
 
 const API = "http://localhost:5050/api/reservations";
 
-const STATUS_LABELS = {
-  upcoming: "Būsima",
-  "in-progress": "Vyksta",
-  completed: "Įvykusi",
-  cancelled: "Atšaukta",
+const STATUS_BADGES = {
+  upcoming: {
+    label: "Būsima",
+    backgroundColor: "#d1fae5",
+    color: "#065f46",
+  },
+  completed: {
+    label: "Įvykusi",
+    backgroundColor: "#e5e7eb",
+    color: "#374151",
+  },
+  cancelled: {
+    label: "Atšaukta",
+    backgroundColor: "#fde8e8",
+    color: "#c53030",
+  },
 };
-
-const FILTER_OPTIONS = [
-  { value: "all", label: "Visos" },
-  { value: "upcoming", label: "Būsimos" },
-  { value: "completed", label: "Įvykusios" },
-  { value: "cancelled", label: "Atšauktos" },
-];
 
 const getDisplayStatus = (r) => {
   if (r.status === "cancelled") return "cancelled";
   if (r.has_ended) return "completed";
-  if (r.is_upcoming) return "upcoming";
-  return "in-progress";
+  return "upcoming";
 };
 
-const startKey = (r) => `${r.date} ${r.reservation_start}`;
-const isActive = (r) =>
-  r.displayStatus === "upcoming" || r.displayStatus === "in-progress";
+const toTimestamp = (r) => {
+  const time = (r.reservation_start || "00:00").slice(0, 5);
+  return new Date(`${r.date}T${time}:00`).getTime();
+};
 
 const ShelterReservationsPage = () => {
   const navigate = useNavigate();
   const [reservations, setReservations] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState("all");
 
   const [cancelTarget, setCancelTarget] = useState(null);
   const [cancelling, setCancelling] = useState(false);
@@ -73,27 +76,44 @@ const ShelterReservationsPage = () => {
     fetchReservations();
   }, [navigate]);
 
-  const visibleReservations = useMemo(() => {
+  // Filtravimas pagal dropdown'ą ir rikiavimas nuo arčiausios iki tolimiausios
+  const filteredReservations = useMemo(() => {
+    const now = Date.now();
+
     const withStatus = reservations.map((r) => ({
       ...r,
       displayStatus: getDisplayStatus(r),
+      ts: toTimestamp(r),
     }));
 
-    const filtered = withStatus.filter((r) => {
-      if (filter === "all") return true;
-      if (filter === "upcoming") return isActive(r);
-      return r.displayStatus === filter;
-    });
+    const filtered =
+      statusFilter === "all"
+        ? withStatus
+        : withStatus.filter((r) => r.displayStatus === statusFilter);
 
-    // Būsimos – artimiausios viršuje, kitos – naujausios viršuje
-    const active = filtered
-      .filter(isActive)
-      .sort((a, b) => startKey(a).localeCompare(startKey(b)));
-    const rest = filtered
-      .filter((r) => !isActive(r))
-      .sort((a, b) => startKey(b).localeCompare(startKey(a)));
-    return [...active, ...rest];
-  }, [reservations, filter]);
+    const priority = {
+      upcoming: 0,
+      completed: 1,
+      cancelled: 2,
+    };
+
+    return [...filtered].sort((a, b) => {
+      if (
+        statusFilter === "all" &&
+        priority[a.displayStatus] !== priority[b.displayStatus]
+      ) {
+        return priority[a.displayStatus] - priority[b.displayStatus];
+      }
+
+      // Būsimos – nuo artimiausios ateities iki tolimiausios
+      if (a.displayStatus === "upcoming" && b.displayStatus === "upcoming") {
+        return a.ts - b.ts;
+      }
+
+      // Įvykusios / atšauktos – nuo arčiausios šiandienai iki tolimiausios
+      return Math.abs(a.ts - now) - Math.abs(b.ts - now);
+    });
+  }, [reservations, statusFilter]);
 
   const openCancelModal = (reservation) => {
     setCancelError("");
@@ -136,6 +156,14 @@ const ShelterReservationsPage = () => {
     }
   };
 
+  const formatTime = (r) => {
+    const start = r.reservation_start?.slice(0, 5) || "";
+    if (r.reservation_end) {
+      return `${start} - ${r.reservation_end.slice(0, 5)}`;
+    }
+    return start;
+  };
+
   if (loading) {
     return (
       <div style={{ padding: "32px", textAlign: "center" }}>
@@ -145,69 +173,191 @@ const ShelterReservationsPage = () => {
   }
 
   return (
-    <div className="shelter-res-page">
-      <div className="shelter-res-header">
-        <h1>Prieglaudos rezervacijos</h1>
-        <div className="shelter-res-filter">
-          <label htmlFor="status-filter">Statusas</label>
-          <select
-            id="status-filter"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+    <div
+      style={{ maxWidth: "1100px", margin: "0 auto", padding: "24px 0 40px" }}
+    >
+      {/* Viršutinė eilutė: Pavadinimas + Statuso dropdown */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          marginBottom: "18px",
+          flexWrap: "wrap",
+          gap: "16px",
+        }}
+      >
+        <h1 style={{ margin: 0, color: "#1f2937", fontSize: "1.65rem" }}>
+          Prieglaudos rezervacijos
+        </h1>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <label
+            htmlFor="shelter-status-filter"
+            style={{
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              color: "#6b7280",
+            }}
           >
-            {FILTER_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
+            Statusas
+          </label>
+          <select
+            id="shelter-status-filter"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={{
+              minWidth: "200px",
+              padding: "9px 12px",
+              borderRadius: "6px",
+              border: "1px solid #d1d5db",
+              backgroundColor: "#fff",
+              color: "#374151",
+              fontSize: "0.95rem",
+              cursor: "pointer",
+            }}
+          >
+            <option value="all">Visos</option>
+            <option value="upcoming">Būsimos</option>
+            <option value="completed">Įvykusios</option>
+            <option value="cancelled">Atšauktos</option>
           </select>
         </div>
       </div>
 
-      {error && <div className="shelter-res-error">{error}</div>}
+      {error && (
+        <div
+          style={{
+            backgroundColor: "#fee2e2",
+            color: "#991b1b",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            marginBottom: "18px",
+          }}
+        >
+          {error}
+        </div>
+      )}
+
       {successMessage && (
-        <div className="shelter-res-success">{successMessage}</div>
+        <div
+          style={{
+            backgroundColor: "#e3f1df",
+            color: "#3f7a35",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            marginBottom: "18px",
+            fontWeight: 600,
+          }}
+        >
+          {successMessage}
+        </div>
       )}
 
       {!error && (
-        <div className="shelter-res-table">
-          <div className="shelter-res-row shelter-res-head">
-            <span>Savanoris</span>
-            <span>Augintinis</span>
-            <span>Data</span>
-            <span>Laikas</span>
-            <span />
-          </div>
+        <div style={{ overflowX: "auto" }}>
+          <div style={{ minWidth: "700px" }}>
+            {/* Žalias headingas */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1.4fr 1.2fr 1fr 1fr 200px",
+                alignItems: "center",
+                gap: "12px",
+                backgroundColor: "#6aa84f",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                padding: "14px 20px",
+                borderRadius: "8px",
+                marginBottom: "10px",
+              }}
+            >
+              <span>Savanoris</span>
+              <span>Augintinis</span>
+              <span>Data</span>
+              <span>Laikas</span>
+              <span />
+            </div>
 
-          {visibleReservations.length === 0 ? (
-            <div className="shelter-res-empty">Rezervacijų nėra.</div>
-          ) : (
-            visibleReservations.map((r) => (
+            {/* Rezervacijų eilutės */}
+            {filteredReservations.length === 0 ? (
               <div
-                key={r.reservation_id}
-                className={`shelter-res-row shelter-res-item ${r.displayStatus === "cancelled" ? "is-cancelled" : ""}`}
+                style={{
+                  border: "1px solid #d1d5db",
+                  borderRadius: "6px",
+                  backgroundColor: "#fff",
+                  padding: "24px",
+                  textAlign: "center",
+                  color: "#6b7280",
+                }}
               >
-                <span>{r.volunteer}</span>
-                <span>{r.pet_name}</span>
-                <span>{r.date}</span>
-                <span>{r.reservation_start.slice(0, 5)}</span>
-                <span className="shelter-res-action">
-                  {r.displayStatus === "upcoming" ? (
-                    <button
-                      className="shelter-res-cancel-btn"
-                      onClick={() => openCancelModal(r)}
-                    >
-                      Atšaukti rezervaciją
-                    </button>
-                  ) : (
-                    <span className={`shelter-res-status ${r.displayStatus}`}>
-                      {STATUS_LABELS[r.displayStatus]}
-                    </span>
-                  )}
-                </span>
+                Pagal pasirinktą statusą rezervacijų nėra.
               </div>
-            ))
-          )}
+            ) : (
+              filteredReservations.map((r) => {
+                const badge = STATUS_BADGES[r.displayStatus];
+
+                return (
+                  <div
+                    key={r.reservation_id}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1.4fr 1.2fr 1fr 1fr 200px",
+                      alignItems: "center",
+                      gap: "12px",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      backgroundColor: "#fff",
+                      padding: "12px 20px",
+                      marginBottom: "8px",
+                      color: "#374151",
+                      fontSize: "0.95rem",
+                      opacity: r.displayStatus === "cancelled" ? 0.75 : 1,
+                    }}
+                  >
+                    <span>{r.volunteer}</span>
+                    <span>{r.pet_name}</span>
+                    <span>{r.date}</span>
+                    <span>{formatTime(r)}</span>
+                    <span style={{ display: "flex", justifyContent: "flex-end" }}>
+                      {r.displayStatus === "upcoming" ? (
+                        <button
+                          onClick={() => openCancelModal(r)}
+                          style={{
+                            width: "100%",
+                            backgroundColor: "#e5e7eb",
+                            color: "#1f2937",
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "10px 14px",
+                            fontWeight: 700,
+                            fontSize: "0.9rem",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Atšaukti rezervaciją
+                        </button>
+                      ) : (
+                        <span
+                          style={{
+                            backgroundColor: badge.backgroundColor,
+                            color: badge.color,
+                            padding: "6px 14px",
+                            borderRadius: "999px",
+                            fontSize: "0.82rem",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {badge.label}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       )}
 
