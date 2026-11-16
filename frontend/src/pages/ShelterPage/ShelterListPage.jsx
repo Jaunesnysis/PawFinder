@@ -105,6 +105,7 @@ const ShelterListPage = () => {
                                     transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                                     cursor: 'pointer',
                                     height: '100%',
+                                    boxSizing: 'border-box',
                                     display: 'flex',
                                     flexDirection: 'column'
                                 }}
