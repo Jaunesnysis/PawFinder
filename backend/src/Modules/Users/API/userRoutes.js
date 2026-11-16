@@ -16,7 +16,18 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-router.post("/register", async (req, res) => {
+//Iškeltas slaptažodžio patikrinimas
+const validatePassWithConfimationPass = (req, res, next) => {
+    const {password, passwordConfirmation} = req.body;
+    if (password !== passwordConfirmation) {
+        return res
+            .status(400)
+            .json({ error: "Password confirmation does not match" });
+    }
+    next();
+};
+
+router.post("/register", validatePassWithConfimationPass, async (req, res) => {
   try {
     const {
       name,
@@ -28,11 +39,6 @@ router.post("/register", async (req, res) => {
       passwordConfirmation,
     } = req.body;
 
-    if (password !== passwordConfirmation) {
-      return res
-        .status(400)
-        .json({ error: "Password confirmation does not match" });
-    }
 
     const userData = { name, surname, email, phone, birthDate, password };
     const user = await userService.registerUser(userData);
