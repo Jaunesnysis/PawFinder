@@ -64,33 +64,33 @@ const Navbar = () => {
         {/*  Pradžia*/}
         {/*</Link>*/}
         {/* TIK SAVANORIAMS (Volunteer) */}
-        {(user.role === "user") && (
+        {user.role === "user" && (
           <>
             <Link to="/animals" style={styles.link}>
               Savanoriams
             </Link>
-              <Link to="/mainAnimals" style={styles.link}>
-                  Gyvūnai
-              </Link>
-              <Link to="/shelters" style={styles.link}>
-                  Prieglaudos
-              </Link>
-              <Link to="/myReservationsPage" style={styles.link}>
-                  Mano rezervacijos
-              </Link>
-              <Link to="/" style={styles.link}>
-                  Mano profilis
-              </Link>
+            <Link to="/mainAnimals" style={styles.link}>
+              Gyvūnai
+            </Link>
+            <Link to="/shelters" style={styles.link}>
+              Prieglaudos
+            </Link>
+            <Link to="/myReservationsPage" style={styles.link}>
+              Mano rezervacijos
+            </Link>
+            <Link to="/" style={styles.link}>
+              Mano profilis
+            </Link>
 
             <Link to="/achievements" style={styles.achievementsLink}>
               🏆 Pasiekimai
             </Link>
             <Link
-                  to={`/favorites/${user.id}`}
-                  style={{ ...styles.link, color: "#e91e63" }}>
-                  ❤️ Patikę
+              to={`/favorites/${user.id}`}
+              style={{ ...styles.link, color: "#e91e63" }}
+            >
+              ❤️ Patikę
             </Link>
-
           </>
         )}
 
@@ -100,16 +100,15 @@ const Navbar = () => {
             <Link to="/mySheltersPets" style={styles.link}>
               Mano augintiniai
             </Link>
-            <Link to="/myReservationsPage" style={styles.link}>
+            <Link to="/shelterReservations" style={styles.link}>
               Prieglaudos rezervacijos
             </Link>
-              <Link to="/statistics" style={styles.link}>
-                  Statistika
-              </Link>
-              <Link to="/shelterProfile" style={styles.link}>
-                  Prieglaudos profilis
-              </Link>
-
+            <Link to="/statistics" style={styles.link}>
+              Statistika
+            </Link>
+            <Link to="/shelterProfile" style={styles.link}>
+              Prieglaudos profilis
+            </Link>
           </>
         )}
 
@@ -117,7 +116,6 @@ const Navbar = () => {
         <Link to="/notifications" style={styles.notificationsLink}>
           🔔 Pranešimai
         </Link>
-
       </div>
 
       {/* DEŠINĖ: Atsijungimas */}

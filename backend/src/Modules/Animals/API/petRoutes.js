@@ -5,7 +5,6 @@ const petService = require("../Application/petService");
 const reservationService = require("../../Reservations/Application/reservationService");
 const authorizeUser = require("../../../Infrastructure/Middleware/authMiddleware");
 
-
 // Front-ende tu kvieti: http://localhost:5050/api/mainAnimals
 router.get("/mainAnimals", async (req, res) => {
   try {
@@ -154,25 +153,6 @@ router.post("/reservations", async (req, res) => {
   }
 });
 
-/**
- * POST /api/pets/reservations/:id/cancel
- * Cancel a reservation
- */
-router.post("/reservations/:id/cancel", async (req, res) => {
-  try {
-    const reservationId = parseInt(req.params.id);
-
-    const reservation = await petService.cancelReservation(reservationId);
-
-    res.json(reservation);
-  } catch (error) {
-    console.error("Klaida atšaukiant rezervaciją:", error);
-    res
-      .status(500)
-      .json({ error: error.message || "Nepavyko atšaukti rezervacijos." });
-  }
-});
-
 router.get("/favorites/:userid", async (req, res) => {
   try {
     const userId = req.params.userid;
@@ -184,7 +164,7 @@ router.get("/favorites/:userid", async (req, res) => {
   }
 });
 
-router.get('/favorites/:userId/:petId', async (req, res) => {
+router.get("/favorites/:userId/:petId", async (req, res) => {
   try {
     const { userId, petId } = req.params;
     const isFav = await petService.isFavorite(userId, petId);
@@ -194,7 +174,7 @@ router.get('/favorites/:userId/:petId', async (req, res) => {
   }
 });
 
-router.post('/favorites/:userId/:petId', async (req, res) => {
+router.post("/favorites/:userId/:petId", async (req, res) => {
   try {
     const { userId, petId } = req.params;
     const result = await petService.addFavorite(userId, petId);
@@ -205,7 +185,7 @@ router.post('/favorites/:userId/:petId', async (req, res) => {
 });
 
 // Pašalinti iš mėgstamiausių
-router.delete('/favorites/:userId/:petId', async (req, res) => {
+router.delete("/favorites/:userId/:petId", async (req, res) => {
   try {
     const { userId, petId } = req.params;
     const result = await petService.removeFavorite(userId, petId);
@@ -214,87 +194,111 @@ router.delete('/favorites/:userId/:petId', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-router.get('/shelter/petList', authorizeUser, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const pets = await petService.getSheltersPets(userId);
-        res.json(pets);
-
-    } catch (error) {
-        console.log("Serverio klaida Animal routes: GET sheltersPets");
-        res.status(500).json({ error: "Serverio klaida." });
-    }
+router.get("/shelter/petList", authorizeUser, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const pets = await petService.getSheltersPets(userId);
+    res.json(pets);
+  } catch (error) {
+    console.log("Serverio klaida Animal routes: GET sheltersPets");
+    res.status(500).json({ error: "Serverio klaida." });
+  }
 });
 
 const sendError = (res, error, where) => {
-    console.error(`Klaida ${where}:`, error.message);
-    const status = error.status ?? 500;
-    res.status(status).json({ error: status === 500 ? "Serverio klaida." : error.message });
+  console.error(`Klaida ${where}:`, error.message);
+  const status = error.status ?? 500;
+  res
+    .status(status)
+    .json({ error: status === 500 ? "Serverio klaida." : error.message });
 };
 
 router.post("/", authorizeUser, async (req, res) => {
-    try {
-        const pet = await petService.createPet(req.user.id, req.body);
-        res.status(201).json(pet);
-    } catch (e) {
-        sendError(res, e, "POST /pets");
-    }
+  try {
+    const pet = await petService.createPet(req.user.id, req.body);
+    res.status(201).json(pet);
+  } catch (e) {
+    sendError(res, e, "POST /pets");
+  }
 });
 
 router.put("/:id", authorizeUser, async (req, res) => {
-    try {
-        const pet = await petService.updatePet(req.user.id, Number(req.params.id), req.body);
-        res.json(pet);
-    } catch (e) {
-        sendError(res, e, "PUT /pets/:id");
-    }
+  try {
+    const pet = await petService.updatePet(
+      req.user.id,
+      Number(req.params.id),
+      req.body,
+    );
+    res.json(pet);
+  } catch (e) {
+    sendError(res, e, "PUT /pets/:id");
+  }
 });
 
-const multer = require('multer');
-const crypto = require('crypto');
-const path = require('path');
-const fs = require('fs');
+const multer = require("multer");
+const crypto = require("crypto");
+const path = require("path");
+const fs = require("fs");
 
 console.log("UPLOADS_DIR:", petService.UPLOADS_DIR);
 const upload = multer({
-    storage: multer.diskStorage({
-        destination: petService.UPLOADS_DIR,
-        filename: (req, file, cb) =>
-            cb(null, crypto.randomUUID() + path.extname(file.originalname).toLowerCase()),
-    }),
-    fileFilter: (req, file, cb) => cb(null, ['image/jpeg', 'image/png'].includes(file.mimetype)),
-    limits: { fileSize: 5 * 1024 * 1024, files: 10 },
+  storage: multer.diskStorage({
+    destination: petService.UPLOADS_DIR,
+    filename: (req, file, cb) =>
+      cb(
+        null,
+        crypto.randomUUID() + path.extname(file.originalname).toLowerCase(),
+      ),
+  }),
+  fileFilter: (req, file, cb) =>
+    cb(null, ["image/jpeg", "image/png"].includes(file.mimetype)),
+  limits: { fileSize: 5 * 1024 * 1024, files: 10 },
 });
 
-router.post('/:id/images', authorizeUser, upload.array('images', 10), async (req, res) => {
+router.post(
+  "/:id/images",
+  authorizeUser,
+  upload.array("images", 10),
+  async (req, res) => {
     try {
-        const pet = await petService.addImages(
-            req.user.id, Number(req.params.id), req.files, req.body.primaryIndex);
-        res.status(201).json(pet);
+      const pet = await petService.addImages(
+        req.user.id,
+        Number(req.params.id),
+        req.files,
+        req.body.primaryIndex,
+      );
+      res.status(201).json(pet);
     } catch (e) {
-        (req.files || []).forEach((f) => fs.unlink(f.path, () => {}));   // neleisti likti nereikalingų failų
-        sendError(res, e, 'POST /pets/:id/images');
+      (req.files || []).forEach((f) => fs.unlink(f.path, () => {})); // neleisti likti nereikalingų failų
+      sendError(res, e, "POST /pets/:id/images");
     }
+  },
+);
+
+router.delete("/:id/images/:imageId", authorizeUser, async (req, res) => {
+  try {
+    const pet = await petService.deleteImage(
+      req.user.id,
+      Number(req.params.id),
+      Number(req.params.imageId),
+    );
+    res.json(pet);
+  } catch (e) {
+    sendError(res, e, "DELETE /pets/:id/images/:imageId");
+  }
 });
 
-router.delete('/:id/images/:imageId', authorizeUser, async (req, res) => {
-    try {
-        const pet = await petService.deleteImage(
-            req.user.id, Number(req.params.id), Number(req.params.imageId));
-        res.json(pet);
-    } catch (e) {
-        sendError(res, e, 'DELETE /pets/:id/images/:imageId');
-    }
-});
-
-router.put('/:id/images/:imageId/primary', authorizeUser, async (req, res) => {
-    try {
-        const pet = await petService.setPrimaryImage(
-            req.user.id, Number(req.params.id), Number(req.params.imageId));
-        res.json(pet);
-    } catch (e) {
-        sendError(res, e, 'PUT /pets/:id/images/:imageId/primary');
-    }
+router.put("/:id/images/:imageId/primary", authorizeUser, async (req, res) => {
+  try {
+    const pet = await petService.setPrimaryImage(
+      req.user.id,
+      Number(req.params.id),
+      Number(req.params.imageId),
+    );
+    res.json(pet);
+  } catch (e) {
+    sendError(res, e, "PUT /pets/:id/images/:imageId/primary");
+  }
 });
 
 module.exports = router;

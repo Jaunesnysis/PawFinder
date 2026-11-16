@@ -1,0 +1,73 @@
+.cancel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(107, 114, 128, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.cancel-modal {
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.cancel-modal h2 {
+  margin: 0 0 16px;
+  font-size: 1.4rem;
+  color: #1f2937;
+}
+
+.cancel-modal p {
+  margin: 0 0 10px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.cancel-modal-note {
+  font-size: 0.9rem;
+  color: #6b7280 !important;
+}
+
+.cancel-modal-error {
+  color: #c53030 !important;
+}
+
+.cancel-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.cancel-btn-secondary,
+.cancel-btn-danger {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.cancel-btn-secondary {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+.cancel-btn-danger {
+  background: #d9534f;
+  color: #fff;
+}
+
+.cancel-btn-secondary:disabled,
+.cancel-btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

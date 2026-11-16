@@ -16,10 +16,11 @@ import RegistrationPage from "./pages/RegistrationPage/RegistrationPage.jsx";
 import PetDetailsPage from "./pages/PetDetailsPage/PetDetailsPage";
 import LeaderboardPage from "./pages/LeaderboardPage/LeaderboardPage.jsx";
 import MyReservationsPage from "./pages/MyReservationsPage.jsx";
-import RegistrationPageShelter from './pages/RegistrationPage/RegistrationPageShelter';
+import RegistrationPageShelter from "./pages/RegistrationPage/RegistrationPageShelter";
 import ShelterPetsListPage from "./pages/ShelterPage/ShelterPetsListPage.jsx";
 import NewPetPage from "./pages/PetFormPage/NewPetPage.jsx";
 import EditPetPage from "./pages/PetFormPage/EditPetPage.jsx";
+import ShelterReservationsPage from "./pages/ShelterPage/ShelterReservationsPage.jsx";
 
 function App() {
   return (
@@ -38,14 +39,24 @@ function App() {
           <Route path="/mainAnimals" element={<MainAnimalsPage />} />
           <Route path="/shelters" element={<ShelterListPage />} />
           <Route path="/shelters/:shelterId" element={<ShelterProfilePage />} />
+          <Route
+            path="/shelterReservations"
+            element={<ShelterReservationsPage />}
+          />
           <Route path="/achievements" element={<AchievementsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/favorites/:userid" element={<FavoritesPage />} />
           <Route path="/pets/:id" element={<PetDetailsPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="/myReservationsPage" element={<MyReservationsPage/>}></Route>
-          <Route path="/register-shelter" element={<RegistrationPageShelter />} />
+          <Route
+            path="/myReservationsPage"
+            element={<MyReservationsPage />}
+          ></Route>
+          <Route
+            path="/register-shelter"
+            element={<RegistrationPageShelter />}
+          />
           <Route path="/mySheltersPets" element={<ShelterPetsListPage />} />
           <Route path="/addNewPet" element={<NewPetPage />} />
           <Route path="/editPet/:id" element={<EditPetPage />} />

@@ -162,18 +162,6 @@ const createReservation = async (reservation) => {
   return newReservation;
 };
 
-const cancelReservation = async (reservationId) => {
-  const reservation = mockReservations.find(
-    (r) => r.reservation_id === reservationId,
-  );
-  if (!reservation) throw new Error("Reservation not found");
-  if (reservation.status === "cancelled") throw new Error("Already cancelled");
-
-  reservation.status = "cancelled";
-  reservation.cancelled_at = new Date();
-  return reservation;
-};
-
 const getReservationById = async (reservationId) => {
   return mockReservations.find((r) => r.reservation_id === reservationId);
 };
@@ -226,7 +214,7 @@ const addFavorite = async (userId, petId) => {
       WHERE user_id = $1 AND pet_id = $2
     `;
     const checkResult = await db.query(checkQuery, [userId, petId]);
-    
+
     if (checkResult.rows.length > 0) {
       return { alreadyExists: true };
     }
@@ -276,7 +264,8 @@ const getFavoritesByUser = async (userId) => {
   }
 };
 
-const isFavorite = async (userId, petId) => {  try {
+const isFavorite = async (userId, petId) => {
+  try {
     const query = `
       SELECT * FROM favourites 
       WHERE user_id = $1 AND pet_id = $2
@@ -290,8 +279,7 @@ const isFavorite = async (userId, petId) => {  try {
 };
 
 const findSheltersPets = async (userId) => {
-
-    const query = `
+  const query = `
         SELECT p.*, 
         COALESCE(
             (SELECT json_agg(json_build_object(
@@ -306,84 +294,115 @@ const findSheltersPets = async (userId) => {
         JOIN users u ON u.shelter_id = p.shelter_id
         WHERE u.user_id = $1
     `;
-    try {
-        const result = await db.query(query, [userId]);
-        return result.rows.map((row) => new Pet(row));
-    } catch (error) {
-        console.error("Klaida findSheltersPets:", error.message);
-        throw error;
-    }
-}
+  try {
+    const result = await db.query(query, [userId]);
+    return result.rows.map((row) => new Pet(row));
+  } catch (error) {
+    console.error("Klaida findSheltersPets:", error.message);
+    throw error;
+  }
+};
 const createPet = async (p) => {
-    const result = await db.query(
-        `INSERT INTO pets
+  const result = await db.query(
+    `INSERT INTO pets
          (name, species, breed, age, size, weight, activity_level,
           health_info, shelter_description, status, shelter_id, city)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
                  (SELECT city FROM shelters WHERE shelter_id = $11))
              RETURNING pet_id`,
-        [p.name, p.species, p.breed, p.age, p.size, p.weight, p.activity_level,
-            p.health_info, p.shelter_description, p.status, p.shelter_id]
-    );
-    return result.rows[0].pet_id;
+    [
+      p.name,
+      p.species,
+      p.breed,
+      p.age,
+      p.size,
+      p.weight,
+      p.activity_level,
+      p.health_info,
+      p.shelter_description,
+      p.status,
+      p.shelter_id,
+    ],
+  );
+  return result.rows[0].pet_id;
 };
 
 const updatePet = async (petId, p) => {
-    await db.query(
-        `UPDATE pets
+  await db.query(
+    `UPDATE pets
          SET name = $2, species = $3, breed = $4, age = $5, size = $6,
              weight = $7, activity_level = $8, health_info = $9,
              shelter_description = $10, status = $11, updated_at = NOW()
          WHERE pet_id = $1`,
-        [petId, p.name, p.species, p.breed, p.age, p.size, p.weight,
-            p.activity_level, p.health_info, p.shelter_description, p.status]
-    );
+    [
+      petId,
+      p.name,
+      p.species,
+      p.breed,
+      p.age,
+      p.size,
+      p.weight,
+      p.activity_level,
+      p.health_info,
+      p.shelter_description,
+      p.status,
+    ],
+  );
 };
 
 const findPetShelterId = async (petId) => {
-    const r = await db.query("SELECT shelter_id FROM pets WHERE pet_id = $1", [petId]);
-    return r.rows[0]?.shelter_id ?? null;
+  const r = await db.query("SELECT shelter_id FROM pets WHERE pet_id = $1", [
+    petId,
+  ]);
+  return r.rows[0]?.shelter_id ?? null;
 };
 
 const ensurePrimaryImage = async (petId) => {
-    await db.query(
-        `UPDATE pet_images SET is_primary = TRUE
+  await db.query(
+    `UPDATE pet_images SET is_primary = TRUE
          WHERE image_id = (SELECT image_id FROM pet_images WHERE pet_id = $1 ORDER BY image_id LIMIT 1)
            AND NOT EXISTS (SELECT 1 FROM pet_images WHERE pet_id = $1 AND is_primary = TRUE)`,
-        [petId]);
+    [petId],
+  );
 };
 
 const setPrimaryImage = async (petId, imageId) => {
-    await db.query(
-        "UPDATE pet_images SET is_primary = (image_id = $2) WHERE pet_id = $1",
-        [petId, imageId]);
+  await db.query(
+    "UPDATE pet_images SET is_primary = (image_id = $2) WHERE pet_id = $1",
+    [petId, imageId],
+  );
 };
 
 const addPetImages = async (petId, urls, primaryIndex = null) => {
-    const ids = [];
-    for (const url of urls) {
-        const r = await db.query(
-            "INSERT INTO pet_images (pet_id, image_url, is_primary) VALUES ($1, $2, FALSE) RETURNING image_id",
-            [petId, url]);
-        ids.push(r.rows[0].image_id);
-    }
-    if (primaryIndex !== null && ids[primaryIndex] !== undefined) {
-        await setPrimaryImage(petId, ids[primaryIndex]);   // vartotojas pasirinko naują kaip pagrindinę
-    } else {
-        await ensurePrimaryImage(petId);                   // kitaip, jei nėra pagrindinės, pirma tampa
-    }
+  const ids = [];
+  for (const url of urls) {
+    const r = await db.query(
+      "INSERT INTO pet_images (pet_id, image_url, is_primary) VALUES ($1, $2, FALSE) RETURNING image_id",
+      [petId, url],
+    );
+    ids.push(r.rows[0].image_id);
+  }
+  if (primaryIndex !== null && ids[primaryIndex] !== undefined) {
+    await setPrimaryImage(petId, ids[primaryIndex]); // vartotojas pasirinko naują kaip pagrindinę
+  } else {
+    await ensurePrimaryImage(petId); // kitaip, jei nėra pagrindinės, pirma tampa
+  }
 };
 
 const findPetImage = async (petId, imageId) => {
-    const r = await db.query(
-        "SELECT image_id, image_url FROM pet_images WHERE image_id = $1 AND pet_id = $2",
-        [imageId, petId]);
-    return r.rows[0] ?? null;
+  const r = await db.query(
+    "SELECT image_id, image_url FROM pet_images WHERE image_id = $1 AND pet_id = $2",
+    [imageId, petId],
+  );
+  return r.rows[0] ?? null;
 };
 
 const deletePetImage = async (petId, imageId) => {
-    await db.query("DELETE FROM pet_images WHERE image_id = $1 AND pet_id = $2", [imageId, petId]);
-    await ensurePrimaryImage(petId);   // ištrynus pagrindinę, kita tampa pagrindine
+  await db.query("DELETE FROM pet_images WHERE image_id = $1 AND pet_id = $2", [
+    imageId,
+    petId,
+  ]);
+  await ensurePrimaryImage(petId); // ištrynus pagrindinę, kita tampa pagrindine
 };
 
 module.exports = {
@@ -391,7 +410,6 @@ module.exports = {
   getAllAvailablePets,
   findAvailableByShelterId,
   createReservation,
-  cancelReservation,
   getReservationById,
   findPetById,
   getDistinctBreeds,
@@ -406,5 +424,5 @@ module.exports = {
   addPetImages,
   findPetImage,
   deletePetImage,
-  setPrimaryImage
+  setPrimaryImage,
 };
