@@ -27,19 +27,23 @@ const validatePassWithConfimationPass = (req, res, next) => {
     next();
 };
 
+//Iškeltas klaidų priskirimas
+const handleRegistrationError = (error, res) => {
+    if (error.message.includes("Validation failed")) {
+        return res.status(400).json({ error: error.message });
+    }
+
+    if (error.message === "Email already exists") {
+        return res.status(409).json({ error: "Email already exists" });
+    }
+
+    console.error("Registration error:", error);
+    res.status(500).json({ error: "Internal server error" });
+}
+
 router.post("/register", validatePassWithConfimationPass, async (req, res) => {
   try {
-    const {
-      name,
-      surname,
-      email,
-      phone,
-      birthDate,
-      password,
-      passwordConfirmation,
-    } = req.body;
-
-
+    const {name, surname, email, phone, birthDate, password} = req.body;
     const userData = { name, surname, email, phone, birthDate, password };
     const user = await userService.registerUser(userData);
 
@@ -48,16 +52,7 @@ router.post("/register", validatePassWithConfimationPass, async (req, res) => {
       user,
     });
   } catch (error) {
-    if (error.message.includes("Validation failed")) {
-      return res.status(400).json({ error: error.message });
-    }
-
-    if (error.message === "Email already exists") {
-      return res.status(409).json({ error: "Email already exists" });
-    }
-
-    console.error("Registration error:", error);
-    res.status(500).json({ error: "Internal server error" });
+        handleRegistrationError(error, res);
   }
 });
 
