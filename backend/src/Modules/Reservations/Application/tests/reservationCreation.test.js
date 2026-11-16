@@ -64,6 +64,21 @@ describe("Reservation creation", () => {
     expect(reservationRepository.getReservedSlots).not.toHaveBeenCalled();
   });
 
+  test("returns no available slots when the pet is not available", async () => {
+    reservationRepository.getPetById.mockResolvedValue({
+      pet_id: 5,
+      status: "reserved",
+    });
+
+    const slots = await reservationService.getAvailableTimeslots(
+      5,
+      "2026-11-17",
+    );
+
+    expect(slots).toEqual([]);
+    expect(reservationRepository.getReservedSlots).not.toHaveBeenCalled();
+  });
+
   test("rejects a past date", async () => {
     await expect(
       reservationService.createReservation({
@@ -125,32 +140,47 @@ describe("Reservation creation", () => {
     );
   });
 
-  test("allows another time slot when the pet is already reserved", async () => {
+  test("allows separate time slots for the same available pet", async () => {
+    reservationRepository.getCurrentDateTime.mockResolvedValue({
+      date: "2026-11-16",
+      time: "08:00:00",
+    });
+    reservationRepository.createReservation
+      .mockResolvedValueOnce({ reservation_id: 12 })
+      .mockResolvedValueOnce({ reservation_id: 13 });
+
+    await reservationService.createReservation({
+      user_id: 7,
+      pet_id: 5,
+      date: "2026-11-16",
+      reservation_start: "09:00:00",
+      reservation_end: "10:00:00",
+    });
+    await reservationService.createReservation({
+      user_id: 8,
+      pet_id: 5,
+      date: "2026-11-16",
+      reservation_start: "10:00:00",
+      reservation_end: "11:00:00",
+    });
+
+    expect(reservationRepository.createReservation).toHaveBeenCalledTimes(2);
+    expect(reservationRepository.createReservation).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ reservation_start: "09:00:00" }),
+    );
+    expect(reservationRepository.createReservation).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ reservation_start: "10:00:00" }),
+    );
+  });
+
+  test("does not allow a reservation when the pet is reserved", async () => {
     reservationRepository.getPetById.mockResolvedValue({
       pet_id: 5,
       name: "Mika",
       shelter_id: 3,
       status: "reserved",
-    });
-
-    await expect(
-      reservationService.createReservation({
-        user_id: 7,
-        pet_id: 5,
-        date: "2026-11-16",
-        reservation_start: "11:00:00",
-        reservation_end: "12:00:00",
-      }),
-    ).resolves.toEqual({ reservation_id: 12 });
-    expect(reservationRepository.createReservation).toHaveBeenCalled();
-  });
-
-  test("does not allow a reservation for an adopted pet", async () => {
-    reservationRepository.getPetById.mockResolvedValue({
-      pet_id: 5,
-      name: "Mika",
-      shelter_id: 3,
-      status: "adopted",
     });
 
     await expect(

@@ -41,6 +41,7 @@ const getAvailableTimeslots = async (petId, date) => {
 
   const pet = await reservationRepository.getPetById(petId);
   if (!pet) throw { status: 404, message: "Pet not found" };
+  if (pet.status !== "available") return [];
 
   const currentDateTime = await reservationRepository.getCurrentDateTime();
   if (date < currentDateTime.date) return [];
@@ -90,8 +91,8 @@ const createReservation = async (reservation) => {
 
   const pet = await reservationRepository.getPetById(pet_id);
   if (!pet) throw { status: 404, message: "Pet not found" };
-  if (pet.status === "adopted") {
-    throw { status: 400, message: "Adopted pets cannot be reserved" };
+  if (pet.status !== "available") {
+    throw { status: 400, message: "Pet is not available for walking" };
   }
 
   const normalizedStart = normalizeTime(reservation_start);
