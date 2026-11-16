@@ -6,6 +6,16 @@ const WALK_START = 9; // 09:00
 const WALK_END = 17; // 17:00
 const SLOT_MINUTES = 60;
 
+const isValidDate = (date) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+  const parsed = new Date(`${date}T00:00:00.000Z`);
+  return parsed.toISOString().slice(0, 10) === date;
+};
+
+const isInPast = (date, time, currentDateTime) =>
+  date < currentDateTime.date ||
+  (date === currentDateTime.date && time <= currentDateTime.time);
+
 const normalizeTime = (timeStr) => {
   // accept HH:MM or HH:MM:SS
   const [h, m] = timeStr.split(":").map((x) => parseInt(x, 10));
@@ -25,12 +35,24 @@ const generateShelterSlots = (date) => {
 const getAvailableTimeslots = async (petId, date) => {
   if (!petId) throw { status: 400, message: "PetId required" };
   if (!date) throw { status: 400, message: "Date required" };
+  if (!isValidDate(date)) {
+    throw { status: 400, message: "Invalid date" };
+  }
 
   const pet = await reservationRepository.getPetById(petId);
   if (!pet) throw { status: 404, message: "Pet not found" };
 
+  const currentDateTime = await reservationRepository.getCurrentDateTime();
+  if (date < currentDateTime.date) return [];
+
   // fetch all standard schedule slots and remove reserved
   const shelterSlots = generateShelterSlots(date);
+  const futureSlots =
+    date === currentDateTime.date
+      ? shelterSlots.filter(
+          (slot) => slot.reservation_start > currentDateTime.time,
+        )
+      : shelterSlots;
   const reservedSlots = await reservationRepository.getReservedSlots(
     petId,
     date,
@@ -42,7 +64,7 @@ const getAvailableTimeslots = async (petId, date) => {
     ),
   );
 
-  return shelterSlots.filter(
+  return futureSlots.filter(
     (slot) =>
       !reservedKeySet.has(`${slot.reservation_start}-${slot.reservation_end}`),
   );
@@ -59,14 +81,17 @@ const createReservation = async (reservation) => {
         "user_id, pet_id, date, reservation_start and reservation_end are required",
     };
   }
+  if (!isValidDate(date)) {
+    throw { status: 400, message: "Invalid reservation date" };
+  }
 
   const user = await reservationRepository.getUserById(user_id);
   if (!user) throw { status: 404, message: "User not found" };
 
   const pet = await reservationRepository.getPetById(pet_id);
   if (!pet) throw { status: 404, message: "Pet not found" };
-  if (pet.status !== "available") {
-    throw { status: 400, message: "Pet status is not available" };
+  if (pet.status === "adopted") {
+    throw { status: 400, message: "Adopted pets cannot be reserved" };
   }
 
   const normalizedStart = normalizeTime(reservation_start);
@@ -84,6 +109,11 @@ const createReservation = async (reservation) => {
   );
   if (!slotValid) {
     throw { status: 400, message: "Selected slot is outside shelter schedule" };
+  }
+
+  const currentDateTime = await reservationRepository.getCurrentDateTime();
+  if (isInPast(date, normalizedStart, currentDateTime)) {
+    throw { status: 400, message: "Cannot reserve a past date or time" };
   }
 
   const alreadyTaken = await reservationRepository.isTimeSlotTaken(

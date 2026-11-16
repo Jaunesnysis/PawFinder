@@ -13,7 +13,9 @@ const sendError = (res, error, label) => {
 router.get("/pets/:id/timeslots", async (req, res) => {
   try {
     const petId = parseInt(req.params.id, 10);
-    const date = req.query.date || new Date().toISOString().split("T")[0];
+    const date =
+      req.query.date ||
+      new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Vilnius" });
 
     const slots = await reservationService.getAvailableTimeslots(petId, date);
     res.json({ pet_id: petId, date, slots });

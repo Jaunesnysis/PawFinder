@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
+const getLocalDate = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 const ReservationModal = ({ pet, onClose, onSuccess }) => {
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(getLocalDate);
     const [slots, setSlots] = useState([]);
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
@@ -10,12 +18,15 @@ const ReservationModal = ({ pet, onClose, onSuccess }) => {
 
     const fetchSlots = async (date) => {
         setLoadingSlots(true);
+        setSelectedSlot(null);
         try {
             const response = await fetch(`http://localhost:5050/api/pets/${pet.id}/timeslots?date=${date}`);
             const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Nepavyko užkrauti laikų');
             setSlots(data.slots || []);
         } catch (error) {
-            setErrorMessage('Nepavyko užkrauti laikų');
+            setSlots([]);
+            setErrorMessage(error.message);
         } finally {
             setLoadingSlots(false);
         }
@@ -43,7 +54,10 @@ const ReservationModal = ({ pet, onClose, onSuccess }) => {
                 }),
             });
 
-            if (!response.ok) throw new Error('Rezervacija nepavyko.');
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Rezervacija nepavyko.');
+            }
 
             // Pranešame tėviniam komponentui apie sėkmę
             onSuccess();
@@ -56,7 +70,15 @@ const ReservationModal = ({ pet, onClose, onSuccess }) => {
         <div className="modal-overlay">
             <div className="modal-content">
                 <h3>Rezervuoti laiką su {pet.name}</h3>
-                <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
+                <input
+                    type="date"
+                    value={selectedDate}
+                    min={getLocalDate()}
+                    onChange={(e) => {
+                        setErrorMessage('');
+                        setSelectedDate(e.target.value);
+                    }}
+                />
 
                 {loadingSlots ? <p>Kraunama...</p> : (
                     <div className="slots-grid">
@@ -69,6 +91,7 @@ const ReservationModal = ({ pet, onClose, onSuccess }) => {
                                 {slot.reservation_start.slice(0,5)}
                             </button>
                         ))}
+                        {slots.length === 0 && <p>Laisvų laikų šią dieną nėra.</p>}
                     </div>
                 )}
 

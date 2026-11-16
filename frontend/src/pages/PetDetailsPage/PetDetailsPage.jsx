@@ -112,15 +112,15 @@ const PetDetailsPage = () => {
                         </div>
                     )}
 
-                    {/* VEIKSMO ZONA: Mygtukas rodomas tik jei laisvas */}
+                    {/* Pavedžiojimo rezervacijos yra atskirtos nuo gyvūno būsenos. */}
                     <div className="action-area">
-                        {pet.status === 'available' ? (
+                        {pet.status !== 'adopted' ? (
                             <button className="cta-reserve" onClick={() => setShowModal(true)}>
                                 Rezervuoti pasivaikščiojimą
                             </button>
                         ) : (
                             <div className="reserved-message">
-                                🔒 Šiuo metu augintinis rezervuotas. Laisvų laikų nėra.
+                                🔒 Šis augintinis jau įvaikintas.
                             </div>
                         )}
                     </div>

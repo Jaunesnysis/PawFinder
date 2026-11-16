@@ -3,6 +3,7 @@ const reservationRepository = require('../../Infrastructure/reservationRepositor
 
 jest.mock('../../Infrastructure/reservationRepository', () => ({
   getReservationsByUserId: jest.fn(),
+  getCurrentDateTime: jest.fn(),
 }));
 
 describe('ReservationService - getUserReservations', () => {
