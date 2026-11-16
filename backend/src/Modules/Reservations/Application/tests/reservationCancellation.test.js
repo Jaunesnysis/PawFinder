@@ -9,6 +9,7 @@ jest.mock("../../Infrastructure/reservationRepository", () => ({
 jest.mock("../../../Notifications/Application/notificationService", () => ({
   createReservationNotification: jest.fn(),
   createCancellationNotification: jest.fn(),
+  createShelterCancellationNotification: jest.fn(),
 }));
 
 jest.mock("../../../Users/Application/userService", () => ({
@@ -89,6 +90,50 @@ describe("Reservation cancellation (US-15)", () => {
       expect(
         notificationService.createCancellationNotification,
       ).not.toHaveBeenCalled();
+      expect(
+        notificationService.createShelterCancellationNotification,
+      ).toHaveBeenCalledWith(
+        "1",
+        "10",
+        "Mika",
+        "2026-12-01",
+        "10:00:00",
+        "11:00:00",
+      );
+    });
+
+    test("volunteer cancelling does not notify the volunteer", async () => {
+      reservationRepository.getReservationForCancellation.mockResolvedValue(
+        upcomingReservation,
+      );
+      reservationRepository.cancelReservation.mockResolvedValue({
+        reservation_id: "10",
+        status: "cancelled",
+      });
+
+      await reservationService.cancelReservation(1, "10");
+
+      expect(
+        notificationService.createShelterCancellationNotification,
+      ).not.toHaveBeenCalled();
+    });
+
+    test("shelter cancellation still succeeds when volunteer notification fails", async () => {
+      reservationRepository.getReservationForCancellation.mockResolvedValue(
+        upcomingReservation,
+      );
+      reservationRepository.cancelReservation.mockResolvedValue({
+        reservation_id: "10",
+        status: "cancelled",
+      });
+      userService.getShelterIdByUserId.mockResolvedValue("3");
+      notificationService.createShelterCancellationNotification.mockRejectedValue(
+        new Error("Notification error"),
+      );
+
+      const result = await reservationService.cancelReservation(99, "10");
+
+      expect(result).toMatchObject({ status: "cancelled", cancelled_by: "shelter" });
     });
 
     test("shelter cannot cancel reservation of another shelter's pet", async () => {

@@ -140,6 +140,24 @@ describe("Reservation creation", () => {
     );
   });
 
+  test("still creates the reservation when the shelter notification fails", async () => {
+    notificationService.createReservationNotification.mockRejectedValueOnce(
+      new Error("Notification error"),
+    );
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const reservation = await reservationService.createReservation({
+      user_id: 7,
+      pet_id: 5,
+      date: "2026-11-16",
+      reservation_start: "11:00:00",
+      reservation_end: "12:00:00",
+    });
+
+    expect(reservation).toEqual({ reservation_id: 12 });
+    console.error.mockRestore();
+  });
+
   test("allows separate time slots for the same available pet", async () => {
     reservationRepository.getCurrentDateTime.mockResolvedValue({
       date: "2026-11-16",

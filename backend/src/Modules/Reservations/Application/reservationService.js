@@ -136,14 +136,19 @@ const createReservation = async (reservation) => {
     reservation_end: normalizedEnd,
   });
 
-  await notificationService.createReservationNotification(
-    pet.shelter_id,
-    created.reservation_id,
-    pet.name,
-    date,
-    normalizedStart,
-    normalizedEnd,
-  );
+  // Pranešimo klaida neturi sugadinti jau sukurtos rezervacijos
+  try {
+    await notificationService.createReservationNotification(
+      pet.shelter_id,
+      created.reservation_id,
+      pet.name,
+      date,
+      normalizedStart,
+      normalizedEnd,
+    );
+  } catch (error) {
+    console.error("Nepavyko sukurti rezervacijos pranešimo:", error.message);
+  }
 
   return created;
 };
@@ -254,8 +259,21 @@ const cancelReservation = async (userId, reservationId) => {
     } catch (error) {
       console.error("Nepavyko sukurti atšaukimo pranešimo:", error.message);
     }
+  } else if (actor === "shelter") {
+    // Prieglauda atšaukė – pranešame savanoriui
+    try {
+      await notificationService.createShelterCancellationNotification(
+        reservation.user_id,
+        reservation.reservation_id,
+        reservation.pet_name,
+        reservation.date,
+        reservation.reservation_start,
+        reservation.reservation_end,
+      );
+    } catch (error) {
+      console.error("Nepavyko sukurti atšaukimo pranešimo savanoriui:", error.message);
+    }
   }
-  // TODO: kai prieglauda atšaukia – pranešti savanoriui (notifications lentelė kol kas turi tik shelter_id)
 
   return { ...cancelled, cancelled_by: actor };
 };

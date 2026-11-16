@@ -1,152 +1,130 @@
-const notificationService = require('../notificationService');
+const notificationService = require("../notificationService");
 
-// Mock the repository
-jest.mock('../../Infrastructure/notificationRepository', () => ({
-    createNotification: jest.fn(),
-    getNotificationsByUser: jest.fn(),
-    markAsRead: jest.fn()
+jest.mock("../../Infrastructure/notificationRepository", () => ({
+  createNotifications: jest.fn(),
+  getShelterUserIds: jest.fn(),
+  getNotificationsByUser: jest.fn(),
+  markAsRead: jest.fn(),
 }));
 
-const notificationRepository = require('../../Infrastructure/notificationRepository');
+const notificationRepository = require("../../Infrastructure/notificationRepository");
 
-describe('NotificationService', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
+describe("NotificationService", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    console.warn.mockRestore();
+  });
+
+  describe("createReservationNotification (savanoris rezervavo -> prieglauda)", () => {
+    test("sends one notification to every user of the pet's shelter", async () => {
+      notificationRepository.getShelterUserIds.mockResolvedValue(["5", "6"]);
+      notificationRepository.createNotifications.mockResolvedValue([
+        { notification_id: "1", user_id: "5" },
+        { notification_id: "2", user_id: "6" },
+      ]);
+
+      const result = await notificationService.createReservationNotification(
+        101, 1, "Pukis", "2024-03-20", "10:00:00", "11:00:00",
+      );
+
+      expect(notificationRepository.getShelterUserIds).toHaveBeenCalledWith(101);
+      expect(notificationRepository.createNotifications).toHaveBeenCalledWith(["5", "6"], {
+        reservation_id: 1,
+        type: "reservation_created",
+        message: "Nauja rezervacija: Pukis pavedžiojimui 2024-03-20 nuo 10:00 iki 11:00.",
+      });
+      expect(result).toHaveLength(2);
     });
 
-    describe('createReservationNotification', () => {
-        test('should create reservation notification successfully', async () => {
-            // Arrange
-            const mockNotification = {
-                notification_id: 1,
-                shelter_id: 101,
-                reservation_id: 1,
-                type: 'reservation_created',
-                message: 'Nauja rezervacija: Pukis pavedžiojimui 2024-03-20 nuo 10:00 iki 11:00.',
-                status: 'unread',
-                created_at: new Date(),
-                read_at: null
-            };
-            notificationRepository.createNotification.mockResolvedValue(mockNotification);
+    test("does not insert anything when the shelter has no users", async () => {
+      notificationRepository.getShelterUserIds.mockResolvedValue([]);
 
-            // Act
-            const result = await notificationService.createReservationNotification(
-                101, 1, 'Pukis', '2024-03-20', '10:00', '11:00'
-            );
+      const result = await notificationService.createReservationNotification(
+        101, 1, "Pukis", "2024-03-20", "10:00", "11:00",
+      );
 
-            // Assert
-            expect(notificationRepository.createNotification).toHaveBeenCalledWith({
-                shelter_id: 101,
-                reservation_id: 1,
-                type: 'reservation_created',
-                message: 'Nauja rezervacija: Pukis pavedžiojimui 2024-03-20 nuo 10:00 iki 11:00.'
-            });
-            expect(result).toEqual(mockNotification);
-        });
-
-        test('should handle repository error (critical situation)', async () => {
-            // Arrange
-            notificationRepository.createNotification.mockRejectedValue(new Error('Database error'));
-
-            // Act & Assert
-            await expect(notificationService.createReservationNotification(
-                101, 1, 'Pukis', '2024-03-20', '10:00', '11:00'
-            )).rejects.toThrow('Database error');
-        });
+      expect(notificationRepository.createNotifications).not.toHaveBeenCalled();
+      expect(result).toEqual([]);
     });
 
-    describe('createCancellationNotification', () => {
-        test('should create cancellation notification successfully', async () => {
-            // Arrange
-            const mockNotification = {
-                notification_id: 2,
-                shelter_id: 101,
-                reservation_id: 1,
-                type: 'reservation_cancelled',
-                message: 'Rezervacija atšaukta: Pukis pavedžiojimas 2024-03-20 nuo 10:00 iki 11:00 buvo atšauktas.',
-                status: 'unread',
-                created_at: new Date(),
-                read_at: null
-            };
-            notificationRepository.createNotification.mockResolvedValue(mockNotification);
+    test("propagates repository errors", async () => {
+      notificationRepository.getShelterUserIds.mockResolvedValue(["5"]);
+      notificationRepository.createNotifications.mockRejectedValue(new Error("Database error"));
 
-            // Act
-            const result = await notificationService.createCancellationNotification(
-                101, 1, 'Pukis', '2024-03-20', '10:00', '11:00'
-            );
+      await expect(
+        notificationService.createReservationNotification(101, 1, "Pukis", "2024-03-20", "10:00", "11:00"),
+      ).rejects.toThrow("Database error");
+    });
+  });
 
-            // Assert
-            expect(notificationRepository.createNotification).toHaveBeenCalledWith({
-                shelter_id: 101,
-                reservation_id: 1,
-                type: 'reservation_cancelled',
-                message: 'Rezervacija atšaukta: Pukis pavedžiojimas 2024-03-20 nuo 10:00 iki 11:00 buvo atšauktas.'
-            });
-            expect(result).toEqual(mockNotification);
-        });
+  describe("createCancellationNotification (savanoris atšaukė -> prieglauda)", () => {
+    test("notifies the shelter users about the cancellation", async () => {
+      notificationRepository.getShelterUserIds.mockResolvedValue(["5"]);
+      notificationRepository.createNotifications.mockResolvedValue([{ notification_id: "3" }]);
 
-        test('should handle repository error (critical situation)', async () => {
-            // Arrange
-            notificationRepository.createNotification.mockRejectedValue(new Error('Database error'));
+      await notificationService.createCancellationNotification(
+        101, 1, "Pukis", "2024-03-20", "10:00:00", "11:00:00",
+      );
 
-            // Act & Assert
-            await expect(notificationService.createCancellationNotification(
-                101, 1, 'Pukis', '2024-03-20', '10:00', '11:00'
-            )).rejects.toThrow('Database error');
-        });
+      expect(notificationRepository.createNotifications).toHaveBeenCalledWith(["5"], {
+        reservation_id: 1,
+        type: "reservation_cancelled",
+        message: "Rezervacija atšaukta: Pukis pavedžiojimas 2024-03-20 nuo 10:00 iki 11:00 buvo atšauktas.",
+      });
+    });
+  });
+
+  describe("createShelterCancellationNotification (prieglauda atšaukė -> savanoris)", () => {
+    test("notifies only the volunteer who made the reservation", async () => {
+      notificationRepository.createNotifications.mockResolvedValue([{ notification_id: "4" }]);
+
+      await notificationService.createShelterCancellationNotification(
+        "7", "10", "Mika", "2026-12-01", "10:00:00", "11:00:00",
+      );
+
+      expect(notificationRepository.getShelterUserIds).not.toHaveBeenCalled();
+      expect(notificationRepository.createNotifications).toHaveBeenCalledWith(["7"], {
+        reservation_id: "10",
+        type: "reservation_cancelled_by_shelter",
+        message: "Prieglauda atšaukė jūsų rezervaciją: Mika pavedžiojimas 2026-12-01 nuo 10:00 iki 11:00 neįvyks.",
+      });
+    });
+  });
+
+  describe("getNotifications", () => {
+    test("returns the user's notifications", async () => {
+      const rows = [{ notification_id: "1", user_id: "5", status: "unread" }];
+      notificationRepository.getNotificationsByUser.mockResolvedValue(rows);
+
+      const result = await notificationService.getNotifications(5);
+
+      expect(notificationRepository.getNotificationsByUser).toHaveBeenCalledWith(5);
+      expect(result).toEqual(rows);
     });
 
-    describe('getNotifications', () => {
-        test('should return notifications', async () => {
-            // Arrange
-            const mockNotifications = [
-                { notification_id: 1, shelter_id: 101, message: 'Test' }
-            ];
-            notificationRepository.getNotificationsByUser.mockResolvedValue(mockNotifications);
+    test("returns an empty list when there are none", async () => {
+      notificationRepository.getNotificationsByUser.mockResolvedValue([]);
+      expect(await notificationService.getNotifications(5)).toEqual([]);
+    });
+  });
 
-            // Act
-            const result = await notificationService.getNotifications(101);
+  describe("markNotificationAsRead", () => {
+    test("passes the user id so only own notifications can be marked", async () => {
+      notificationRepository.markAsRead.mockResolvedValue({ notification_id: "1", status: "read" });
 
-            // Assert
-            expect(notificationRepository.getNotificationsByUser).toHaveBeenCalledWith(101);
-            expect(result).toEqual(mockNotifications);
-        });
+      const result = await notificationService.markNotificationAsRead(1, 5);
 
-        test('should handle empty notifications list (edge case)', async () => {
-            // Arrange
-            notificationRepository.getNotificationsByUser.mockResolvedValue([]);
-
-            // Act
-            const result = await notificationService.getNotifications(101);
-
-            // Assert
-            expect(result).toEqual([]);
-        });
+      expect(notificationRepository.markAsRead).toHaveBeenCalledWith(1, 5);
+      expect(result.status).toBe("read");
     });
 
-    describe('markNotificationAsRead', () => {
-        test('should mark notification as read', async () => {
-            // Arrange
-            const mockNotification = { notification_id: 1, status: 'read' };
-            notificationRepository.markAsRead.mockResolvedValue(mockNotification);
-
-            // Act
-            const result = await notificationService.markNotificationAsRead(1);
-
-            // Assert
-            expect(notificationRepository.markAsRead).toHaveBeenCalledWith(1);
-            expect(result).toEqual(mockNotification);
-        });
-
-        test('should handle non-existent notification (critical situation)', async () => {
-            // Arrange
-            notificationRepository.markAsRead.mockResolvedValue(null);
-
-            // Act
-            const result = await notificationService.markNotificationAsRead(999);
-
-            // Assert
-            expect(result).toBeNull();
-        });
+    test("returns null for a missing or someone else's notification", async () => {
+      notificationRepository.markAsRead.mockResolvedValue(null);
+      expect(await notificationService.markNotificationAsRead(999, 5)).toBeNull();
     });
+  });
 });
