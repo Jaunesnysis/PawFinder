@@ -99,4 +99,46 @@ router.get("/leaderboard", authenticateToken, async (req, res) => {
   }
 });
 
+// Gauti prisijungusio vartotojo profilio duomenis
+router.get("/me", authenticateToken, async (req, res) => {
+  try {
+    const user = await userService.getUserById(req.user.userId);
+    if (!user) return res.status(404).json({ error: "Vartotojas nerastas." });
+    res.json(user);
+  } catch (error) {
+    console.error("[userRoutes GET /me]", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Atnaujinti prisijungusio vartotojo profilį
+router.put("/me", authenticateToken, async (req, res) => {
+  try {
+    const { name, surname, email, phone, birthDate, password } = req.body;
+    const updatedUser = await userService.updateProfile(req.user.userId, {
+      name,
+      surname,
+      email,
+      phone,
+      birthDate,
+      password, // jei tuščias stringas – service/repository slaptažodžio nekeičia
+    });
+    res.json(updatedUser);
+  } catch (error) {
+    console.error("[userRoutes PUT /me]", error.message);
+    res.status(error.status || 400).json({ error: error.message });
+  }
+});
+
+// Ištrinti prisijungusio vartotojo paskyrą
+router.delete("/me", authenticateToken, async (req, res) => {
+  try {
+    await userService.deleteUser(req.user.userId);
+    res.sendStatus(204);
+  } catch (error) {
+    console.error("[userRoutes DELETE /me]", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;

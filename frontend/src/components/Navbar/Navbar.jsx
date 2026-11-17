@@ -78,7 +78,7 @@ const Navbar = () => {
             <Link to="/myReservationsPage" style={styles.link}>
               Mano rezervacijos
             </Link>
-            <Link to="/" style={styles.link}>
+            <Link to="/editProfile" style={styles.link}>
               Mano profilis
             </Link>
 
