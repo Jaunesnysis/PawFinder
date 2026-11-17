@@ -233,4 +233,46 @@
   background-color: #fee2e2;
   border-radius: 8px;
 }
+
+}
+
+/* Prieglaudos profilio papildymai */
+.profile-section-title {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.profile-section-title--spaced {
+  margin-top: 28px;
+}
+
+.profile-field-full {
+  grid-column: 1 / -1;
+}
+
+.profile-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.profile-field textarea:focus {
+  border-color: #5ea84f;
+  box-shadow: 0 0 0 3px rgba(94, 168, 79, 0.16);
+}
+
+.profile-actions--end {
+  justify-content: flex-end;
+  margin-top: 28px;
 }

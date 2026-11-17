@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./UserEditPage.css";
+import "./EditPage.css";
 
 const formatDateForInput = (value) => {
   if (!value) return "";

@@ -99,6 +99,7 @@ const login = async (email, password) => {
       email: user.email,
       points: user.points,
       role: user.role,
+      shelterId: user.shelter_id ?? user.shelterId ?? null,
     },
   };
 };
@@ -128,6 +129,7 @@ const formatUserProfile = (user) => ({
   birthDate: user.birthDate,
   role: user.role,
   points: user.points,
+  shelterId: user.shelter_id ?? user.shelterId ?? null,
 });
 
 const getUserById = async (userId) => {
