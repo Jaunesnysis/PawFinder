@@ -60,7 +60,7 @@ export default function StatisticsPage() {
 
   const { maxScale, yTicks } = useMemo(() => {
     const maxVal = Math.max(0, ...rows.map((r) => r.views));
-    const targetMax = Math.max(2, maxVal); // kad bent iki 2 visada matytųsi 0, 1, 2
+    const targetMax = Math.max(3, maxVal);
 
     let step = 1;
     if (targetMax > 6) {
@@ -120,35 +120,50 @@ export default function StatisticsPage() {
               ))}
             </div>
 
-            <div className="stats-chart-area">
-              <div className="stats-grid-lines">
-                {yTicks.map((tick) => (
-                  <div key={tick} className="stats-grid-line" />
-                ))}
-              </div>
+            <div className="stats-chart-scroll">
+              <div className="stats-plot">
+                <div className="stats-grid-lines">
+                  {yTicks.map((tick) => (
+                    <div key={tick} className="stats-grid-line" />
+                  ))}
+                </div>
 
-              <div className="stats-chart">
-                {rows.map((p) => {
-                  const heightPct = maxScale > 0 ? (p.views / maxScale) * 100 : 0;
-                  return (
-                    <div key={p.petId} className="stats-bar-item">
-                      <div className="stats-bar-track">
-                        <div
-                          className="stats-bar"
-                          style={{ height: `${heightPct}%` }}
-                          title={`${p.name}: ${p.views}`}
-                        >
-                          {p.views > 0 && (
-                            <span className="stats-bar-value">{p.views}</span>
-                          )}
+                <div className="stats-bars-row">
+                  {rows.map((p) => {
+                    const heightPct = maxScale > 0 ? (p.views / maxScale) * 100 : 0;
+                    const showInside = p.views > 0 && heightPct >= 15;
+
+                    return (
+                      <div key={p.petId} className="stats-bar-col">
+                        <div className="stats-bar-track">
+                          <div
+                            className={`stats-bar ${p.views === 0 ? "stats-bar-zero" : ""}`}
+                            style={{ height: p.views === 0 ? "6px" : `${heightPct}%` }}
+                            title={`${p.name}: ${p.views}`}
+                          >
+                            <span
+                              className={
+                                showInside
+                                  ? "stats-bar-value-inside"
+                                  : "stats-bar-value-above"
+                              }
+                            >
+                              {p.views}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      <span className="stats-bar-label" title={p.name}>
-                        {p.name}
-                      </span>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="stats-labels-row">
+                {rows.map((p) => (
+                  <span key={p.petId} className="stats-bar-label" title={p.name}>
+                    {p.name}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
