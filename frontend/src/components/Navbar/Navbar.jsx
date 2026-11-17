@@ -138,45 +138,47 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "15px 40px", // Padidintas padding (viršus/apačia 15px, šonai 40px)
+    gap: "16px",
+    padding: "14px 24px",
     background: "#ffffff",
-    marginBottom: "30px", // Daugiau vietos iki turinio apačioje
-    borderRadius: "16px", // Kiek apvalesni kampai atrodo moderniau
-    boxShadow: "0 4px 15px rgba(0,0,0,0.06)", // Švelnesnis, didesnis šešėlis
-    width: "100%", // Naudojam visą prieinamą plotį
-    maxWidth: "1400px", // Bet neleidžiam išsiplėsti per visą milžinišką ekraną
-    margin: "15px auto",
+    borderRadius: "16px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+    width: "100%",
+    maxWidth: "1400px",
+    margin: "15px auto 30px",
     boxSizing: "border-box",
   },
   sideSection: {
     flex: "0 0 auto",
     display: "flex",
     justifyContent: "flex-start",
-    minWidth: "120px", // Užtikrina, kad logotipas nesusitrauktų
   },
   sideSectionRight: {
     flex: "0 0 auto",
     display: "flex",
     justifyContent: "flex-end",
-    minWidth: "120px",
   },
   centerSection: {
-    flex: 6, // Padidintas iš 4 į 6 (duoda daugiau vietos centrui)
+    flex: 1,
+    minWidth: 0,
     display: "flex",
+    alignItems: "center",
     justifyContent: "center",
-    gap: "35px", // Padidintas tarpas tarp nuorodų nuo 20px iki 35px
-    flexWrap: "wrap",
+    gap: "18px",
+    flexWrap: "nowrap",
+    overflowX: "auto",
   },
   logo: {
-    fontWeight: "800", // Ryškesnis logotipas
+    fontWeight: "800",
     color: "#4CAF50",
-    fontSize: "1.4rem",
+    fontSize: "1.35rem",
     letterSpacing: "-0.5px",
+    whiteSpace: "nowrap",
   },
   link: {
     textDecoration: "none",
     color: "#444",
-    fontSize: "1rem", // Šiek tiek didesnis šriftas geresniam skaitomumui
+    fontSize: "0.93rem",
     fontWeight: "500",
     whiteSpace: "nowrap",
     transition: "color 0.2s",
@@ -185,24 +187,25 @@ const styles = {
     textDecoration: "none",
     color: "#4CAF50",
     fontWeight: "700",
-    fontSize: "1rem",
+    fontSize: "0.93rem",
     whiteSpace: "nowrap",
   },
   notificationsLink: {
     textDecoration: "none",
     color: "#FF9800",
     fontWeight: "700",
-    fontSize: "1rem",
+    fontSize: "0.93rem",
     whiteSpace: "nowrap",
   },
   logoutBtn: {
-    padding: "10px 20px",
+    padding: "9px 16px",
     backgroundColor: "#fff1f0",
     color: "#f5222d",
     border: "1px solid #ffa39e",
     borderRadius: "10px",
     cursor: "pointer",
     fontWeight: "700",
+    whiteSpace: "nowrap",
     transition: "all 0.2s",
   },
 };
