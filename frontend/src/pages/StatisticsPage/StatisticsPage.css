@@ -1,0 +1,113 @@
+.stats-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 0 48px;
+  color: #1f2937;
+}
+
+.stats-title {
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.stats-filters {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.stats-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stats-field span {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.stats-field select {
+  min-width: 134px;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.stats-field select:focus-visible {
+  outline: 2px solid #6bb05d;
+  outline-offset: 2px;
+}
+
+/* Grafikas */
+.stats-chart-card {
+  margin-bottom: 18px;
+  padding: 10px 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.stats-chart-title {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.stats-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  height: 110px;
+  padding: 0 24px;
+}
+
+.stats-bar {
+  width: 34px;
+  border-radius: 6px 6px 4px 4px;
+  background: #4a90e2;
+  transition: height 0.3s ease;
+}
+
+/* Lentelė */
+.stats-table {
+  font-size: 13px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: 4fr 2fr 2fr;
+  align-items: center;
+  padding: 11px 14px;
+  margin-bottom: 2px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+}
+
+.stats-row-head {
+  margin-bottom: 0;
+  border-color: #6bb05d;
+  border-radius: 8px 8px 0 0;
+  background: #6bb05d;
+  color: #fff;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .stats-chart {
+    gap: 10px;
+    padding: 0 8px;
+  }
+
+  .stats-bar {
+    flex: 1;
+    width: auto;
+  }
+}

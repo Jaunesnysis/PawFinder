@@ -21,6 +21,7 @@ import ShelterPetsListPage from "./pages/ShelterPage/ShelterPetsListPage.jsx";
 import NewPetPage from "./pages/PetFormPage/NewPetPage.jsx";
 import EditPetPage from "./pages/PetFormPage/EditPetPage.jsx";
 import ShelterReservationsPage from "./pages/ShelterPage/ShelterReservationsPage.jsx";
+import StatisticsPage from "./pages/StatisticsPage/StatisticsPage.jsx";
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
           <Route path="/mySheltersPets" element={<ShelterPetsListPage />} />
           <Route path="/addNewPet" element={<NewPetPage />} />
           <Route path="/editPet/:id" element={<EditPetPage />} />
+          <Route path="/statistics" element={<StatisticsPage />} />
         </Routes>
       </main>
     </div>

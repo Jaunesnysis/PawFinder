@@ -405,6 +405,56 @@ const deletePetImage = async (petId, imageId) => {
   await ensurePrimaryImage(petId); // ištrynus pagrindinę, kita tampa pagrindine
 };
 
+// 1. Sukuria įrašą šiai dienai su 1 arba padidina esamą +1 (vienas įrašas per dieną)
+const incrementViewCount = async (petId) => {
+  await db.query(
+    `INSERT INTO pet_statistics (pet_id, date, views_count)
+     VALUES ($1, CURRENT_DATE, 1)
+     ON CONFLICT (pet_id, date)
+     DO UPDATE SET views_count = pet_statistics.views_count + 1`,
+    [petId]
+  );
+};
+
+// 2a. Lentelės duomenys: kiekvieno prieglaudos gyvūno peržiūrų suma per N dienų
+const getStatsSummary = async (shelterId, days, petId = null) => {
+  const result = await db.query(
+    `SELECT p.pet_id AS "petId",
+            p.name,
+            COALESCE(SUM(s.views_count), 0)::int AS views
+     FROM pets p
+     LEFT JOIN pet_statistics s
+       ON s.pet_id = p.pet_id
+      AND s.date >= CURRENT_DATE - ($2::int - 1)
+     WHERE p.shelter_id = $1
+       AND ($3::int IS NULL OR p.pet_id = $3::int)
+     GROUP BY p.pet_id, p.name
+     ORDER BY views DESC, p.name`,
+    [shelterId, days, petId]
+  );
+  return result.rows;
+};
+
+// 2b. Grafiko duomenys: kiekvienos dienos peržiūros per N dienų (tuščios dienos = 0)
+const getStatsDaily = async (shelterId, days, petId = null) => {
+  const result = await db.query(
+    `SELECT to_char(d, 'YYYY-MM-DD') AS date,
+            COALESCE(SUM(s.views_count), 0)::int AS views
+     FROM generate_series(CURRENT_DATE - ($2::int - 1), CURRENT_DATE, interval '1 day') AS d
+     LEFT JOIN (
+       pet_statistics s
+       JOIN pets p
+         ON p.pet_id = s.pet_id
+        AND p.shelter_id = $1
+        AND ($3::int IS NULL OR p.pet_id = $3::int)
+     ) ON s.date = d::date
+     GROUP BY d
+     ORDER BY d`,
+    [shelterId, days, petId]
+  );
+  return result.rows;
+};
+
 module.exports = {
   findAvailableByCity,
   getAllAvailablePets,
@@ -425,4 +475,7 @@ module.exports = {
   findPetImage,
   deletePetImage,
   setPrimaryImage,
+  incrementViewCount,
+  getStatsSummary,
+  getStatsDaily
 };
