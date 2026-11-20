@@ -54,6 +54,23 @@ describe('AchievementService Logika (FR1 + DeivM)', () => {
         expect(result.newly_earned).toHaveLength(2); // Gavo abu: 10 ir 50 tšk.
     });
 
+    // TESTAS 2b: AC3 (Taškų per mažai naujam pasiekimui, niekas neįrašoma)
+    test('Neturėtų įrašyti pasiekimų, jei taškų nepakanka naujam pasiekimui', async () => {
+        const userId = 1;
+        userService.addPointsToUser.mockResolvedValue({ user_id: userId, points: 5 });
+
+        achievementRepository.getAllAchievements.mockResolvedValue([
+            { achievement_id: 1, title: 'First Steps', points_threshold: 10 }
+        ]);
+        achievementRepository.getEarnedBadgeIds.mockResolvedValue([]);
+
+        const result = await achievementService.addPoints(userId, 5);
+
+        expect(result.current_points).toBe(5);
+        expect(result.newly_earned).toHaveLength(0);
+        expect(achievementRepository.saveEarnedBadges).not.toHaveBeenCalled();
+    });
+
     // TESTAS 3: AC4 (Progresas ir trūkstami taškai)
     test('Turėtų teisingai suskaičiuoti, kiek taškų trūksta iki kito pasiekimo', async () => {
         const userId = 1;
@@ -70,6 +87,24 @@ describe('AchievementService Logika (FR1 + DeivM)', () => {
         expect(progress.total_points).toBe(35);
         expect(progress.next_achievement.title).toBe('Sekantis badge');
         expect(progress.next_achievement.points_missing).toBe(15); // 50 - 35 = 15
+    });
+
+    // TESTAS 3b: AC4 (Kitas pasiekimas yra su mažiausia riba, net jei sąrašas nesurikiuotas)
+    test('Turėtų parinkti artimiausią pasiekimą pagal mažiausią ribą, kai jų keli', async () => {
+        const userId = 1;
+        userService.getUserPoints.mockResolvedValue(5);
+
+        achievementRepository.getAllAchievements.mockResolvedValue([
+            { achievement_id: 3, title: 'Didelis', points_threshold: 100 },
+            { achievement_id: 1, title: 'Mažas', points_threshold: 20 },
+            { achievement_id: 2, title: 'Vidutinis', points_threshold: 50 }
+        ]);
+        achievementRepository.getEarnedBadgeIds.mockResolvedValue([]);
+
+        const progress = await achievementService.getAchievementProgress(userId);
+
+        expect(progress.next_achievement.title).toBe('Mažas');
+        expect(progress.next_achievement.points_missing).toBe(15); // 20 - 5
     });
 
     // TESTAS 4: AC4 Edge Case (Visi pasiekimai gauti)
