@@ -42,12 +42,7 @@ const getAchievementProgress = async (userId) => {
         earnedBadgeIds.includes(ach.achievement_id)
     );
 
-    // 2. Surandame artimiausią dar neuždirbtą pasiekimą
-    const locked = allAchievements
-        .filter(ach => !earnedBadgeIds.includes(ach.achievement_id))
-        .sort((a, b) => a.points_threshold - b.points_threshold);
-
-    const nextBadge = locked.length > 0 ? locked[0] : null;
+    const nextBadge = findNextAchievement(allAchievements,earnedBadgeIds);
 
     // Paruošiame atsakymo objektą
     const response = {
@@ -73,6 +68,11 @@ const loadAchievementState = async (userId) => {
     const earnedBadgeIds = await achievementRepository.getEarnedBadgeIds(userId);
     return { allAchievements, earnedBadgeIds };
 };
+
+const findNextAchievement = (allAchievements, earnedBadgeIds) =>
+    allAchievements
+        .filter(ach => !earnedBadgeIds.includes(ach.achievement_id))
+        .sort((a, b) => a.points_threshold - b.points_threshold)[0] || null;
 
 module.exports = {
     addPoints,
