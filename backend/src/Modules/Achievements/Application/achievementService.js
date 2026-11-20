@@ -1,26 +1,18 @@
 const achievementRepository = require('../Infrastructure/achievementRepository');
 const userService = require('../../Users/Application/userService');
 
-const findNewlyEarned = (allAchievements, earnedBadgeIds, points) =>
-    allAchievements.filter(ach =>
-        points >= ach.points_threshold &&
-        !earnedBadgeIds.includes(ach.achievement_id)
-    );
-
 /**
  * Prideda taškus vartotojui ir patikrina, ar jis uždirbo naujų pasiekimų (AC2, AC3)
  */
 const addPoints = async (userId, pointsToAdd) =>{
-    //Prasome userService prideti taskus ir grazinti mums kaip atrodo updated User
-    const updatedUser = await userService.addPointsToUser(userId, pointsToAdd)
 
+    const updatedUser = await userService.addPointsToUser(userId, pointsToAdd)
 
     const {allAchievements, earnedBadgeIds} = await loadAchievementState(userId);
 
-    //Tikriname, kurie pasiekimai turi buti suteikiami vartotojui
     const newEarned = findNewlyEarned(allAchievements, earnedBadgeIds, updatedUser.points);
 
-    //Jei radome naujų, pranešame Repository, kad įrašytų TIK pasiekimo faktą
+
     if (newEarned.length > 0) {
         const newBadgeIds = newEarned.map(a => a.achievement_id);
         await achievementRepository.saveEarnedBadges(userId, newBadgeIds);
@@ -32,6 +24,11 @@ const addPoints = async (userId, pointsToAdd) =>{
         newly_earned: newEarned
     };
 }
+const findNewlyEarned = (allAchievements, earnedBadgeIds, points) =>
+    allAchievements.filter(ach =>
+        points >= ach.points_threshold &&
+        !earnedBadgeIds.includes(ach.achievement_id)
+    );
 
 /**
  * Gauna informaciją apie progresą iki artimiausio pasiekimo (AC4)
@@ -40,14 +37,12 @@ const getAchievementProgress = async (userId) => {
     const currentPoints = await userService.getUserPoints(userId);
     const {allAchievements, earnedBadgeIds} = await loadAchievementState(userId);
 
-    // 1. Surandame TIK tuos pasiekimus, kuriuos vartotojas JAU uždirbo
     const earnedBadges = allAchievements.filter(ach =>
         earnedBadgeIds.includes(ach.achievement_id)
     );
 
     const nextBadge = findNextAchievement(allAchievements,earnedBadgeIds);
 
-    // Paruošiame atsakymo objektą
     const response = {
         total_points: currentPoints,
         earned_badges: earnedBadges,
