@@ -8,9 +8,8 @@ const addPoints = async (userId, pointsToAdd) =>{
     //Prasome userService prideti taskus ir grazinti mums kaip atrodo updated User
     const updatedUser = await userService.addPointsToUser(userId, pointsToAdd)
 
-    //Gauname visus pasiekimus sistemoje
-    const allAchievements = await achievementRepository.getAllAchievements();
-    const earnedBadgeIds = await achievementRepository.getEarnedBadgeIds(userId);
+
+    const {allAchievements, earnedBadgeIds} = await loadAchievementState(userId);
 
     //Tikriname, kurie pasiekimai turi buti suteikiami vartotojui
     const newEarned = allAchievements.filter(ach =>
@@ -36,8 +35,7 @@ const addPoints = async (userId, pointsToAdd) =>{
  */
 const getAchievementProgress = async (userId) => {
     const currentPoints = await userService.getUserPoints(userId);
-    const allAchievements = await achievementRepository.getAllAchievements();
-    const earnedBadgeIds = await achievementRepository.getEarnedBadgeIds(userId);
+    const {allAchievements, earnedBadgeIds} = await loadAchievementState(userId);
 
     // 1. Surandame TIK tuos pasiekimus, kuriuos vartotojas JAU uždirbo
     const earnedBadges = allAchievements.filter(ach =>
@@ -70,6 +68,11 @@ const getAchievementProgress = async (userId) => {
     return response;
 };
 
+const loadAchievementState = async (userId) => {
+    const allAchievements = await achievementRepository.getAllAchievements();
+    const earnedBadgeIds = await achievementRepository.getEarnedBadgeIds(userId);
+    return { allAchievements, earnedBadgeIds };
+};
 
 module.exports = {
     addPoints,
