@@ -62,7 +62,30 @@ const getReservablePet = async (petId) => {
   }
   return pet;
 };
+const isSlotInSchedule = (date, start, end) =>
+  generateShelterSlots(date).some(
+    (slot) => slot.reservation_start === start && slot.reservation_end === end,
+  );
 
+const validateSlot = (date, reservationStart, reservationEnd) => {
+  const normalizedStart = normalizeTime(reservationStart);
+  const normalizedEnd = normalizeTime(reservationEnd);
+
+  if (normalizedStart >= normalizedEnd) {
+    throw { status: 400, message: "Invalid reservation interval" };
+  }
+  if (!isSlotInSchedule(date, normalizedStart, normalizedEnd)) {
+    throw { status: 400, message: "Selected slot is outside shelter schedule" };
+  }
+  return { normalizedStart, normalizedEnd };
+};
+
+const ensureSlotIsFree = async (petId, date, start, end) => {
+  const alreadyTaken = await reservationRepository.isTimeSlotTaken(petId, date, start, end);
+  if (alreadyTaken) {
+    throw { status: 409, message: "Time slot already taken" };
+  }
+};
 const createReservation = async (reservation) => {
   assertRequiredFields(reservation);
   const { user_id, pet_id, date, reservation_start, reservation_end } = reservation;
@@ -70,31 +93,8 @@ const createReservation = async (reservation) => {
   await ensureUserExists(user_id);
   const pet = await getReservablePet(pet_id);
 
-  const normalizedStart = normalizeTime(reservation_start);
-  const normalizedEnd = normalizeTime(reservation_end);
-
-  if (normalizedStart >= normalizedEnd) {
-    throw { status: 400, message: "Invalid reservation interval" };
-  }
-
-  const allSlots = generateShelterSlots(date);
-  const slotValid = allSlots.some(
-    (s) => s.reservation_start === normalizedStart && s.reservation_end === normalizedEnd,
-  );
-  if (!slotValid) {
-    throw { status: 400, message: "Selected slot is outside shelter schedule" };
-  }
-
-  const alreadyTaken = await reservationRepository.isTimeSlotTaken(
-    pet_id,
-    date,
-    normalizedStart,
-    normalizedEnd,
-  );
-
-  if (alreadyTaken) {
-    throw { status: 409, message: "Time slot already taken" };
-  }
+  const { normalizedStart, normalizedEnd } = validateSlot(date, reservation_start, reservation_end);
+  await ensureSlotIsFree(pet_id, date, normalizedStart, normalizedEnd);
 
   const created = await reservationRepository.createReservation({
     user_id,
