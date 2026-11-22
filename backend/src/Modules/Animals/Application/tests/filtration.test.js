@@ -101,4 +101,81 @@ describe("Pet filtering tests (DB mocked)", () => {
         });
     });
 
+    test("should filter pets by breed", async () => {
+        db.query.mockResolvedValue({ rows: [] });
+
+        await getAllAvailablePets({ breed: "Labradoras" });
+
+        expect(db.query).toHaveBeenCalledWith("SELECT * FROM pets WHERE 1=1 AND breed = $1", ["Labradoras"]);
+    });
+
+    test("should filter pets by size", async () => {
+        db.query.mockResolvedValue({ rows: [] });
+
+        await getAllAvailablePets({ size: "small" });
+
+        expect(db.query).toHaveBeenCalledWith("SELECT * FROM pets WHERE 1=1 AND size = $1", ["small"]);
+    });
+
+    test("should map activity filter to activity_level column", async () => {
+        db.query.mockResolvedValue({ rows: [] });
+
+        await getAllAvailablePets({ activity: "high" });
+
+        expect(db.query).toHaveBeenCalledWith("SELECT * FROM pets WHERE 1=1 AND activity_level = $1", ["high"]);
+    });
+
+    test("should filter pets by maximum age and convert it to number", async () => {
+        db.query.mockResolvedValue({ rows: [] });
+
+        await getAllAvailablePets({ ageMax: "6" });
+
+        expect(db.query).toHaveBeenCalledWith("SELECT * FROM pets WHERE 1=1 AND age <= $1", [6]);
+    });
+
+    test("should filter pets by weight range and convert values to numbers", async () => {
+        db.query.mockResolvedValue({ rows: [] });
+
+        await getAllAvailablePets({ weightMin: "3", weightMax: "25" });
+
+        expect(db.query).toHaveBeenCalledWith(
+            "SELECT * FROM pets WHERE 1=1 AND weight >= $1 AND weight <= $2",
+            [3, 25]
+        );
+    });
+
+    test("should combine all filters in a fixed order with sequential placeholders", async () => {
+        db.query.mockResolvedValue({ rows: [] });
+
+        await getAllAvailablePets({
+            weightMax: "30", city: "Vilnius", species: "Šuo", ageMin: "1",
+            breed: "Test", activity: "high", size: "large", ageMax: "8", weightMin: "5"
+        });
+
+        expect(db.query).toHaveBeenCalledWith(
+            "SELECT * FROM pets WHERE 1=1 AND species = $1 AND breed = $2 AND size = $3" +
+            " AND activity_level = $4 AND city = $5 AND age >= $6 AND age <= $7" +
+            " AND weight >= $8 AND weight <= $9",
+            ["Šuo", "Test", "large", "high", "Vilnius", 1, 8, 5, 30]
+        );
+    });
+
+    test("should return all pets without conditions when no filters are given", async () => {
+        db.query.mockResolvedValue({ rows: mockPets });
+
+        const result = await getAllAvailablePets();
+
+        expect(db.query).toHaveBeenCalledWith("SELECT * FROM pets WHERE 1=1", []);
+        expect(result).toHaveLength(2);
+        expect(result[0].name).toBe("Rikis");
+    });
+
+    test("should ignore empty filter values", async () => {
+        db.query.mockResolvedValue({ rows: [] });
+
+        await getAllAvailablePets({ species: "", city: undefined, ageMin: 0 });
+
+        expect(db.query).toHaveBeenCalledWith("SELECT * FROM pets WHERE 1=1", []);
+    });
+
 });
