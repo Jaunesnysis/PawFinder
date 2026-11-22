@@ -80,55 +80,28 @@ const findAvailableByCity = async (city) => {
   }
 };
 
+const asText = (value) => value;
+
+const PET_FILTERS = [
+  { key: "species", column: "species", operator: "=", parse: asText },
+  { key: "breed", column: "breed", operator: "=", parse: asText },
+  { key: "size", column: "size", operator: "=", parse: asText },
+  { key: "activity", column: "activity_level", operator: "=", parse: asText },
+  { key: "city", column: "city", operator: "=", parse: asText },
+  { key: "ageMin", column: "age", operator: ">=", parse: Number },
+  { key: "ageMax", column: "age", operator: "<=", parse: Number },
+  { key: "weightMin", column: "weight", operator: ">=", parse: Number },
+  { key: "weightMax", column: "weight", operator: "<=", parse: Number },
+];
+
 const getAllAvailablePets = async (filters = {}) => {
-  let query = "SELECT * FROM pets WHERE 1=1";
-  const values = [];
-  let index = 1;
+  const activeFilters = PET_FILTERS.filter(({ key }) => filters[key]);
 
-  if (filters.species) {
-    query += ` AND species = $${index++}`;
-    values.push(filters.species);
-  }
-
-  if (filters.breed) {
-    query += ` AND breed = $${index++}`;
-    values.push(filters.breed);
-  }
-
-  if (filters.size) {
-    query += ` AND size = $${index++}`;
-    values.push(filters.size);
-  }
-
-  if (filters.activity) {
-    query += ` AND activity_level = $${index++}`;
-    values.push(filters.activity);
-  }
-
-  if (filters.city) {
-    query += ` AND city = $${index++}`;
-    values.push(filters.city);
-  }
-
-  if (filters.ageMin) {
-    query += ` AND age >= $${index++}`;
-    values.push(Number(filters.ageMin));
-  }
-
-  if (filters.ageMax) {
-    query += ` AND age <= $${index++}`;
-    values.push(Number(filters.ageMax));
-  }
-
-  if (filters.weightMin) {
-    query += ` AND weight >= $${index++}`;
-    values.push(Number(filters.weightMin));
-  }
-
-  if (filters.weightMax) {
-    query += ` AND weight <= $${index++}`;
-    values.push(Number(filters.weightMax));
-  }
+  const conditions = activeFilters.map(
+    ({ column, operator }, i) => ` AND ${column} ${operator} $${i + 1}`,
+  );
+  const values = activeFilters.map(({ key, parse }) => parse(filters[key]));
+  const query = "SELECT * FROM pets WHERE 1=1" + conditions.join("");
 
   const result = await db.query(query, values);
   return result.rows.map((row) => new Pet(row));
