@@ -40,12 +40,18 @@ const getAvailableTimeslots = async (petId, date) => {
   );
 };
 
-const createReservation = async (reservation) => {
-  const { user_id, pet_id, date, reservation_start, reservation_end } = reservation;
+const REQUIRED_RESERVATION_FIELDS = ["user_id", "pet_id", "date", "reservation_start", "reservation_end"];
 
-  if (!user_id || !pet_id || !date || !reservation_start || !reservation_end) {
+const assertRequiredFields = (reservation) => {
+  const missing = REQUIRED_RESERVATION_FIELDS.some((field) => !reservation[field]);
+  if (missing) {
     throw { status: 400, message: "user_id, pet_id, date, reservation_start and reservation_end are required" };
   }
+};
+
+const createReservation = async (reservation) => {
+  assertRequiredFields(reservation);
+  const { user_id, pet_id, date, reservation_start, reservation_end } = reservation;
 
   const user = await reservationRepository.getUserById(user_id);
   if (!user) throw { status: 404, message: "User not found" };
