@@ -94,15 +94,19 @@ const PET_FILTERS = [
   { key: "weightMax", column: "weight", operator: "<=", parse: Number },
 ];
 
-const getAllAvailablePets = async (filters = {}) => {
+const buildPetFilterQuery = (filters) => {
   const activeFilters = PET_FILTERS.filter(({ key }) => filters[key]);
 
   const conditions = activeFilters.map(
     ({ column, operator }, i) => ` AND ${column} ${operator} $${i + 1}`,
   );
   const values = activeFilters.map(({ key, parse }) => parse(filters[key]));
-  const query = "SELECT * FROM pets WHERE 1=1" + conditions.join("");
 
+  return { query: "SELECT * FROM pets WHERE 1=1" + conditions.join(""), values };
+};
+
+const getAllAvailablePets = async (filters = {}) => {
+  const { query, values } = buildPetFilterQuery(filters);
   const result = await db.query(query, values);
   return result.rows.map((row) => new Pet(row));
 };
