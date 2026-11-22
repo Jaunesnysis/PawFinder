@@ -49,18 +49,26 @@ const assertRequiredFields = (reservation) => {
   }
 };
 
-const createReservation = async (reservation) => {
-  assertRequiredFields(reservation);
-  const { user_id, pet_id, date, reservation_start, reservation_end } = reservation;
-
-  const user = await reservationRepository.getUserById(user_id);
+const ensureUserExists = async (userId) => {
+  const user = await reservationRepository.getUserById(userId);
   if (!user) throw { status: 404, message: "User not found" };
+};
 
-  const pet = await reservationRepository.getPetById(pet_id);
+const getReservablePet = async (petId) => {
+  const pet = await reservationRepository.getPetById(petId);
   if (!pet) throw { status: 404, message: "Pet not found" };
   if (pet.status !== "available") {
     throw { status: 400, message: "Pet status is not available" };
   }
+  return pet;
+};
+
+const createReservation = async (reservation) => {
+  assertRequiredFields(reservation);
+  const { user_id, pet_id, date, reservation_start, reservation_end } = reservation;
+
+  await ensureUserExists(user_id);
+  const pet = await getReservablePet(pet_id);
 
   const normalizedStart = normalizeTime(reservation_start);
   const normalizedEnd = normalizeTime(reservation_end);
