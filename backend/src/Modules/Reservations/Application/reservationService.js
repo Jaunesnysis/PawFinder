@@ -3,7 +3,6 @@ const notificationService = require("../../Notifications/Application/notificatio
 
 const WALK_START = 9; // 09:00
 const WALK_END = 17; // 17:00
-const SLOT_MINUTES = 60;
 
 const normalizeTime = (timeStr) => {
   // accept HH:MM or HH:MM:SS
