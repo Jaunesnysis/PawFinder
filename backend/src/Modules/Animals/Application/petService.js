@@ -161,6 +161,44 @@ const setPrimaryImage = async (userId, petId, imageId) => {
   return petRepository.findPetById(petId);
 };
 
+const addView = async (petId) => {
+  const id = Number(petId);
+  if (!Number.isInteger(id) || id <= 0) {
+    throw httpError(400, "Neteisingas gyvūno ID.");
+  }
+
+  try {
+    await petRepository.incrementViewCount(id);
+  } catch (e) {
+    if (e.code === "23503") throw httpError(404, "Gyvūnas nerastas.");
+    throw e;
+  }
+};
+
+const getStatistics = async (userId, { days, petId } = {}) => {
+  const shelterId = await requireShelterId(userId);
+
+  const d = days === undefined || days === "" ? 30 : Number(days);
+  if (![7, 30, 90].includes(d)) {
+    throw httpError(400, "Laikotarpis turi būti 7, 30 arba 90 dienų.");
+  }
+
+  let pet = null;
+  if (petId && petId !== "all") {
+    pet = Number(petId);
+    if (!Number.isInteger(pet) || pet <= 0) {
+      throw httpError(400, "Neteisingas gyvūno ID.");
+    }
+  }
+
+  const [summary, daily] = await Promise.all([
+    petRepository.getStatsSummary(shelterId, d, pet),
+    petRepository.getStatsDaily(shelterId, d, pet),
+  ]);
+
+  return { days: d, summary, daily };
+};
+
 module.exports = {
   getAvailablePets,
   getAllAvailablePets,
@@ -178,4 +216,6 @@ module.exports = {
   deleteImage,
   setPrimaryImage,
   UPLOADS_DIR,
+  addView,
+  getStatistics
 };

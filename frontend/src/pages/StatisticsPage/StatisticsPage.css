@@ -1,0 +1,244 @@
+.stats-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.stats-title {
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Filtrai */
+.stats-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stats-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stats-field span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.stats-field select {
+  min-width: 150px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+}
+
+.stats-field select:focus {
+  border-color: #5ea84f;
+  box-shadow: 0 0 0 2px rgba(94, 168, 79, 0.2);
+}
+
+.stats-error {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #b91c1c;
+  background-color: #fee2e2;
+  border-radius: 8px;
+}
+
+/* Grafiko kortelė */
+.stats-chart-card {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.stats-chart-title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.stats-chart-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-top: 20px;
+}
+
+.stats-y-axis {
+  height: 220px;
+  padding-bottom: 2px;
+  box-sizing: border-box;
+  min-width: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.stats-y-tick {
+  height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.stats-chart-scroll {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.stats-plot {
+  position: relative;
+  height: 220px;
+  min-width: max-content;
+  width: 100%;
+  box-sizing: border-box;
+  border-left: 2px solid #374151;
+  border-bottom: 2px solid #374151;
+}
+
+.stats-grid-lines {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.stats-grid-line {
+  height: 0;
+  border-top: 1px solid #d1d5db;
+}
+
+.stats-grid-line:last-child {
+  border-top: none;
+}
+
+.stats-bars-row {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 28px;
+  padding: 0 24px;
+}
+
+.stats-bar-col {
+  flex: 0 0 76px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.stats-bar-track {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.stats-bar {
+  position: relative;
+  width: 48px;
+  min-height: 4px;
+  background-color: #3b82f6;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.25s ease;
+}
+
+.stats-bar-zero {
+  background-color: #93c5fd;
+}
+
+.stats-bar-value-inside {
+  display: block;
+  padding-top: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.stats-bar-value-above {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.stats-labels-row {
+  display: flex;
+  justify-content: flex-start;
+  gap: 28px;
+  padding: 8px 24px 0;
+  min-width: max-content;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stats-bar-label {
+  flex: 0 0 76px;
+  text-align: center;
+  font-size: 13px;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats-empty {
+  color: #6b7280;
+  font-size: 14px;
+  padding: 16px 0;
+}
+
+/* Lentelė */
+.stats-table {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 14px 20px;
+  font-size: 14px;
+  color: #1f2937;
+  border-top: 1px solid #e5e7eb;
+}
+
+.stats-row-head {
+  border-top: none;
+  background-color: #5ea84f;
+  color: #ffffff;
+  font-weight: 600;
+}

@@ -14,7 +14,9 @@ const PetDetailsPage = () => {
     const [statusMessage, setStatusMessage] = useState('');
 
     useEffect(() => {
-        fetch(`http://localhost:5050/api/pets/${id}`)
+        const controller = new AbortController();
+
+        fetch(`http://localhost:5050/api/pets/${id}`, { signal: controller.signal })
             .then(res => {
                 if (!res.ok) throw new Error("Nepavyko gauti duomenų");
                 return res.json();
@@ -23,8 +25,18 @@ const PetDetailsPage = () => {
                 setPet(data);
                 const primaryIdx = data.images.findIndex(img => img.is_primary);
                 if (primaryIdx !== -1) setActiveImg(primaryIdx);
+
+                fetch(`http://localhost:5050/api/pets/${id}/addView`, {
+                    method: 'POST',
+                }).catch(err => console.error("Klaida fiksuojant peržiūrą:", err));
             })
-            .catch(err => console.error("Klaida:", err));
+            .catch(err => {
+                if (err.name !== 'AbortError') {
+                    console.error("Klaida:", err);
+                }
+            });
+
+        return () => controller.abort();
     }, [id]);
 
     const handleReservationSuccess = () => {

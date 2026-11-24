@@ -303,4 +303,27 @@ router.put("/:id/images/:imageId/primary", authorizeUser, async (req, res) => {
   }
 });
 
+// POST /api/pets/:id/addView
+router.post("/:id/addView", async (req, res) => {
+  try {
+    await petService.addView(req.params.id);
+    res.sendStatus(204);
+  } catch (e) {
+    sendError(res, e, "POST /pets/:id/addView");
+  }
+});
+
+// GET /api/pets/shelter/statistics?days=30&petId=all
+router.get("/shelter/statistics", authorizeUser, async (req, res) => {
+  try {
+    const data = await petService.getStatistics(req.user.id, {
+      days: req.query.days,
+      petId: req.query.petId,
+    });
+    res.json(data);
+  } catch (e) {
+    sendError(res, e, "GET /pets/shelter/statistics");
+  }
+});
+
 module.exports = router;
