@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userService = require("../Application/userService");
 const jwt = require("jsonwebtoken");
+const authorizeUser = require('../../../Infrastructure/Middleware/authMiddleware');
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -100,9 +101,9 @@ router.get("/leaderboard", authenticateToken, async (req, res) => {
 });
 
 // Gauti prisijungusio vartotojo profilio duomenis
-router.get("/me", authenticateToken, async (req, res) => {
+router.get("/me", authorizeUser, async (req, res) => {
   try {
-    const user = await userService.getUserById(req.user.userId);
+    const user = await userService.getUserById(req.user.id);
     if (!user) return res.status(404).json({ error: "Vartotojas nerastas." });
     res.json(user);
   } catch (error) {
@@ -112,10 +113,10 @@ router.get("/me", authenticateToken, async (req, res) => {
 });
 
 // Atnaujinti prisijungusio vartotojo profilį
-router.put("/me", authenticateToken, async (req, res) => {
+router.put("/me", authorizeUser, async (req, res) => {
   try {
     const { name, surname, email, phone, birthDate, password } = req.body;
-    const updatedUser = await userService.updateProfile(req.user.userId, {
+    const updatedUser = await userService.updateProfile(req.user.id, {
       name,
       surname,
       email,
@@ -131,9 +132,9 @@ router.put("/me", authenticateToken, async (req, res) => {
 });
 
 // Ištrinti prisijungusio vartotojo paskyrą
-router.delete("/me", authenticateToken, async (req, res) => {
+router.delete("/me", authorizeUser, async (req, res) => {
   try {
-    await userService.deleteUser(req.user.userId);
+    await userService.deleteUser(req.user.id);
     res.sendStatus(204);
   } catch (error) {
     console.error("[userRoutes DELETE /me]", error.message);

@@ -18,7 +18,7 @@ const findByEmail = async (email) => {
 };
 
 const findById = async (userId) => {
-  const query = "SELECT * FROM users WHERE user_id = $1";
+  const query = " SELECT user_id, name, surname, email, phone, city, points, role, shelter_id, to_char(birth_date, 'YYYY-MM-DD') AS birth_date FROM users WHERE user_id = $1";
 
   try {
     const result = await db.query(query, [userId]);
@@ -57,7 +57,7 @@ const update = async (user) => {
     user.city,
     user.points,
     user.last_earned_at,
-    user.birth_date ?? user.birthDate,
+    user.birthDate ?? user.birth_date,
     user.password_hash || null,
     user.id,
   ];
