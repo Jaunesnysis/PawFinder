@@ -29,7 +29,7 @@ function App() {
   return (
     <div className="app-main-container">
       {/* Navbar pats nusprendžia ar ir ką rodyti */}
-      <Navbar />S
+      <Navbar />
 
       {/* Pagrindinis turinys */}
       <main style={{ padding: "0 20px" }}>
