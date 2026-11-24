@@ -21,18 +21,15 @@ import ShelterPetsListPage from "./pages/ShelterPage/ShelterPetsListPage.jsx";
 import NewPetPage from "./pages/PetFormPage/NewPetPage.jsx";
 import EditPetPage from "./pages/PetFormPage/EditPetPage.jsx";
 import ShelterReservationsPage from "./pages/ShelterPage/ShelterReservationsPage.jsx";
-<<<<<<< HEAD
 import StatisticsPage from "./pages/StatisticsPage/StatisticsPage.jsx";
-=======
 import UserEditPage from "./pages/ProfileEditPage/UserEditPage.jsx";
 import ShelterEditPage from "./pages/ProfileEditPage/ShelterEditPage.jsx";
->>>>>>> origin/US-20-user-shelter-edit-page
 
 function App() {
   return (
     <div className="app-main-container">
       {/* Navbar pats nusprendžia ar ir ką rodyti */}
-      <Navbar />
+      <Navbar />S
 
       {/* Pagrindinis turinys */}
       <main style={{ padding: "0 20px" }}>
