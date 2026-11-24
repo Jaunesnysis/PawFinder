@@ -36,7 +36,8 @@ const getShelterProfile = async (shelterId) => {
         description: shelter.description,
         city: shelter.city,
         contact: formattedContact,
-        pets: shelterPets
+        pets: shelterPets,
+        donation_account: shelter.donation_account || null,
     };
 };
 
@@ -54,4 +55,12 @@ const getAllShelters = async () => {
     }));
 };
 
-module.exports = { getShelterProfile, getAllShelters, registerShelter };
+const updateShelter = async (shelterId, shelter) => {
+    return await shelterRepository.updateShelter(shelterId, shelter);
+};
+
+const deleteShelter = async (shelterId) => {
+    return await shelterRepository.deleteShelter(shelterId);
+};
+
+module.exports = { getShelterProfile, getAllShelters, registerShelter, updateShelter, deleteShelter, };

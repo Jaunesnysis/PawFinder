@@ -1,0 +1,278 @@
+.profile-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.profile-title {
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.profile-card {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 28px;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-field span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.profile-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  font-size: 14px;
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.profile-field input:focus {
+  border-color: #5ea84f;
+  box-shadow: 0 0 0 3px rgba(94, 168, 79, 0.16);
+}
+
+/* Slaptažodžio laukas su akute */
+.profile-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.profile-password-input {
+  padding-right: 44px;
+}
+
+.profile-eye-btn {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.profile-eye-btn:hover {
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+.profile-success {
+  margin: 20px 0 0;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #166534;
+  background-color: #dcfce7;
+  border-radius: 8px;
+}
+
+/* Apatiniai mygtukai */
+.profile-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 48px;
+}
+
+.profile-delete-btn {
+  padding: 11px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #dc2626;
+  background-color: #fff1f0;
+  border: 1px solid #f87171;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.profile-delete-btn:hover {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+}
+
+.profile-save-btn {
+  padding: 11px 32px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #5ea84f;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.profile-save-btn:hover {
+  background-color: #4f9441;
+}
+
+/* Patvirtinimo modalas */
+.profile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(17, 24, 39, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.profile-modal {
+  width: 100%;
+  max-width: 420px;
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.profile-modal-title {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.profile-modal-text {
+  margin: 0 0 24px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.profile-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.profile-modal-cancel {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.profile-modal-cancel:hover {
+  background-color: #f3f4f6;
+}
+
+.profile-modal-confirm {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.profile-modal-confirm:hover {
+  background-color: #b91c1c;
+}
+
+@media (max-width: 700px) {
+  .profile-card {
+    padding: 20px;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    margin-top: 28px;
+  }
+  
+  .profile-error {
+  margin: 20px 0 0;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #b91c1c;
+  background-color: #fee2e2;
+  border-radius: 8px;
+}
+
+}
+
+/* Prieglaudos profilio papildymai */
+.profile-section-title {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.profile-section-title--spaced {
+  margin-top: 28px;
+}
+
+.profile-field-full {
+  grid-column: 1 / -1;
+}
+
+.profile-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.profile-field textarea:focus {
+  border-color: #5ea84f;
+  box-shadow: 0 0 0 3px rgba(94, 168, 79, 0.16);
+}
+
+.profile-actions--end {
+  justify-content: flex-end;
+  margin-top: 28px;
+}

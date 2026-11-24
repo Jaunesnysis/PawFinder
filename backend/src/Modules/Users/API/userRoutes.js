@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userService = require("../Application/userService");
 const jwt = require("jsonwebtoken");
+const authorizeUser = require('../../../Infrastructure/Middleware/authMiddleware');
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -95,6 +96,48 @@ router.get("/leaderboard", authenticateToken, async (req, res) => {
     res.json({ leaderboard });
   } catch (error) {
     console.error("[userRoutes GET /leaderboard]", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Gauti prisijungusio vartotojo profilio duomenis
+router.get("/me", authorizeUser, async (req, res) => {
+  try {
+    const user = await userService.getUserById(req.user.id);
+    if (!user) return res.status(404).json({ error: "Vartotojas nerastas." });
+    res.json(user);
+  } catch (error) {
+    console.error("[userRoutes GET /me]", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Atnaujinti prisijungusio vartotojo profilį
+router.put("/me", authorizeUser, async (req, res) => {
+  try {
+    const { name, surname, email, phone, birthDate, password } = req.body;
+    const updatedUser = await userService.updateProfile(req.user.id, {
+      name,
+      surname,
+      email,
+      phone,
+      birthDate,
+      password, // jei tuščias stringas – service/repository slaptažodžio nekeičia
+    });
+    res.json(updatedUser);
+  } catch (error) {
+    console.error("[userRoutes PUT /me]", error.message);
+    res.status(error.status || 400).json({ error: error.message });
+  }
+});
+
+// Ištrinti prisijungusio vartotojo paskyrą
+router.delete("/me", authorizeUser, async (req, res) => {
+  try {
+    await userService.deleteUser(req.user.id);
+    res.sendStatus(204);
+  } catch (error) {
+    console.error("[userRoutes DELETE /me]", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 });

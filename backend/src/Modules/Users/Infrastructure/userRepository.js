@@ -18,7 +18,7 @@ const findByEmail = async (email) => {
 };
 
 const findById = async (userId) => {
-  const query = "SELECT * FROM users WHERE user_id = $1";
+  const query = " SELECT user_id, name, surname, email, phone, city, points, role, shelter_id, to_char(birth_date, 'YYYY-MM-DD') AS birth_date FROM users WHERE user_id = $1";
 
   try {
     const result = await db.query(query, [userId]);
@@ -43,8 +43,10 @@ const update = async (user) => {
             phone = $4,
             city = $5,
             points = $6,
-            last_earned_at = $7
-        WHERE user_id = $8
+            last_earned_at = $7,
+            birth_date = $8,
+            password_hash = COALESCE($9, password_hash)
+        WHERE user_id = $10
         RETURNING *
     `;
   const values = [
@@ -55,11 +57,13 @@ const update = async (user) => {
     user.city,
     user.points,
     user.last_earned_at,
+    user.birthDate ?? user.birth_date,
+    user.password_hash || null,
     user.id,
   ];
   try {
     const result = await db.query(query, values);
-    return result.rows[0]; // Grąžiname atnaujintus duomenis patvirtinimui
+    return result.rows[0];
   } catch (error) {
     console.error("Klaida userRepository.update:", error);
     throw error;
@@ -110,4 +114,12 @@ const getShelterIdByUserId = async (userId) => {
     return result.rows[0]?.shelter_id ?? null;
 };
 
-module.exports = { update, findById, findByEmail, create, getTopUsersByPoints, getShelterIdByUserId };
+const deleteById = async (userId) => {
+  const result = await db.query(
+    "DELETE FROM users WHERE user_id = $1 RETURNING user_id",
+    [userId]
+  );
+  return result.rows[0] || null;
+};
+
+module.exports = { update, findById, findByEmail, create, getTopUsersByPoints, getShelterIdByUserId, deleteById };
