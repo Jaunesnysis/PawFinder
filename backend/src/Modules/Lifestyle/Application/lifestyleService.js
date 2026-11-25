@@ -1,6 +1,7 @@
 const lifestyleRepository = require("../Infrastructure/lifestyleRepository");
 const { LifestyleDescription } = require("../Domain/LifestyleDescription");
 const { Pet } = require("../../Animals/Domain/Pet");
+const aiService = require("../../AI/Application/aiService");
 
 // Prieglaudos gyvenimo būdo aprašymo nepildo
 const assertCanUseLifestyle = (user) => {
@@ -33,9 +34,9 @@ const getLifestyle = async (user) => {
 };
 
 /**
- * Išsaugo gyvenimo būdo aprašymą (AC2.2).
+ * Išsaugo gyvenimo būdo aprašymą (AC2.2) ir sugeneruoja vartotojo žymas DI pagalba (AC2.3).
  * Sutikimas tikrinamas kiekvieną kartą, bet DB nesaugomas.
- * AC2.3 (DI tagų generavimas) bus realizuota vėliau.
+ * DI klaida nesugadina išsaugojimo: tekstas lieka, grąžinamos tuščios žymos ir aiError.
  */
 const saveLifestyle = async (user, { description, consent } = {}) => {
   assertCanUseLifestyle(user);
@@ -49,18 +50,40 @@ const saveLifestyle = async (user, { description, consent } = {}) => {
   if (consent !== true) {
     throw {
       status: 400,
-      message: "Pažymėkite sutikimą, kad aprašymas būtų perduotas DI paslaugai.",
+      message:
+        "Pažymėkite sutikimą, kad aprašymas būtų perduotas DI paslaugai.",
     };
   }
 
-  const row = await lifestyleRepository.saveDescription(user.id, lifestyle.text);
+  const row = await lifestyleRepository.saveDescription(
+    user.id,
+    lifestyle.text,
+  );
   if (!row) throw { status: 404, message: "Vartotojas nerastas." };
+
+  let criteria = null;
+  let aiError = null;
+  try {
+    const analysis = await aiService.analyzeLifestyle(lifestyle.text);
+    criteria = analysis.criteria;
+    await lifestyleRepository.replaceUserTags(user.id, analysis.tags);
+  } catch (error) {
+    console.error(
+      "DI gyvenimo būdo analizė nepavyko:",
+      error.message,
+      error.detail || "",
+    );
+    aiError =
+      "Aprašymas išsaugotas, bet žymų sugeneruoti nepavyko. Bandykite išsaugoti dar kartą.";
+  }
 
   const tags = await lifestyleRepository.findTagNamesByUserId(user.id);
 
   return {
     description: row.life_description,
     tags,
+    criteria,
+    aiError,
   };
 };
 

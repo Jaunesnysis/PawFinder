@@ -11,7 +11,9 @@ const findDescriptionByUserId = async (userId) => {
     const result = await db.query(query, [userId]);
     return result.rows[0] || null;
   } catch (error) {
-    throw new Error(`[lifestyleRepository.findDescriptionByUserId] ${error.message}`);
+    throw new Error(
+      `[lifestyleRepository.findDescriptionByUserId] ${error.message}`,
+    );
   }
 };
 
@@ -28,7 +30,9 @@ const findTagNamesByUserId = async (userId) => {
     const result = await db.query(query, [userId]);
     return result.rows.map((row) => row.tag_name);
   } catch (error) {
-    throw new Error(`[lifestyleRepository.findTagNamesByUserId] ${error.message}`);
+    throw new Error(
+      `[lifestyleRepository.findTagNamesByUserId] ${error.message}`,
+    );
   }
 };
 
@@ -89,8 +93,28 @@ const findSuggestedPets = async (userId, limit = 20) => {
   }
 };
 
+/**
+ * Pakeičia vartotojo žymas DI sugeneruotomis. Žymos ieškomos pagal pavadinimą,
+ * nežinomi pavadinimai praleidžiami.
+ */
+const replaceUserTags = async (userId, tagNames = []) => {
+  try {
+    await db.query("DELETE FROM user_tag WHERE user_id = $1", [userId]);
+    if (tagNames.length === 0) return;
+
+    await db.query(
+      `INSERT INTO user_tag (user_id, tag_id)
+       SELECT DISTINCT $1::bigint, tag_id FROM tag WHERE tag_name = ANY($2::text[])`,
+      [userId, tagNames],
+    );
+  } catch (error) {
+    throw new Error(`[lifestyleRepository.replaceUserTags] ${error.message}`);
+  }
+};
+
 module.exports = {
   findDescriptionByUserId,
+  replaceUserTags,
   findTagNamesByUserId,
   saveDescription,
   findSuggestedPets,

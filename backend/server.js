@@ -16,7 +16,6 @@ const app = express();
 const PORT = process.env.PORT || 5050;
 
 const recommendationsController = require("./src/Modules/Recommendations/API/recommendations.controller");
-const animalsController = require("./src/Modules/Animals/API/animals.controller");
 const userRoutes = require("./src/Modules/Users/API/userRoutes");
 const authorizeUser = require('./src/Infrastructure/Middleware/authMiddleware');
 
@@ -67,10 +66,5 @@ io.on("connection", (socket) => {
 server.listen(PORT, () => {
   console.log(`Serveris paleistas ant porto ${PORT}`);
 });
-
-app.post(
-  "/api/animals/generate-description",
-  animalsController.generateDescription,
-);
 
 app.use("/api/achievements", achievementRoutes);
