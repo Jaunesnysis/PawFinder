@@ -58,6 +58,9 @@ app.use("/api/reservations", reservationRoutes);
 const lifestyleRoutes = require("./src/Modules/Lifestyle/API/lifestyleRoutes");
 app.use("/api/lifestyle", lifestyleRoutes);
 
+const feedbackRoutes = require("./src/Modules/Feedback/API/feedbackRoutes");
+app.use("/api/feedback", feedbackRoutes);
+
 io.on("connection", (socket) => {
   console.log(`Vartotojas prisijungė: ${socket.id}`);
 });

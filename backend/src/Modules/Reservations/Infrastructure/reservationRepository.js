@@ -115,6 +115,7 @@ const getReservationsByUserId = async (userId) => {
             r.reservation_start,
             r.reservation_end,
             r.status,
+            r.feedback_received,
             r.created_at,
             p.name AS pet_name,
             p.species AS pet_species,

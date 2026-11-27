@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CancelReservationModal from "../components/Reservation/CancelReservationModal";
+import FeedbackModal from "../components/Feedback/FeedbackModal";
 
 const API = "http://localhost:5050/api/reservations";
+const FEEDBACK_API = "http://localhost:5050/api/feedback";
 
 const STATUS_BADGES = {
   upcoming: {
@@ -45,6 +47,11 @@ const MyReservationsPage = () => {
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  // US-10: atsiliepimas po pavedžiojimo
+  const [feedbackTarget, setFeedbackTarget] = useState(null);
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+  const [feedbackError, setFeedbackError] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -177,6 +184,54 @@ const MyReservationsPage = () => {
     }
   };
 
+  const canLeaveFeedback = (reservation) =>
+    reservation.displayStatus === "completed" && !reservation.feedback_received;
+
+  const openFeedbackModal = (reservation) => {
+    setFeedbackError("");
+    setFeedbackTarget(reservation);
+  };
+
+  const handleFeedbackSubmit = async (content) => {
+    const token = localStorage.getItem("token");
+    setFeedbackSubmitting(true);
+    setFeedbackError("");
+
+    try {
+      const response = await fetch(FEEDBACK_API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          reservation_id: feedbackTarget.reservation_id,
+          content,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "Nepavyko pateikti atsiliepimo.");
+      }
+
+      setReservations((prev) =>
+        prev.map((r) =>
+          r.reservation_id === feedbackTarget.reservation_id
+            ? { ...r, feedback_received: true }
+            : r,
+        ),
+      );
+      setFeedbackTarget(null);
+      setSuccessMessage("Ačiū! Jūsų atsiliepimas gautas.");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (err) {
+      setFeedbackError(err.message);
+    } finally {
+      setFeedbackSubmitting(false);
+    }
+  };
+
   const formatTime = (r) => {
     const start = r.reservation_start?.slice(0, 5) || "";
     if (r.reservation_end) {
@@ -291,12 +346,12 @@ const MyReservationsPage = () => {
 
       {!error && (
         <div style={{ overflowX: "auto" }}>
-          <div style={{ minWidth: "700px" }}>
+          <div style={{ minWidth: "860px" }}>
             {/* Žalias headingas */}
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1.4fr 1.2fr 1fr 1fr 200px",
+                gridTemplateColumns: "1.4fr 1.2fr 1fr 1fr 110px 190px",
                 alignItems: "center",
                 gap: "12px",
                 backgroundColor: "#6aa84f",
@@ -312,6 +367,7 @@ const MyReservationsPage = () => {
               <span>Augintinis</span>
               <span>Data</span>
               <span>Laikas</span>
+              <span style={{ textAlign: "center" }}>Statusas</span>
               <span />
             </div>
 
@@ -338,7 +394,7 @@ const MyReservationsPage = () => {
                     key={r.reservation_id}
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "1.4fr 1.2fr 1fr 1fr 200px",
+                      gridTemplateColumns: "1.4fr 1.2fr 1fr 1fr 110px 190px",
                       alignItems: "center",
                       gap: "12px",
                       border: "1px solid #d1d5db",
@@ -355,8 +411,22 @@ const MyReservationsPage = () => {
                     <span>{r.pet_name}</span>
                     <span>{r.date}</span>
                     <span>{formatTime(r)}</span>
+                    <span style={{ display: "flex", justifyContent: "center" }}>
+                      <span
+                        style={{
+                          backgroundColor: badge.backgroundColor,
+                          color: badge.color,
+                          padding: "6px 14px",
+                          borderRadius: "999px",
+                          fontSize: "0.82rem",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {badge.label}
+                      </span>
+                    </span>
                     <span style={{ display: "flex", justifyContent: "flex-end" }}>
-                      {canCancel(r) ? (
+                      {canCancel(r) && (
                         <button
                           onClick={() => openCancelModal(r)}
                           style={{
@@ -373,18 +443,34 @@ const MyReservationsPage = () => {
                         >
                           Atšaukti rezervaciją
                         </button>
-                      ) : (
-                        <span
+                      )}
+                      {canLeaveFeedback(r) && (
+                        <button
+                          onClick={() => openFeedbackModal(r)}
                           style={{
-                            backgroundColor: badge.backgroundColor,
-                            color: badge.color,
-                            padding: "6px 14px",
-                            borderRadius: "999px",
-                            fontSize: "0.82rem",
+                            width: "100%",
+                            backgroundColor: "#6aa84f",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "10px 14px",
                             fontWeight: 700,
+                            fontSize: "0.9rem",
+                            cursor: "pointer",
                           }}
                         >
-                          {badge.label}
+                          Palikti atsiliepimą
+                        </button>
+                      )}
+                      {r.displayStatus === "completed" && r.feedback_received && (
+                        <span
+                          style={{
+                            fontSize: "0.85rem",
+                            fontWeight: 600,
+                            color: "#3f7a35",
+                          }}
+                        >
+                          Atsiliepimas paliktas
                         </span>
                       )}
                     </span>
@@ -403,6 +489,16 @@ const MyReservationsPage = () => {
           onClose={() => setCancelTarget(null)}
           loading={cancelling}
           error={cancelError}
+        />
+      )}
+
+      {feedbackTarget && (
+        <FeedbackModal
+          reservation={feedbackTarget}
+          onSubmit={handleFeedbackSubmit}
+          onClose={() => setFeedbackTarget(null)}
+          loading={feedbackSubmitting}
+          error={feedbackError}
         />
       )}
     </div>
