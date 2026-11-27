@@ -68,9 +68,13 @@ const saveDescription = async (userId, description) => {
   }
 };
 
+// Mažiausiai tiek bendrų žymų turi turėti gyvūnas ir vartotojas, kad gyvūnas būtų pasiūlytas.
+// Jei vartotojas turi mažiau žymų, reikalaujama, kad sutaptų visos jo žymos.
+const MIN_MATCHED_TAGS = 3;
+
 /**
- * Laisvi gyvūnai, turintys bent vieną bendrą tagą su vartotoju.
- * Pirmiausia tie, kurių sutampa daugiausia tagų.
+ * Gyvūnai pagal bendrus vartotojo ir gyvūno tagus (user_tag ↔ pet_tag).
+ * Rikiuojama pagal sutapusių tagų skaičių, tada pagal naujumą.
  */
 const findSuggestedPets = async (userId, limit = 20) => {
   const query = `
@@ -81,12 +85,16 @@ const findSuggestedPets = async (userId, limit = 20) => {
     WHERE ut.user_id = $1
       AND p.status = 'available'
     GROUP BY p.pet_id
+    HAVING COUNT(*) >= LEAST(
+      $3::int,
+      (SELECT COUNT(*) FROM user_tag WHERE user_id = $1)
+    )
     ORDER BY matched_tags DESC, p.created_at DESC
     LIMIT $2
   `;
 
   try {
-    const result = await db.query(query, [userId, limit]);
+    const result = await db.query(query, [userId, limit, MIN_MATCHED_TAGS]);
     return result.rows;
   } catch (error) {
     throw new Error(`[lifestyleRepository.findSuggestedPets] ${error.message}`);

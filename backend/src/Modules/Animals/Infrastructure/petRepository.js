@@ -473,8 +473,25 @@ const saveAiProfile = async (petId, description, tagNames) => {
     );
   }
 };
+// Gyvūno žymų pavadinimai (pet_tag -> tag)
+const findTagNamesByPetId = async (petId) => {
+  try {
+    const result = await db.query(
+      `SELECT t.tag_name
+       FROM pet_tag pt
+       JOIN tag t ON t.tag_id = pt.tag_id
+       WHERE pt.pet_id = $1
+       ORDER BY t.tag_name`,
+      [petId],
+    );
+    return result.rows.map((row) => row.tag_name);
+  } catch (error) {
+    throw new Error(`[petRepository.findTagNamesByPetId] ${error.message}`);
+  }
+};
 
 module.exports = {
+  findTagNamesByPetId,
   findAvailableByCity,
   getAllAvailablePets,
   findAvailableByShelterId,
