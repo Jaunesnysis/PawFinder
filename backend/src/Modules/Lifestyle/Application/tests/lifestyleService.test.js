@@ -1,7 +1,9 @@
 jest.mock("../../../../Infrastructure/db", () => ({ query: jest.fn() }));
 jest.mock("../../Infrastructure/lifestyleRepository");
+jest.mock("../../../AI/Application/aiService");
 
 const lifestyleRepository = require("../../Infrastructure/lifestyleRepository");
+const aiService = require("../../../AI/Application/aiService");
 const lifestyleService = require("../lifestyleService");
 const { MIN_LENGTH } = require("../../Domain/LifestyleDescription");
 
@@ -24,7 +26,9 @@ describe("lifestyleService (US-02)", () => {
 
       const result = await lifestyleService.getLifestyle(volunteer);
 
-      expect(lifestyleRepository.findDescriptionByUserId).toHaveBeenCalledWith(7);
+      expect(lifestyleRepository.findDescriptionByUserId).toHaveBeenCalledWith(
+        7,
+      );
       expect(result).toEqual({ description: null, tags: [] });
     });
 
@@ -33,23 +37,35 @@ describe("lifestyleService (US-02)", () => {
         user_id: 7,
         life_description: validText.trim(),
       });
-      lifestyleRepository.findTagNamesByUserId.mockResolvedValue(["butas", "ramus"]);
+      lifestyleRepository.findTagNamesByUserId.mockResolvedValue([
+        "butas",
+        "ramus",
+      ]);
 
       const result = await lifestyleService.getLifestyle(volunteer);
 
-      expect(result).toEqual({ description: validText.trim(), tags: ["butas", "ramus"] });
+      expect(result).toEqual({
+        description: validText.trim(),
+        tags: ["butas", "ramus"],
+      });
     });
 
     test("prieglaudai grąžina 403", async () => {
-      await expect(lifestyleService.getLifestyle(shelter)).rejects.toMatchObject({
+      await expect(
+        lifestyleService.getLifestyle(shelter),
+      ).rejects.toMatchObject({
         status: 403,
       });
-      expect(lifestyleRepository.findDescriptionByUserId).not.toHaveBeenCalled();
+      expect(
+        lifestyleRepository.findDescriptionByUserId,
+      ).not.toHaveBeenCalled();
     });
 
     test("grąžina 404, kai vartotojo nėra", async () => {
       lifestyleRepository.findDescriptionByUserId.mockResolvedValue(null);
-      await expect(lifestyleService.getLifestyle(volunteer)).rejects.toMatchObject({
+      await expect(
+        lifestyleService.getLifestyle(volunteer),
+      ).rejects.toMatchObject({
         status: 404,
       });
     });
@@ -68,13 +84,79 @@ describe("lifestyleService (US-02)", () => {
         consent: true,
       });
 
-      expect(lifestyleRepository.saveDescription).toHaveBeenCalledWith(7, validText.trim());
-      expect(result).toEqual({ description: validText.trim(), tags: [] });
+      expect(lifestyleRepository.saveDescription).toHaveBeenCalledWith(
+        7,
+        validText.trim(),
+      );
+      expect(result).toMatchObject({ description: validText.trim(), tags: [] });
+    });
+
+    test("DI žymos išsaugomos vartotojui (AC2.3)", async () => {
+      const criteria = {
+        species: "Šuo",
+        size: null,
+        activityLevel: "high",
+        hasChildren: true,
+        hasOtherPets: false,
+        livingSpace: "house",
+      };
+      lifestyleRepository.saveDescription.mockResolvedValue({
+        user_id: 7,
+        life_description: validText.trim(),
+      });
+      aiService.analyzeLifestyle.mockResolvedValue({
+        criteria,
+        tags: ["ACTIVE", "FRIENDLY"],
+      });
+      lifestyleRepository.findTagNamesByUserId.mockResolvedValue([
+        "ACTIVE",
+        "FRIENDLY",
+      ]);
+
+      const result = await lifestyleService.saveLifestyle(volunteer, {
+        description: validText,
+        consent: true,
+      });
+
+      expect(aiService.analyzeLifestyle).toHaveBeenCalledWith(validText.trim());
+      expect(lifestyleRepository.replaceUserTags).toHaveBeenCalledWith(7, [
+        "ACTIVE",
+        "FRIENDLY",
+      ]);
+      expect(result).toEqual({
+        description: validText.trim(),
+        tags: ["ACTIVE", "FRIENDLY"],
+        criteria,
+        aiError: null,
+      });
+    });
+
+    test("DI klaida nesugadina išsaugojimo", async () => {
+      lifestyleRepository.saveDescription.mockResolvedValue({
+        user_id: 7,
+        life_description: validText.trim(),
+      });
+      aiService.analyzeLifestyle.mockRejectedValue(
+        new Error("DI paslauga šiuo metu nepasiekiama."),
+      );
+      lifestyleRepository.findTagNamesByUserId.mockResolvedValue([]);
+
+      const result = await lifestyleService.saveLifestyle(volunteer, {
+        description: validText,
+        consent: true,
+      });
+
+      expect(lifestyleRepository.replaceUserTags).not.toHaveBeenCalled();
+      expect(result.tags).toEqual([]);
+      expect(result.aiError).toMatch(/nepavyko/);
     });
 
     test("neišsaugo tuščio aprašymo", async () => {
       await expect(
-        lifestyleService.saveLifestyle(volunteer, { description: "", consent: true }),
+        lifestyleService.saveLifestyle(volunteer, {
+          description: "",
+          consent: true,
+        }),
       ).rejects.toMatchObject({ status: 400 });
       expect(lifestyleRepository.saveDescription).not.toHaveBeenCalled();
     });
@@ -85,7 +167,10 @@ describe("lifestyleService (US-02)", () => {
           description: "a".repeat(MIN_LENGTH - 1),
           consent: true,
         }),
-      ).rejects.toMatchObject({ status: 400, message: expect.stringMatching(/per trumpas/) });
+      ).rejects.toMatchObject({
+        status: 400,
+        message: expect.stringMatching(/per trumpas/),
+      });
       expect(lifestyleRepository.saveDescription).not.toHaveBeenCalled();
     });
 
@@ -95,20 +180,29 @@ describe("lifestyleService (US-02)", () => {
           description: "a".repeat(2001),
           consent: true,
         }),
-      ).rejects.toMatchObject({ status: 400, message: expect.stringMatching(/per ilgas/) });
+      ).rejects.toMatchObject({
+        status: 400,
+        message: expect.stringMatching(/per ilgas/),
+      });
       expect(lifestyleRepository.saveDescription).not.toHaveBeenCalled();
     });
 
     test("neišsaugo be sutikimo", async () => {
       await expect(
         lifestyleService.saveLifestyle(volunteer, { description: validText }),
-      ).rejects.toMatchObject({ status: 400, message: expect.stringMatching(/sutikimą/) });
+      ).rejects.toMatchObject({
+        status: 400,
+        message: expect.stringMatching(/sutikimą/),
+      });
       expect(lifestyleRepository.saveDescription).not.toHaveBeenCalled();
     });
 
     test("prieglauda negali išsaugoti aprašymo", async () => {
       await expect(
-        lifestyleService.saveLifestyle(shelter, { description: validText, consent: true }),
+        lifestyleService.saveLifestyle(shelter, {
+          description: validText,
+          consent: true,
+        }),
       ).rejects.toMatchObject({ status: 403 });
     });
 
@@ -118,7 +212,10 @@ describe("lifestyleService (US-02)", () => {
       );
 
       await expect(
-        lifestyleService.saveLifestyle(volunteer, { description: validText, consent: true }),
+        lifestyleService.saveLifestyle(volunteer, {
+          description: validText,
+          consent: true,
+        }),
       ).rejects.toThrow("connection lost");
     });
   });
@@ -126,8 +223,20 @@ describe("lifestyleService (US-02)", () => {
   describe("getSuggestedPets", () => {
     test("grąžina gyvūnus su id ir sutapusių tagų skaičiumi", async () => {
       lifestyleRepository.findSuggestedPets.mockResolvedValue([
-        { pet_id: 5, name: "Mika", species: "Katė", status: "available", matched_tags: 3 },
-        { pet_id: 2, name: "Rikis", species: "Šuo", status: "available", matched_tags: 1 },
+        {
+          pet_id: 5,
+          name: "Mika",
+          species: "Katė",
+          status: "available",
+          matched_tags: 3,
+        },
+        {
+          pet_id: 2,
+          name: "Rikis",
+          species: "Šuo",
+          status: "available",
+          matched_tags: 1,
+        },
       ]);
 
       const result = await lifestyleService.getSuggestedPets(volunteer);
@@ -140,7 +249,9 @@ describe("lifestyleService (US-02)", () => {
     });
 
     test("prieglaudai grąžina 403", async () => {
-      await expect(lifestyleService.getSuggestedPets(shelter)).rejects.toMatchObject({
+      await expect(
+        lifestyleService.getSuggestedPets(shelter),
+      ).rejects.toMatchObject({
         status: 403,
       });
     });
