@@ -57,6 +57,7 @@ describe('shelterService', () => {
                 name: 'Pagalba uodegėlėms',
                 description: 'A welcoming shelter in Vilnius focused on socializing dogs and cats for adoption',
                 city: 'Vilnius',
+                donation_account: null,
                 contact: {
                     email: 'nfo@vilniusshelter.lt',
                     phone: '+370 612 34567',
